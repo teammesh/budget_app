@@ -4,6 +4,8 @@ import { persist } from "zustand/middleware";
 interface SessionStoreState {
 	transactions: [];
 	setTransactions: (x: []) => void;
+	transactionCursor: string | null;
+	setTransactionCursor: (x: string) => void;
 	accounts: [];
 	setAccounts: (x: []) => void;
 }
@@ -13,6 +15,8 @@ export const sessionStore = create<SessionStoreState>(
 		(set, get) => ({
 			transactions: [],
 			setTransactions: (x) => set(() => ({ transactions: x })),
+			transactionCursor: null,
+			setTransactionCursor: (x) => set(() => ({ transactionCursor: x })),
 			accounts: [],
 			setAccounts: (x) => set(() => ({ accounts: x })),
 		}),

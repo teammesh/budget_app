@@ -1,8 +1,5 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { supabase } from "@/utils/supabaseClient";
-import Auth from "@/components/Auth";
-import Account from "@/components/Account";
-import { PlaidLink } from "@/components/PlaidLink";
 import { sessionStore } from "@/utils/store";
 import { isEmpty, reverse, sort } from "ramda";
 
@@ -11,6 +8,8 @@ export default function Transactions() {
 	const setAccounts = sessionStore.getState().setAccounts;
 	const transactions = sessionStore((state) => state.transactions);
 	const setTransactions = sessionStore.getState().setTransactions;
+	const transactionCursor = sessionStore.getState().transactionCursor;
+	const setTransactionCursor = sessionStore.getState().setTransactionCursor;
 
 	useEffect(() => {
 		const profile_id = supabase.auth.session()?.user?.id;
@@ -31,6 +30,7 @@ export default function Transactions() {
 			method: "post",
 			body: JSON.stringify({
 				access_token,
+				transactionCursor,
 			}),
 		})
 			.then((res) => res.json())
@@ -40,6 +40,7 @@ export default function Transactions() {
 					return new Date(a.date).getTime() - new Date(b.date).getTime();
 				};
 
+				setTransactionCursor(data.next_cursor);
 				setTransactions(reverse(sort(diff, data.added)));
 			});
 	};
@@ -73,7 +74,9 @@ export default function Transactions() {
 			{!isEmpty(accounts) &&
 				accounts.map((x) => (
 					<div
-						className={"p-3 text-purple-400 hover:text-purple-100 cursor-pointer"}
+						className={
+							"p-3 text-purple-400 hover:text-purple-100 cursor-pointer bg-purple-100 border-2"
+						}
 						onClick={() => getTransactions(x.access_token)}
 						key={x.item_id}
 					>
