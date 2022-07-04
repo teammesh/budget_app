@@ -47,6 +47,7 @@
 		"sort-keys": ["off"],
 		"space-before-function-paren": ["off"],
 		"indent": ["off"],
-		"react/display-name": "off"
+		"react/display-name": "off",
+		"react/react-in-jsx-scope": "off"
 	}
 }
