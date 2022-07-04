@@ -2,6 +2,8 @@ import { useEffect } from "react";
 import { supabase } from "@/utils/supabaseClient";
 import { sessionStore } from "@/utils/store";
 import { isEmpty, reverse, sort } from "ramda";
+import { Transaction } from "plaid";
+import { ItemPublicTokenExchangeResponse } from "plaid/api";
 
 export default function Transactions() {
 	const accounts = sessionStore((state) => state.accounts);
@@ -25,7 +27,7 @@ export default function Transactions() {
 		if (accounts.length === 0) return;
 	}, [accounts]);
 
-	const getTransactions = (access_token) => {
+	const getTransactions = (access_token: ItemPublicTokenExchangeResponse["access_token"]) => {
 		fetch("/api/plaidGetTransactions", {
 			method: "post",
 			body: JSON.stringify({
@@ -41,10 +43,13 @@ export default function Transactions() {
 				};
 
 				setTransactionCursor(data.next_cursor);
-				setTransactions(reverse(sort(diff, data.added)));
+				setTransactions(reverse(sort(diff, [...transactions, ...data.added])));
 			});
 	};
 
+	const addTransactionToGroup = (transactionId: string, amount: number) => {
+		console.log("test");
+	};
 	// account_id: '9a1a4NRBPAHKNJVbv7z8hGX9KkkBBnIV4r3bN',
 	// account_owner: null,
 	// amount: 5.4,
@@ -72,7 +77,7 @@ export default function Transactions() {
 	return (
 		<>
 			{!isEmpty(accounts) &&
-				accounts.map((x) => (
+				accounts.map((x: ItemPublicTokenExchangeResponse) => (
 					<div
 						className={
 							"p-3 text-purple-400 hover:text-purple-100 cursor-pointer bg-purple-100 border-2"
@@ -84,14 +89,17 @@ export default function Transactions() {
 					</div>
 				))}
 			<div>
-				<div className={"text-lg font-semibold"}>Transactions</div>
+				<div className={"text-lg font-semibold"}>Transactions {transactions.length}</div>
 				{!isEmpty(transactions) &&
-					transactions.map((x) => (
-						<div key={x.transaction_id} className={"grid grid-cols-4"}>
+					transactions.map((x: Transaction) => (
+						<div key={x.transaction_id} className={"grid grid-cols-5"}>
 							<div>{x.authorized_date}</div>
 							<div>{x.merchant_name}</div>
 							<div>{x.name}</div>
 							<div>{x.amount}</div>
+							<button onClick={() => addTransactionToGroup(x.transaction_id, x.amount)}>
+								Add to group
+							</button>
 						</div>
 					))}
 			</div>
