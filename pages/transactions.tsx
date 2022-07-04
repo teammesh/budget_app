@@ -4,7 +4,7 @@ import Auth from "@/components/Auth";
 import Account from "@/components/Account";
 import { PlaidLink } from "@/components/PlaidLink";
 import { sessionStore } from "@/utils/store";
-import { isEmpty } from "ramda";
+import { isEmpty, reverse, sort } from "ramda";
 
 export default function Transactions() {
 	const accounts = sessionStore((state) => state.accounts);
@@ -23,7 +23,6 @@ export default function Transactions() {
 	}, []);
 
 	useEffect(() => {
-		console.log(accounts);
 		if (accounts.length === 0) return;
 	}, [accounts]);
 
@@ -37,7 +36,11 @@ export default function Transactions() {
 			.then((res) => res.json())
 			.then((data) => {
 				console.log(data);
-				setTransactions(data.added);
+				const diff = function (a, b) {
+					return new Date(a.date).getTime() - new Date(b.date).getTime();
+				};
+
+				setTransactions(reverse(sort(diff, data.added)));
 			});
 	};
 
