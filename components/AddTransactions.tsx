@@ -9,10 +9,11 @@ import { PlaidLink } from "@/components/PlaidLink";
 
 export default function AddTransactions({ gid }: { gid: string }) {
 	const [showAccounts, setShowAccounts] = useState<string[]>([]);
+	const [transactions, setTransactions] = useState([]);
 	const accounts = sessionStore((state) => state.accounts);
 	const setAccounts = sessionStore.getState().setAccounts;
-	const transactions = sessionStore((state) => state.transactions);
-	const setTransactions = sessionStore.getState().setTransactions;
+	// const transactions = sessionStore((state) => state.transactions);
+	// const setTransactions = sessionStore.getState().setTransactions;
 	const transactionCursor = sessionStore.getState().transactionCursor;
 	const setTransactionCursor = sessionStore.getState().setTransactionCursor;
 
@@ -24,9 +25,11 @@ export default function AddTransactions({ gid }: { gid: string }) {
 			.select()
 			.eq("profile_id", profile_id)
 			.then(async ({ data, error }) => {
-				setAccounts(data);
-				await getTransactions(data[0].access_token, data[0].account_id);
-				setShowAccounts([data[0].access_token]);
+				if (!isEmpty(data)) {
+					setAccounts(data);
+					await getTransactions(data[0].access_token, data[0].account_id);
+					setShowAccounts([data[0].access_token]);
+				}
 			});
 	}, []);
 
@@ -49,7 +52,6 @@ export default function AddTransactions({ gid }: { gid: string }) {
 			}),
 		}).then((res) => res.json());
 
-		console.log(data);
 		const diff = function (a, b) {
 			return new Date(a.date).getTime() - new Date(b.date).getTime();
 		};
@@ -58,15 +60,7 @@ export default function AddTransactions({ gid }: { gid: string }) {
 		setShowAccounts([...showAccounts, access_token]);
 		setTransactions(reverse(sort(diff, [...transactions, ...data.added])));
 
-		// store account_id from list of transactions
-		if (!account_id) {
-			const { data: plaidItems, error } = await supabase
-				.from("plaid_items")
-				.update({ account_id: data.added[0].account_id })
-				.eq("access_token", access_token);
-			setAccounts([...accounts.filter((x) => x.access_token !== access_token), plaidItems[0]]);
-		}
-
+		console.log(data);
 		return;
 	};
 
@@ -110,7 +104,7 @@ export default function AddTransactions({ gid }: { gid: string }) {
 						onClick={() => getTransactions(x.access_token, x.account_id)}
 						key={x.item_id}
 					>
-						{x.item_id}
+						{x.name}
 					</div>
 				))}
 			<div>

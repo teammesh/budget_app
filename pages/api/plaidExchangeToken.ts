@@ -28,11 +28,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 	const accessToken = response.data.access_token;
 	const itemID = response.data.item_id;
 
-	// const auth = await client.authGet({ access_token: accessToken });
+	const balance = await client.accountsBalanceGet({ access_token: accessToken });
 
-	const { data, error } = await supabaseService
-		.from("plaid_items")
-		.insert({ profile_id, access_token: accessToken, item_id: itemID });
+	const { data, error } = await supabaseService.from("plaid_items").insert({
+		profile_id,
+		access_token: accessToken,
+		item_id: itemID,
+		account_id: balance.data.accounts[0].account_id,
+		last_four_digits: balance.data.accounts[0].mask,
+		name: balance.data.accounts[0].name,
+	});
 
 	res.status(200).json({ data, error });
 }
