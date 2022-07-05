@@ -1,12 +1,13 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/utils/supabaseClient";
 import { sessionStore } from "@/utils/store";
-import { isEmpty, reverse, sort } from "ramda";
+import { findIndex, isEmpty, remove, reverse, sort } from "ramda";
 import { Transaction } from "plaid";
 import { ItemPublicTokenExchangeResponse } from "plaid/api";
 import { Button } from "@chakra-ui/react";
 
 export default function AddTransactions({ gid }: { gid: string }) {
+	const [showAccounts, setShowAccounts] = useState<string[]>([]);
 	const accounts = sessionStore((state) => state.accounts);
 	const setAccounts = sessionStore.getState().setAccounts;
 	const transactions = sessionStore((state) => state.transactions);
@@ -28,12 +29,23 @@ export default function AddTransactions({ gid }: { gid: string }) {
 		if (accounts.length === 0) return;
 	}, [accounts]);
 
-	const getTransactions = (access_token: ItemPublicTokenExchangeResponse["access_token"]) => {
+	const getTransactions = (
+		access_token: ItemPublicTokenExchangeResponse["access_token"],
+		item_id: ItemPublicTokenExchangeResponse["item_id"],
+	) => {
+		if (showAccounts.includes(access_token)) {
+			const acc = findIndex((x) => x === access_token);
+			setShowAccounts(remove(acc, 1, showAccounts));
+			return setTransactions(transactions.filter((x) => x.account_id !== item_id));
+		}
+
+		const cursor = transactionCursor?.access_token;
+
 		fetch("/api/plaidGetTransactions", {
 			method: "post",
 			body: JSON.stringify({
 				access_token,
-				transactionCursor,
+				cursor,
 			}),
 		})
 			.then((res) => res.json())
@@ -43,7 +55,8 @@ export default function AddTransactions({ gid }: { gid: string }) {
 					return new Date(a.date).getTime() - new Date(b.date).getTime();
 				};
 
-				setTransactionCursor(data.next_cursor);
+				setTransactionCursor({ [access_token]: data.next_cursor });
+				setShowAccounts([...showAccounts, access_token]);
 				setTransactions(reverse(sort(diff, [...transactions, ...data.added])));
 			});
 	};
@@ -51,6 +64,7 @@ export default function AddTransactions({ gid }: { gid: string }) {
 	const addTransactionToGroup = (transactionId: string, amount: number) => {
 		console.log(`${transactionId}: ${amount}`);
 	};
+
 	// account_id: '9a1a4NRBPAHKNJVbv7z8hGX9KkkBBnIV4r3bN',
 	// account_owner: null,
 	// amount: 5.4,
@@ -83,7 +97,7 @@ export default function AddTransactions({ gid }: { gid: string }) {
 						className={
 							"p-3 text-purple-400 hover:text-purple-100 cursor-pointer bg-purple-100 border-2"
 						}
-						onClick={() => getTransactions(x.access_token)}
+						onClick={() => getTransactions(x.access_token, x.item_id)}
 						key={x.item_id}
 					>
 						{x.item_id}

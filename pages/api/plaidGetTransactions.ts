@@ -21,11 +21,11 @@ const configuration = new Configuration({
 const client = new PlaidApi(configuration);
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-	const { access_token, transactionCursor } = JSON.parse(req.body);
+	const { access_token, cursor } = JSON.parse(req.body);
 
 	const request: TransactionsSyncRequest = {
 		access_token,
-		cursor: transactionCursor,
+		cursor,
 	};
 	const response = await client.transactionsSync(request);
 	const data = response.data;

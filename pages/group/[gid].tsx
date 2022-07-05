@@ -10,19 +10,20 @@ const Group = () => {
 	const { gid }: { gid: string } = router.query;
 
 	const [showAddTransactions, setShowAddTransactions] = useState(false);
+	const [sharedTransactions, setSharedTransactions] = useState([]);
 	const transactions = sessionStore((state) => state.transactions);
 	const setTransactions = sessionStore.getState().setTransactions;
 
 	useEffect(() => {
 		if (!gid) return;
 		supabase
-			.from("marked_transactions")
+			.from("shared_transactions")
 			.select()
 			.eq("group_id", gid)
-			.then(({ data, error }) => setTransactions({ ...transactions, [gid]: data }));
+			.then(({ data, error }) => setSharedTransactions(data));
 
 		supabase
-			.from(`marked_transactions:group_id=eq.${gid}`)
+			.from(`shared_transactions:group_id=eq.${gid}`)
 			.on("*", (payload) => {
 				console.log("Change received!", payload);
 			})
@@ -36,8 +37,8 @@ const Group = () => {
 	return (
 		<div>
 			<p>Group: {gid}</p>
-			<Button>Add transactions</Button>
-			{/* <AddTransactions gid={gid} /> */}
+			<Button onClick={addTransactions}>Add transactions</Button>
+			{showAddTransactions && <AddTransactions gid={gid} />}
 		</div>
 	);
 };
