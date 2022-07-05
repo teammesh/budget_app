@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/utils/supabaseClient";
 import { sessionStore } from "@/utils/store";
 import { Button } from "@chakra-ui/react";
+import AddTransactions from "@/components/AddTransactions";
 
 const Group = () => {
 	const router = useRouter();
@@ -36,6 +37,7 @@ const Group = () => {
 		<div>
 			<p>Group: {gid}</p>
 			<Button>Add transactions</Button>
+			{/* <AddTransactions gid={gid} /> */}
 		</div>
 	);
 };
