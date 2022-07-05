@@ -9,24 +9,21 @@ import { PlaidLink } from "@/components/PlaidLink";
 import { sortByDate } from "@/utils/helper";
 
 export default function AddTransactions({ gid }: { gid: string }) {
-	const [showAccounts, setShowAccounts] = useState<string[]>([]);
-	const [transactions, setTransactions] = useState([]);
+	const [showAccounts, setShowAccounts] = useState<any>([]);
+	const [transactions, setTransactions] = useState<any>([]);
 	const accounts = sessionStore((state) => state.accounts);
 	const setAccounts = sessionStore.getState().setAccounts;
-	// const transactions = sessionStore((state) => state.transactions);
-	// const setTransactions = sessionStore.getState().setTransactions;
 	const transactionCursor = sessionStore.getState().transactionCursor;
 	const setTransactionCursor = sessionStore.getState().setTransactionCursor;
 
 	useEffect(() => {
 		const profile_id = supabase.auth.session()?.user?.id;
-		setTransactions([]);
 		supabase
 			.from("plaid_items")
 			.select()
 			.eq("profile_id", profile_id)
 			.then(async ({ data, error }) => {
-				if (!isEmpty(data)) {
+				if (!isEmpty(data) && data) {
 					setAccounts(data);
 					// fetch transactions for the first pm and display them
 					await getTransactions(data[0].access_token, data[0].account_id);
@@ -42,7 +39,7 @@ export default function AddTransactions({ gid }: { gid: string }) {
 		// hide transactions for the pm if it is toggled again
 		if (showAccounts.includes(access_token)) {
 			setShowAccounts(without([access_token], showAccounts));
-			return setTransactions(transactions.filter((x) => x.account_id !== account_id));
+			return setTransactions(transactions.filter((x: Transaction) => x.account_id !== account_id));
 		}
 
 		const cursor = transactionCursor?.access_token;
@@ -111,7 +108,7 @@ export default function AddTransactions({ gid }: { gid: string }) {
 				{!isEmpty(transactions) &&
 					transactions.map((x: Transaction) => (
 						<div key={x.transaction_id} className={"grid grid-cols-5"}>
-							<div>{x.authorized_date}</div>
+							<div>{x.date}</div>
 							<div>{x.merchant_name}</div>
 							<div>{x.name}</div>
 							<div>{x.amount}</div>

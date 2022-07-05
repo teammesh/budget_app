@@ -4,10 +4,10 @@ import { persist } from "zustand/middleware";
 interface SessionStoreState {
 	transactions: any;
 	setTransactions: (x: any) => void;
-	transactionCursor: {};
+	transactionCursor: Record<string, unknown>;
 	setTransactionCursor: (x: any) => void;
-	accounts: [];
-	setAccounts: (x: []) => void;
+	accounts: any[];
+	setAccounts: (x: any[]) => void;
 }
 
 export const sessionStore = create<SessionStoreState>(
