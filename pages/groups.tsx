@@ -1,20 +1,6 @@
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { supabase, supabaseQuery } from "@/utils/supabaseClient";
 import { displayAmount } from "@/components/Amount";
-import {
-	Button,
-	FormControl,
-	FormLabel,
-	Input,
-	Modal,
-	ModalBody,
-	ModalCloseButton,
-	ModalContent,
-	ModalFooter,
-	ModalHeader,
-	ModalOverlay,
-	useDisclosure,
-} from "@chakra-ui/react";
 import Link from "next/link";
 import { tempStore } from "@/utils/store";
 import { isNil } from "ramda";
@@ -120,7 +106,7 @@ export default function Groups() {
 				)}
 			</div>
 			<div className="flex justify-center">
-				<Button onClick={onOpen}>Create Group</Button>
+				<button onClick={onOpen}>Create Group</button>
 			</div>
 
 			<Modal
@@ -153,7 +139,7 @@ export default function Groups() {
 					</ModalBody>
 
 					<ModalFooter>
-						<Button
+						<button
 							colorScheme="blue"
 							mr={3}
 							onClick={() => {
@@ -162,8 +148,8 @@ export default function Groups() {
 							}}
 						>
 							Save
-						</Button>
-						<Button onClick={onClose}>Cancel</Button>
+						</button>
+						<button onClick={onClose}>Cancel</button>
 					</ModalFooter>
 				</ModalContent>
 			</Modal>

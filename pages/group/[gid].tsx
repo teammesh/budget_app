@@ -1,7 +1,6 @@
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { supabase, supabaseQuery } from "@/utils/supabaseClient";
-import { Button } from "@chakra-ui/react";
 import AddTransactions from "@/components/AddTransactions";
 import { isEmpty } from "ramda";
 import { Transaction } from "plaid";
@@ -86,7 +85,7 @@ const Group = () => {
 					</Link>
 				))}
 
-			<Button onClick={addTransactions}>Add transactions</Button>
+			<button onClick={addTransactions}>Add transactions</button>
 			{showAddTransactions && <AddTransactions gid={gid} sharedTransactions={sharedTransactions} />}
 		</div>
 	);

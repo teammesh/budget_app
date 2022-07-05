@@ -1,10 +1,9 @@
 import { useEffect, useState } from "react";
 import { supabase, supabaseQuery } from "@/utils/supabaseClient";
 import { sessionStore } from "@/utils/store";
-import { isEmpty, pick, reverse, sort, without } from "ramda";
+import { isEmpty, pick, reverse, without } from "ramda";
 import { Transaction } from "plaid";
 import { ItemPublicTokenExchangeResponse } from "plaid/api";
-import { Button } from "@chakra-ui/react";
 import { PlaidLink } from "@/components/PlaidLink";
 import { sortByDate } from "@/utils/helper";
 
@@ -142,9 +141,9 @@ export default function AddTransactions({
 							<div>{x.name}</div>
 							<div>{x.amount}</div>
 							{sharedTransactions.find((y) => x.transaction_id === y.transaction_id) ? (
-								<Button onClick={() => console.log("added already")}>Added!</Button>
+								<button onClick={() => console.log("added already")}>Added!</button>
 							) : (
-								<Button onClick={() => shareTransaction(x)}>Add to group</Button>
+								<button onClick={() => shareTransaction(x)}>Add to group</button>
 							)}
 						</div>
 					))}

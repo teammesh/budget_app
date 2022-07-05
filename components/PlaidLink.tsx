@@ -2,7 +2,6 @@ import { PlaidLinkOptions, usePlaidLink } from "react-plaid-link";
 import { supabase } from "@/utils/supabaseClient";
 import { useEffect, useState } from "react";
 import { sessionStore } from "@/utils/store";
-import { Button } from "@chakra-ui/react";
 
 export function PlaidLink() {
 	const [linkToken, setLinkToken] = useState("");
@@ -46,12 +45,12 @@ export function PlaidLink() {
 
 	const { open, exit, ready } = usePlaidLink(config);
 	return (
-		<Button
+		<button
 			onClick={(e) => {
 				open();
 			}}
 		>
 			Add payment source
-		</Button>
+		</button>
 	);
 }
