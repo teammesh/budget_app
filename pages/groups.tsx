@@ -4,9 +4,58 @@ import { displayAmount } from "@/components/Amount";
 import Link from "next/link";
 import { tempStore } from "@/utils/store";
 import { isNil } from "ramda";
+import * as Dialog from "@radix-ui/react-dialog";
+import { keyframes, styled } from "@stitches/react";
+import theme from "@/styles/theme";
+import { Input } from "@/components/Input";
+
+const overlayShow = keyframes({
+	"0%": { opacity: 0 },
+	"100%": { opacity: 1 },
+});
+
+const contentShow = keyframes({
+	"0%": { opacity: 0, transform: "translate(-50%, -48%) scale(.96)" },
+	"100%": { opacity: 1, transform: "translate(-50%, -50%) scale(1)" },
+});
+
+const StyledOverlay = styled(Dialog.Overlay, {
+	backgroundColor: theme.colors.overlayBg,
+	position: "fixed",
+	inset: 0,
+	"@media (prefers-reduced-motion: no-preference)": {
+		animation: `${overlayShow} 150ms cubic-bezier(0.16, 1, 0.3, 1) forwards`,
+	},
+});
+
+const StyledContent = styled(Dialog.Content, {
+	backgroundColor: "white",
+	borderRadius: 6,
+	boxShadow: "hsl(206 22% 7% / 35%) 0px 10px 38px -10px, hsl(206 22% 7% / 20%) 0px 10px 20px -15px",
+	position: "fixed",
+	top: "50%",
+	left: "50%",
+	transform: "translate(-50%, -50%)",
+	width: "90vw",
+	maxWidth: "450px",
+	maxHeight: "85vh",
+	padding: 25,
+	"@media (prefers-reduced-motion: no-preference)": {
+		animation: `${contentShow} 150ms cubic-bezier(0.16, 1, 0.3, 1) forwards`,
+	},
+	"&:focus": { outline: "none" },
+});
+
+function Content({ children, ...props }) {
+	return (
+		<Dialog.Portal>
+			<StyledOverlay />
+			<StyledContent {...props}>{children}</StyledContent>
+		</Dialog.Portal>
+	);
+}
 
 export default function Groups() {
-	const { isOpen, onOpen, onClose } = useDisclosure();
 	const initialRef = useRef(null);
 	const finalRef = useRef(null);
 
@@ -105,54 +154,30 @@ export default function Groups() {
 					<div>You are currently not in any groups</div>
 				)}
 			</div>
-			<div className="flex justify-center">
-				<button onClick={onOpen}>Create Group</button>
-			</div>
-
-			<Modal
-				initialFocusRef={initialRef}
-				finalFocusRef={finalRef}
-				isOpen={isOpen}
-				onClose={onClose}
-			>
-				<ModalOverlay />
-				<ModalContent>
-					<ModalHeader>Create group</ModalHeader>
-					<ModalCloseButton />
-					<ModalBody pb={6}>
-						<FormControl>
-							<FormLabel>Group name</FormLabel>
-							<Input
-								ref={initialRef}
-								placeholder="Group name"
-								onChange={(e) => setGroupName(e.target.value)}
-							/>
-						</FormControl>
-
-						<FormControl mt={4}>
-							<FormLabel>Members</FormLabel>
-							<Input
-								placeholder="Members"
-								onChange={(e) => setMembers(e.target.value.split(","))}
-							/>
-						</FormControl>
-					</ModalBody>
-
-					<ModalFooter>
+			<Dialog.Root>
+				<Dialog.Trigger asChild>
+					<button>Create Group</button>
+				</Dialog.Trigger>
+				<Content>
+					<Dialog.Title>Group name</Dialog.Title>
+					<Dialog.Description>Let's create a group!</Dialog.Description>
+					<Input
+						ref={initialRef}
+						placeholder="Group name"
+						onChange={(e) => setGroupName(e.target.value)}
+					/>
+					<Input placeholder="Members" onChange={(e) => setMembers(e.target.value.split(","))} />
+					<Dialog.Close>
 						<button
-							colorScheme="blue"
-							mr={3}
 							onClick={() => {
 								handleCreateGroup();
-								onClose();
 							}}
 						>
-							Save
+							Create
 						</button>
-						<button onClick={onClose}>Cancel</button>
-					</ModalFooter>
-				</ModalContent>
-			</Modal>
+					</Dialog.Close>
+				</Content>
+			</Dialog.Root>
 		</div>
 	);
 }

@@ -6,6 +6,8 @@ const colors = {
 		900: "rgba(15, 16, 20, 1)",
 	},
 	white: "rgba(255, 255, 255, 1)",
+	black: "rgba(0,0,0, 1)",
+	overlayBg: "rgba(0,0,0, 0.7)",
 	gradient: {
 		a: "linear-gradient(152.26deg, #F6B364 0%, #9E58F6 101.41%)",
 		b: "linear-gradient(152.26deg, #B353FF 0%, #F75D8B 101.41%)",
