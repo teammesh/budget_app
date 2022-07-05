@@ -4,11 +4,12 @@
 
 html,
 body {
-  --custom-font-family: FK Grotesk, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu,
+  --custom-font-family: Oakes Grotesk, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu,
   Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
   padding: 0;
   margin: 0;
   font-family: var(--custom-font-family);
+  /*background: var(--chakra-colors-black) !important;*/
 }
 
 * {

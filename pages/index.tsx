@@ -15,7 +15,7 @@ export default function Home() {
 	}, []);
 
 	return (
-		<div className="pt-24">
+		<div className="md:container md:mx-auto md:max-w-2xl pt-20">
 			{/* {!session ? <Auth /> : <Account key={session.user.id} session={session} />} */}
 			{!session ? <Auth /> : <Groups />}
 		</div>
