@@ -11,11 +11,9 @@ import { sortByDate } from "@/utils/helper";
 export default function AddTransactions({
 	gid,
 	sharedTransactions,
-	setSharedTransactions,
 }: {
 	gid: string;
 	sharedTransactions: any[];
-	setSharedTransactions: any;
 }) {
 	const [showAccounts, setShowAccounts] = useState<any>([]);
 	const [transactions, setTransactions] = useState<any>([]);

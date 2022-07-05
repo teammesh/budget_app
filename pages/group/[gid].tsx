@@ -6,6 +6,7 @@ import AddTransactions from "@/components/AddTransactions";
 import { isEmpty } from "ramda";
 import { Transaction } from "plaid";
 import { tempStore } from "@/utils/store";
+import Link from "next/link";
 
 const Group = () => {
 	const router = useRouter();
@@ -75,22 +76,18 @@ const Group = () => {
 			<div className={"text-lg font-semibold"}>Shared transactions {sharedTransactions.length}</div>
 			{!isEmpty(sharedTransactions) &&
 				sharedTransactions.map((x: Transaction) => (
-					<div key={x.transaction_id} className={"grid grid-cols-4"}>
-						<div>{x.date}</div>
-						<div>{x.merchant_name}</div>
-						<div>{x.name}</div>
-						<div>{x.amount}</div>
-					</div>
+					<Link href={`/transaction/${encodeURIComponent(x.id)}`} key={x.id}>
+						<div className={"grid grid-cols-4"}>
+							<div>{x.date}</div>
+							<div>{x.merchant_name}</div>
+							<div>{x.name}</div>
+							<div>{x.amount}</div>
+						</div>
+					</Link>
 				))}
 
 			<Button onClick={addTransactions}>Add transactions</Button>
-			{showAddTransactions && (
-				<AddTransactions
-					gid={gid}
-					sharedTransactions={sharedTransactions}
-					setSharedTransactions={setSharedTransactions}
-				/>
-			)}
+			{showAddTransactions && <AddTransactions gid={gid} sharedTransactions={sharedTransactions} />}
 		</div>
 	);
 };
