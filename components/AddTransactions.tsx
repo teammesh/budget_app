@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/utils/supabaseClient";
 import { sessionStore } from "@/utils/store";
-import { findIndex, isEmpty, remove, reverse, sort } from "ramda";
+import { isEmpty, reverse, sort, without } from "ramda";
 import { Transaction } from "plaid";
 import { ItemPublicTokenExchangeResponse } from "plaid/api";
 import { Button } from "@chakra-ui/react";
+import { PlaidLink } from "@/components/PlaidLink";
 
 export default function AddTransactions({ gid }: { gid: string }) {
 	const [showAccounts, setShowAccounts] = useState<string[]>([]);
@@ -17,48 +18,56 @@ export default function AddTransactions({ gid }: { gid: string }) {
 
 	useEffect(() => {
 		const profile_id = supabase.auth.session()?.user?.id;
-
+		setTransactions([]);
 		supabase
 			.from("plaid_items")
 			.select()
 			.eq("profile_id", profile_id)
-			.then(({ data, error }) => setAccounts(data));
+			.then(async ({ data, error }) => {
+				setAccounts(data);
+				await getTransactions(data[0].access_token, data[0].account_id);
+				setShowAccounts([data[0].access_token]);
+			});
 	}, []);
 
-	useEffect(() => {
-		if (accounts.length === 0) return;
-	}, [accounts]);
-
-	const getTransactions = (
+	const getTransactions = async (
 		access_token: ItemPublicTokenExchangeResponse["access_token"],
 		account_id: Transaction["account_id"],
 	) => {
 		if (showAccounts.includes(access_token)) {
-			const acc = findIndex((x) => x === access_token);
-			setShowAccounts(remove(acc, 1, showAccounts));
+			setShowAccounts(without([access_token], showAccounts));
 			return setTransactions(transactions.filter((x) => x.account_id !== account_id));
 		}
 
 		const cursor = transactionCursor?.access_token;
 
-		fetch("/api/plaidGetTransactions", {
+		const data = await fetch("/api/plaidGetTransactions", {
 			method: "post",
 			body: JSON.stringify({
 				access_token,
 				cursor,
 			}),
-		})
-			.then((res) => res.json())
-			.then((data) => {
-				console.log(data);
-				const diff = function (a, b) {
-					return new Date(a.date).getTime() - new Date(b.date).getTime();
-				};
+		}).then((res) => res.json());
 
-				setTransactionCursor({ [access_token]: data.next_cursor });
-				setShowAccounts([...showAccounts, access_token]);
-				setTransactions(reverse(sort(diff, [...transactions, ...data.added])));
-			});
+		console.log(data);
+		const diff = function (a, b) {
+			return new Date(a.date).getTime() - new Date(b.date).getTime();
+		};
+
+		setTransactionCursor({ [access_token]: data.next_cursor });
+		setShowAccounts([...showAccounts, access_token]);
+		setTransactions(reverse(sort(diff, [...transactions, ...data.added])));
+
+		// store account_id from list of transactions
+		if (!account_id) {
+			const { data: plaidItems, error } = await supabase
+				.from("plaid_items")
+				.update({ account_id: data.added[0].account_id })
+				.eq("access_token", access_token);
+			setAccounts([...accounts.filter((x) => x.access_token !== access_token), plaidItems[0]]);
+		}
+
+		return;
 	};
 
 	const addTransactionToGroup = (transactionId: string, amount: number) => {
@@ -91,6 +100,7 @@ export default function AddTransactions({ gid }: { gid: string }) {
 
 	return (
 		<>
+			<PlaidLink />
 			{!isEmpty(accounts) &&
 				accounts.map((x: ItemPublicTokenExchangeResponse) => (
 					<div

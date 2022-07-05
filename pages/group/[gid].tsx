@@ -1,7 +1,6 @@
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/utils/supabaseClient";
-import { sessionStore } from "@/utils/store";
 import { Button } from "@chakra-ui/react";
 import AddTransactions from "@/components/AddTransactions";
 
@@ -11,8 +10,6 @@ const Group = () => {
 
 	const [showAddTransactions, setShowAddTransactions] = useState(false);
 	const [sharedTransactions, setSharedTransactions] = useState([]);
-	const transactions = sessionStore((state) => state.transactions);
-	const setTransactions = sessionStore.getState().setTransactions;
 
 	useEffect(() => {
 		if (!gid) return;

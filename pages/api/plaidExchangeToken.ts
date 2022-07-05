@@ -28,6 +28,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 	const accessToken = response.data.access_token;
 	const itemID = response.data.item_id;
 
+	// const auth = await client.authGet({ access_token: accessToken });
+
 	const { data, error } = await supabaseService
 		.from("plaid_items")
 		.insert({ profile_id, access_token: accessToken, item_id: itemID });

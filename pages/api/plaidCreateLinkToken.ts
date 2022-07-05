@@ -23,7 +23,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 			client_user_id: profile_id,
 		},
 		client_name: "budget_app",
-		products: ["transactions", "auth"],
+		products: ["transactions"],
 		language: "en",
 		// webhook: "https://webhook.example.com",
 		// redirect_uri: "https://domainname.com/oauth-page.html",
