@@ -6,6 +6,7 @@ import { Transaction } from "plaid";
 import { ItemPublicTokenExchangeResponse } from "plaid/api";
 import { Button } from "@chakra-ui/react";
 import { PlaidLink } from "@/components/PlaidLink";
+import { sortByDate } from "@/utils/helper";
 
 export default function AddTransactions({ gid }: { gid: string }) {
 	const [showAccounts, setShowAccounts] = useState<string[]>([]);
@@ -27,6 +28,7 @@ export default function AddTransactions({ gid }: { gid: string }) {
 			.then(async ({ data, error }) => {
 				if (!isEmpty(data)) {
 					setAccounts(data);
+					// fetch transactions for the first pm and display them
 					await getTransactions(data[0].access_token, data[0].account_id);
 					setShowAccounts([data[0].access_token]);
 				}
@@ -37,6 +39,7 @@ export default function AddTransactions({ gid }: { gid: string }) {
 		access_token: ItemPublicTokenExchangeResponse["access_token"],
 		account_id: Transaction["account_id"],
 	) => {
+		// hide transactions for the pm if it is toggled again
 		if (showAccounts.includes(access_token)) {
 			setShowAccounts(without([access_token], showAccounts));
 			return setTransactions(transactions.filter((x) => x.account_id !== account_id));
@@ -52,13 +55,9 @@ export default function AddTransactions({ gid }: { gid: string }) {
 			}),
 		}).then((res) => res.json());
 
-		const diff = function (a, b) {
-			return new Date(a.date).getTime() - new Date(b.date).getTime();
-		};
-
 		setTransactionCursor({ [access_token]: data.next_cursor });
 		setShowAccounts([...showAccounts, access_token]);
-		setTransactions(reverse(sort(diff, [...transactions, ...data.added])));
+		setTransactions(reverse(sortByDate([...transactions, ...data.added])));
 
 		console.log(data);
 		return;

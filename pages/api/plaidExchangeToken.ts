@@ -28,6 +28,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 	const accessToken = response.data.access_token;
 	const itemID = response.data.item_id;
 
+	// use balance endpoint to get additional pm data
 	const balance = await client.accountsBalanceGet({ access_token: accessToken });
 
 	const { data, error } = await supabaseService.from("plaid_items").insert({
