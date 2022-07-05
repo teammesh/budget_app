@@ -16,6 +16,7 @@ import {
 	useDisclosure,
 } from "@chakra-ui/react";
 import Link from "next/link";
+import { tempStore } from "@/utils/store";
 
 export default function Groups() {
 	const { isOpen, onOpen, onClose } = useDisclosure();
@@ -25,7 +26,8 @@ export default function Groups() {
 	const profile_id = supabase.auth.session()?.user?.id;
 	const [groupName, setGroupName] = useState("");
 	const [members, setMembers] = useState<string[]>([]);
-	const [userGroups, setUserGroups] = useState([]);
+	const groups = tempStore((state) => state.groups);
+	const setGroups = tempStore.getState().setGroups;
 
 	useEffect(() => {
 		const findGroups = async () => {
@@ -37,8 +39,17 @@ export default function Groups() {
 						.eq("profile_id", profile_id),
 				true,
 			);
-			setUserGroups(data);
+			setGroups(data);
+			return data;
 		};
+
+		supabase
+			.from(`profiles_groups:profile_id=eq.${supabase.auth.session()?.user?.id}`)
+			.on("*", (payload) => {
+				console.log("Change received!", payload);
+				findGroups();
+			})
+			.subscribe();
 
 		findGroups();
 	}, []);
@@ -95,9 +106,9 @@ export default function Groups() {
 				<div className="text-lg text-gray-300">Your groups</div>
 			</div>
 			<div className="pt-6">
-				{userGroups.length > 0 ? (
+				{groups.length > 0 ? (
 					<div className="flex flex-col">
-						{userGroups.map((group) => (
+						{groups.map((group) => (
 							<div key={group.groups.name} className="pt-5">
 								<Link href={`/group/${group.group_id}`}>
 									<div className="flex ">

@@ -30,9 +30,13 @@ export const sessionStore = create<SessionStoreState>(
 interface TempStoreState {
 	sharedTransactions: any[];
 	setSharedTransactions: (x: any[]) => void;
+	groups: any[];
+	setGroups: (x: any[]) => void;
 }
 
 export const tempStore = create<TempStoreState>((set, get) => ({
 	sharedTransactions: [],
 	setSharedTransactions: (x) => set(() => ({ sharedTransactions: x })),
+	groups: [],
+	setGroups: (x) => set(() => ({ groups: x })),
 }));
