@@ -19,7 +19,7 @@ export default function Home() {
 	}, []);
 
 	return (
-		<div className="container" style={{ padding: "50px 0 100px 0" }}>
+		<div className="pt-24">
 			{/* {!session ? <Auth /> : <Account key={session.user.id} session={session} />} */}
 			{/* {session && <Transactions />}
 			{session && <PlaidLink />} */}
