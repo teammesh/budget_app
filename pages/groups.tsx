@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { supabase } from "@/utils/supabaseClient";
+import { supabase, supabaseQuery } from "@/utils/supabaseClient";
 import { displayAmount } from "@/components/Amount";
 import {
 	Button,
@@ -25,21 +25,23 @@ export default function Groups() {
 	const profile_id = supabase.auth.session()?.user?.id;
 	const [groupName, setGroupName] = useState("");
 	const [members, setMembers] = useState<string[]>([]);
-	const [groups, setGroups] = useState<string[]>([]);
 	const [userGroups, setUserGroups] = useState([]);
 
 	useEffect(() => {
-		supabase
-			.from("profiles")
-			.select()
-			.eq("id", profile_id)
-			.then(({ data, error }) => data && setGroups(data[0].groups));
-		supabase
-			.from("groups")
-			.select()
-			.in("id", groups)
-			.then(({ data, error }) => data && setUserGroups(data));
-	}, [groups, profile_id]);
+		const findGroups = async () => {
+			const { data } = await supabaseQuery(
+				() =>
+					supabase
+						.from("profiles_groups")
+						.select("group_id, groups(name)")
+						.eq("profile_id", profile_id),
+				true,
+			);
+			setUserGroups(data);
+		};
+
+		findGroups();
+	}, []);
 
 	const amountTotal = -2200;
 
@@ -52,18 +54,16 @@ export default function Groups() {
 				.from("groups")
 				.insert([{ name: groupName }]);
 
-			// Update current user with new group
+			// Attach current user to group
 			const { data: profileData, error: profileError } = await supabase
-				.from("profiles")
-				.update({
-					groups: [groupsData[0].id, ...groups],
-				})
-				.eq("id", profile_id);
+				.from("profiles_groups")
+				.insert({ group_id: groupsData[0].id, profile_id: supabase.auth.session()?.user?.id });
 
 			// Update list of groups in page
-			setGroups(profileData[0].groups);
+			// setGroups(profileData[0].groups);
 
 			// Update members' group list
+			const req = [];
 			members.map(async (member) => {
 				console.log(member);
 				const { data: memberData } = await supabase
@@ -71,13 +71,10 @@ export default function Groups() {
 					.select()
 					.eq("username", member);
 
-				await supabase
-					.from("profiles")
-					.update({
-						groups: [groupsData[0].id, ...memberData[0].groups],
-					})
-					.eq("username", member);
+				req.push({ group_id: groupsData[0].id, profile_id: memberData[0].id });
 			});
+
+			if (req.length > 0) await supabase.from("profiles_group").insert(req);
 
 			if (error) throw error;
 			alert("Group created!");
@@ -101,17 +98,16 @@ export default function Groups() {
 				{userGroups.length > 0 ? (
 					<div className="flex flex-col">
 						{userGroups.map((group) => (
-							<div key={group.name} className="pt-5">
-                                <Link href={`/group/${group.id}`}>
-                                <div className="flex ">
-								<div className="flex-initial pr-1">Avatar</div>
-                                    <div className="flex-grow flex flex-col">
-                                        <div className="text-xl">{group.name}</div>
-                                        <div className="text-sm">{group.update}</div>
-                                    </div>
-                                    <div className="text-xl text-right">{displayAmount(group.amount)}</div>
-                                </div>
-                                </Link>
+							<div key={group.groups.name} className="pt-5">
+								<Link href={`/group/${group.group_id}`}>
+									<div className="flex ">
+										<div className="flex-initial pr-1">Avatar</div>
+										<div className="flex-grow flex flex-col">
+											<div className="text-xl">{group.groups.name}</div>
+										</div>
+										{/*<div className="text-xl text-right">{displayAmount(group.amount)}</div>*/}
+									</div>
+								</Link>
 							</div>
 						))}
 					</div>
