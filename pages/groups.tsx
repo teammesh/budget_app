@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/utils/supabaseClient";
-
+import { displayAmount } from "@/components/Amount";
 
 export default function Groups() {
     const profile_id = supabase.auth.session()?.user?.id;
@@ -19,21 +19,8 @@ export default function Groups() {
         },
     ];
 
-    const formatter = new Intl.NumberFormat("en-US", {
-        style: "currency",
-        currency: "USD",
-    });
-
-    const displayAmount = (amount: number | bigint) => {
-        return (
-            <div className={amount < 0 ? "text-red-700" : "text-green-700"}>
-                {amount > 0 ? "+" : null}{formatter.format(amount)}
-            </div>
-        );
-    };
-
     return (
-        <>
+        <div className="flex flex-col justify-between">
             <div className="flex flex-col items-center">
                 <div className="text-lg">{amountTotal < 0 ? "You owe" : "Your pending refund"}</div>
                 <div className="pt-2 text-4xl">{displayAmount(amountTotal)}</div>
@@ -57,6 +44,10 @@ export default function Groups() {
                     </div>
                     : <div>You are currently not in any groups</div>}
             </div>
-        </>
+
+            <div>
+
+            </div>
+        </div>
     );
 }
