@@ -31,12 +31,12 @@ export default function AddTransactions({ gid }: { gid: string }) {
 
 	const getTransactions = (
 		access_token: ItemPublicTokenExchangeResponse["access_token"],
-		item_id: ItemPublicTokenExchangeResponse["item_id"],
+		account_id: Transaction["account_id"],
 	) => {
 		if (showAccounts.includes(access_token)) {
 			const acc = findIndex((x) => x === access_token);
 			setShowAccounts(remove(acc, 1, showAccounts));
-			return setTransactions(transactions.filter((x) => x.account_id !== item_id));
+			return setTransactions(transactions.filter((x) => x.account_id !== account_id));
 		}
 
 		const cursor = transactionCursor?.access_token;
@@ -97,7 +97,7 @@ export default function AddTransactions({ gid }: { gid: string }) {
 						className={
 							"p-3 text-purple-400 hover:text-purple-100 cursor-pointer bg-purple-100 border-2"
 						}
-						onClick={() => getTransactions(x.access_token, x.item_id)}
+						onClick={() => getTransactions(x.access_token, x.account_id)}
 						key={x.item_id}
 					>
 						{x.item_id}
