@@ -6,7 +6,7 @@ import { Transaction } from "plaid";
 import { ItemPublicTokenExchangeResponse } from "plaid/api";
 import { Button } from "@chakra-ui/react";
 
-export default function Transactions() {
+export default function AddTransactions({ gid }: { gid: string }) {
 	const accounts = sessionStore((state) => state.accounts);
 	const setAccounts = sessionStore.getState().setAccounts;
 	const transactions = sessionStore((state) => state.transactions);

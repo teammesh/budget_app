@@ -1,4 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
+import { AuthGetRequest } from "plaid";
 
 const { Configuration, PlaidApi, PlaidEnvironments } = require("plaid");
 
@@ -16,20 +17,13 @@ const configuration = new Configuration({
 const client = new PlaidApi(configuration);
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-	const { profile_id } = JSON.parse(req.body);
+	const { access_token } = JSON.parse(req.body);
 
-	const request = {
-		user: {
-			client_user_id: profile_id,
-		},
-		client_name: "budget_app",
-		products: ["transactions", "auth"],
-		language: "en",
-		// webhook: "https://webhook.example.com",
-		// redirect_uri: "https://domainname.com/oauth-page.html",
-		country_codes: ["US"],
+	const request: AuthGetRequest = {
+		access_token,
 	};
 
-	const response = await client.linkTokenCreate(request);
-	res.status(200).json(response.data.link_token);
+	const response = await client.authGet(request);
+
+	res.status(200).json(response);
 }

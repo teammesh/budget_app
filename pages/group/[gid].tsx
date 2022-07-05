@@ -1,15 +1,19 @@
 import { useRouter } from "next/router";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/utils/supabaseClient";
 import { sessionStore } from "@/utils/store";
+import { Button } from "@chakra-ui/react";
 
 const Group = () => {
 	const router = useRouter();
 	const { gid }: { gid: string } = router.query;
+
+	const [showAddTransactions, setShowAddTransactions] = useState(false);
 	const transactions = sessionStore((state) => state.transactions);
 	const setTransactions = sessionStore.getState().setTransactions;
 
 	useEffect(() => {
+		if (!gid) return;
 		supabase
 			.from("marked_transactions")
 			.select()
@@ -22,9 +26,18 @@ const Group = () => {
 				console.log("Change received!", payload);
 			})
 			.subscribe();
-	}, []);
+	}, [gid]);
 
-	return <p>Group: {gid}</p>;
+	const addTransactions = () => {
+		setShowAddTransactions(true);
+	};
+
+	return (
+		<div>
+			<p>Group: {gid}</p>
+			<Button>Add transactions</Button>
+		</div>
+	);
 };
 
 export default Group;
