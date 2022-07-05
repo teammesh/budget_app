@@ -2,6 +2,10 @@ import create from "zustand";
 import { persist } from "zustand/middleware";
 
 interface SessionStoreState {
+	session: any;
+	setSession: (x: any) => void;
+	profile: any;
+	setProfile: (x: any) => void;
 	transactions: any;
 	setTransactions: (x: any) => void;
 	transactionCursor: Record<string, unknown>;
@@ -13,6 +17,10 @@ interface SessionStoreState {
 export const sessionStore = create<SessionStoreState>(
 	persist(
 		(set, get) => ({
+			session: {},
+			setSession: (x) => set(() => ({ session: x })),
+			profile: {},
+			setProfile: (x) => set(() => ({ profile: x })),
 			transactions: [],
 			setTransactions: (x) => set(() => ({ transactions: x })),
 			transactionCursor: null,

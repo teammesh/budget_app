@@ -1,12 +1,14 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { supabase, supabaseQuery } from "@/utils/supabaseClient";
-import { displayAmount } from "@/components/Amount";
 import Link from "next/link";
-import { tempStore } from "@/utils/store";
+import { sessionStore, tempStore } from "@/utils/store";
 import { isNil } from "ramda";
 import * as Dialog from "@radix-ui/react-dialog";
 import { Input } from "@/components/Input";
 import { Content } from "@/components/Modal";
+import { Header, TextGradient } from "@/components/text";
+import { Widget } from "@/components/Widget";
+import { Group } from "@/components/Group";
 
 export default function Groups() {
 	const profile_id = supabase.auth.session()?.user?.id;
@@ -14,6 +16,7 @@ export default function Groups() {
 	const [members, setMembers] = useState<string[]>([]);
 	const groups = tempStore((state) => state.groups);
 	const setGroups = tempStore.getState().setGroups;
+	const profile = sessionStore((state) => state.profile);
 
 	useEffect(() => {
 		const findGroups = async () => {
@@ -75,34 +78,31 @@ export default function Groups() {
 	};
 
 	return (
-		<div className="flex flex-col">
-			<div className="flex flex-col items-center">
-				<div className="text-lg">{amountTotal < 0 ? "You owe" : "Your pending refund"}</div>
-				<div className="pt-2 text-4xl">{displayAmount(amountTotal)}</div>
+		<div className="grid grid-cols-1 gap-16">
+			<div className={"justify-self-start"}>
+				<Header>
+					Welcome <TextGradient>{profile.username},</TextGradient>
+				</Header>
+				<div className={"self-start grid grid-cols-[auto_auto] gap-2"}>
+					<Widget amount={200} label={"Total owed"} />
+					<Widget amount={200} label={"Total refund"} />
+				</div>
 			</div>
-			<div className="pt-20">
-				<div className="text-lg text-gray-300">Your groups</div>
-			</div>
-			<div className="pt-6">
-				{groups.length > 0 ? (
-					<div className="flex flex-col">
-						{groups.map((group) => (
-							<div key={group.groups.name} className="pt-5">
-								<Link href={`/group/${group.group_id}`}>
-									<div className="flex ">
-										<div className="flex-initial pr-1">Avatar</div>
-										<div className="flex-grow flex flex-col">
-											<div className="text-xl">{group.groups.name}</div>
-										</div>
-										{/*<div className="text-xl text-right">{displayAmount(group.amount)}</div>*/}
-									</div>
-								</Link>
-							</div>
-						))}
-					</div>
-				) : (
-					<div>You are currently not in any groups</div>
-				)}
+			<div>
+				<Header>
+					Your <TextGradient>groups</TextGradient>
+				</Header>
+				<div className="grid grid-cols-1 gap-2">
+					{groups.length > 0 ? (
+						groups.map((group) => (
+							<Link href={`/group/${group.group_id}`} key={group.groups.name}>
+								<Group group={group} />
+							</Link>
+						))
+					) : (
+						<div>You are currently not in any groups</div>
+					)}
+				</div>
 			</div>
 			<Dialog.Root>
 				<Dialog.Trigger asChild>
