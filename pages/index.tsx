@@ -5,6 +5,7 @@ import Account from "@/components/Account";
 import { PlaidLink } from "@/components/PlaidLink";
 import { sessionStore } from "@/utils/store";
 import Transactions from "@/pages/transactions";
+import Groups from "@/pages/groups";
 
 export default function Home() {
 	const [session, setSession] = useState(null);
@@ -19,9 +20,10 @@ export default function Home() {
 
 	return (
 		<div className="container" style={{ padding: "50px 0 100px 0" }}>
-			{!session ? <Auth /> : <Account key={session.user.id} session={session} />}
-			{session && <Transactions />}
-			{session && <PlaidLink />}
+			{/* {!session ? <Auth /> : <Account key={session.user.id} session={session} />} */}
+			{/* {session && <Transactions />}
+			{session && <PlaidLink />} */}
+			{!session ? <Auth /> : <Groups />}
 		</div>
 	);
 }

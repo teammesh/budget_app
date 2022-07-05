@@ -1,103 +1,61 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/utils/supabaseClient";
 
+
 export default function Groups() {
     const profile_id = supabase.auth.session()?.user?.id;
-    const [loading, setLoading] = useState(false);
-    const [groupName, setGroupName] = useState("");
-    const [members, setMembers] = useState<string[]>([]);
-    const [groups, setGroups] = useState<string[]>([]);
 
-    useEffect(() => {
-        supabase
-            .from("profiles")
-            .select()
-            .eq("id", profile_id)
-            .then(({ data, error }) => setGroups(data[0].groups));
-    }, []);
+    const amountTotal = -2200;
+    const userGroups = [
+        {
+            name: "NA Tour",
+            amount: -2400,
+            update: "2 new transactions posted",
+        },
+        {
+            name: "EU Tour",
+            amount: 200,
+            update: "No new transactions",
+        },
+    ];
 
-    const handleCreateGroup = async (groupName: string) => {
-        try {
-            setLoading(true);
+    const formatter = new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency: "USD",
+    });
 
-            // Create group
-            const { data: groupsData, error } = await supabase.from("groups").insert([
-                { "name": groupName },
-            ]);
-
-            // Update current user with new group
-            const { data: profileData, error: profileError } = await supabase.from("profiles").update({
-                groups: [groupsData[0].id, ...groups],
-            }).eq("id", profile_id);
-
-            // Update list of groups in page
-            setGroups(profileData[0].groups);
-
-            // Update members' group list
-            members.map(async (member) => {
-                console.log(member);
-                const { data: memberData } = await supabase.from("profiles")
-                    .select()
-                    .eq("username", member);
-
-                await supabase.from("profiles")
-                    .update({
-                        groups: [groupsData[0].id, ...memberData[0].groups],
-                    }).eq("username", member);
-            });
-
-            if (error) throw error;
-            alert("Group created!");
-        } catch (error) {
-            alert(error.error_description || error.message);
-        } finally {
-            setLoading(false);
-        }
+    const displayAmount = (amount: number | bigint) => {
+        return (
+            <div className={amount < 0 ? "text-red-700" : "text-green-700"}>
+                {amount > 0 ? "+" : null}{formatter.format(amount)}
+            </div>
+        );
     };
 
     return (
         <>
-            <div>
-                <h1 className="text-center">Groups</h1>
-                <h2 className="text-center">Create a group</h2>
-                <div className="pt-3">
-                    <input
-                        className="inputField"
-                        type="text"
-                        placeholder="Group name"
-                        value={groupName}
-                        onChange={(e) => setGroupName(e.target.value)}
-                    />
-                </div>
-                <div className="pt-3">
-                    <input
-                        className="inputField"
-                        type="text"
-                        placeholder="Members"
-                        value={members}
-                        onChange={(e) => setMembers(e.target.value.split(","))}
-                    />
-                </div>
-                <div className="pt-3">
-                    <button
-                        onClick={(e) => {
-                            e.preventDefault();
-                            handleCreateGroup(groupName);
-                        }}
-                        className="button block"
-                        disabled={loading}
-                    >
-                        <span>{loading ? "Loading" : "Create group"}</span>
-                    </button>
-                </div>
-                <h2 className="pt-3">Your current groups</h2>
-                <ul>
-                    { groups.length > 0 ? groups.map((group) => (
-                        <li key={group}>{group}</li>
-                    ))
-                    : <p>Not currently part of any groups!</p>
-                    }
-                </ul>
+            <div className="flex flex-col items-center">
+                <div className="text-lg">{amountTotal < 0 ? "You owe" : "Your pending refund"}</div>
+                <div className="pt-2 text-4xl">{displayAmount(amountTotal)}</div>
+            </div>
+            <div className="pt-20">
+                <div className="text-lg text-gray-300">Your groups</div>
+            </div>
+            <div className="pt-6">
+                {userGroups.length > 0 ?
+                    <div className="flex flex-col">
+                        {userGroups.map((group) => (
+                            <div key={group.name} className="flex pt-5">
+                                <div className="flex-initial pr-1">Avatar</div>
+                                <div className="flex-grow flex flex-col">
+                                    <div className="text-xl">{group.name}</div>
+                                    <div className="text-sm">{group.update}</div>
+                                </div>
+                                <div className="text-xl text-right">{displayAmount(group.amount)}</div>
+                            </div>
+                        ))}
+                    </div>
+                    : <div>You are currently not in any groups</div>}
             </div>
         </>
     );
