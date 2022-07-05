@@ -17,6 +17,7 @@ import {
 } from "@chakra-ui/react";
 import Link from "next/link";
 import { tempStore } from "@/utils/store";
+import { isNil } from "ramda";
 
 export default function Groups() {
 	const { isOpen, onOpen, onClose } = useDisclosure();
@@ -56,39 +57,35 @@ export default function Groups() {
 	const amountTotal = -2200;
 
 	const handleCreateGroup = async () => {
-		try {
-			// setLoading(true);
+		// Create group
+		const { data: groupsData, error } = await supabase.from("groups").insert([{ name: groupName }]);
 
-			// Create group
-			const { data: groupsData, error } = await supabase
-				.from("groups")
-				.insert([{ name: groupName }]);
+		// Attach current user to group
+		const { data: profileData } = await supabase
+			.from("profiles_groups")
+			.insert({ group_id: groupsData[0].id, profile_id: supabase.auth.session()?.user?.id })
+			.select("*, profiles(username)");
 
-			// Attach current user to group
-			const { data: profileData, error: profileError } = await supabase
-				.from("profiles_groups")
-				.insert({ group_id: groupsData[0].id, profile_id: supabase.auth.session()?.user?.id });
-
-			// Update members' group list
-			const req = [];
+		// Get profile_ids of invitees
+		const tmp = await Promise.all(
 			members.map(async (member) => {
-				console.log(member);
+				if (profileData[0].profiles.username === member) return;
+
 				const { data: memberData } = await supabase
 					.from("profiles")
 					.select()
 					.eq("username", member);
 
-				req.push({ group_id: groupsData[0].id, profile_id: memberData[0].id });
-			});
+				if (memberData?.length > 0)
+					return { group_id: groupsData[0].id, profile_id: memberData[0].id };
+				else console.error(`user: ${member} not found`);
+			}),
+		);
+		const req = tmp.filter((x) => !isNil(x));
 
-			if (req.length > 0) await supabase.from("profiles_group").insert(req);
-
-			if (error) throw error;
-			alert("Group created!");
-		} catch (error) {
-			alert(error.error_description || error.message);
-		} finally {
-			// setLoading(false);
+		// Add profiles_groups entry for invitees
+		if (req.length > 0) {
+			await supabaseQuery(() => supabase.from("profiles_groups").insert(req), true);
 		}
 	};
 
