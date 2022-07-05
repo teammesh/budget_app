@@ -1,6 +1,6 @@
 import { displayAmount } from "@/components/Amount";
 
-export const Group = ({ group, ...props }: { group: any; props: any }) => (
+export const Group = ({ group, ...props }: { group: any; props?: any }) => (
 	<div
 		className="p-3 rounded-md bg-gray-900 grid grid-cols-[32px_1fr_auto] gap-3 items-center cursor-pointer"
 		{...props}
