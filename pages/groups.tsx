@@ -40,9 +40,10 @@ export default function Groups() {
                     .select()
                     .eq("username", member);
 
-                await supabase.from("profiles").update({
-                    groups: [groupsData[0].id, ...memberData[0].groups],
-                }).eq("username", member);
+                await supabase.from("profiles")
+                    .update({
+                        groups: [groupsData[0].id, ...memberData[0].groups],
+                    }).eq("username", member);
             });
 
             if (error) throw error;
