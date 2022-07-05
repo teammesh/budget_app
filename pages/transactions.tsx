@@ -4,6 +4,7 @@ import { sessionStore } from "@/utils/store";
 import { isEmpty, reverse, sort } from "ramda";
 import { Transaction } from "plaid";
 import { ItemPublicTokenExchangeResponse } from "plaid/api";
+import { Button } from "@chakra-ui/react";
 
 export default function Transactions() {
 	const accounts = sessionStore((state) => state.accounts);
@@ -48,7 +49,7 @@ export default function Transactions() {
 	};
 
 	const addTransactionToGroup = (transactionId: string, amount: number) => {
-		console.log("test");
+		console.log(`${transactionId}: ${amount}`);
 	};
 	// account_id: '9a1a4NRBPAHKNJVbv7z8hGX9KkkBBnIV4r3bN',
 	// account_owner: null,
@@ -97,9 +98,9 @@ export default function Transactions() {
 							<div>{x.merchant_name}</div>
 							<div>{x.name}</div>
 							<div>{x.amount}</div>
-							<button onClick={() => addTransactionToGroup(x.transaction_id, x.amount)}>
+							<Button onClick={() => addTransactionToGroup(x.transaction_id, x.amount)}>
 								Add to group
-							</button>
+							</Button>
 						</div>
 					))}
 			</div>
