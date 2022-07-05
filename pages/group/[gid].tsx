@@ -1,6 +1,6 @@
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import { supabase } from "@/utils/supabaseClient";
+import { supabase, supabaseQuery } from "@/utils/supabaseClient";
 import { Button } from "@chakra-ui/react";
 import AddTransactions from "@/components/AddTransactions";
 import { isEmpty } from "ramda";
@@ -12,19 +12,20 @@ const Group = () => {
 	const { gid }: { gid: string } = router.query;
 
 	const [showAddTransactions, setShowAddTransactions] = useState(false);
+	const [groupUsers, setGroupUsers] = useState([]);
 	const sharedTransactions = tempStore((state) => state.sharedTransactions);
 	const setSharedTransactions = tempStore.getState().setSharedTransactions;
 
 	useEffect(() => {
+		setSharedTransactions([]);
 		if (!gid) return;
 		supabase
 			.from("shared_transactions")
 			.select()
 			.eq("group_id", gid)
-			.then(({ data, error }) =>
-				setSharedTransactions([...tempStore.getState().sharedTransactions, ...data]),
-			);
+			.then(({ data, error }) => setSharedTransactions(data));
 
+		// subscribe to shared_transactions table based on group_id
 		supabase
 			.from(`shared_transactions:group_id=eq.${gid}`)
 			.on("*", (payload) => {
@@ -32,7 +33,32 @@ const Group = () => {
 				setSharedTransactions([...tempStore.getState().sharedTransactions, payload.new]);
 			})
 			.subscribe();
+
+		// subscribe to user changes in this group
+		supabase
+			.from(`profiles_groups:group_id=eq.${gid}`)
+			.on("*", (payload) => {
+				console.log("Change received!", payload);
+				fetchGroupUsers();
+			})
+			.subscribe();
+
+		fetchGroupUsers();
+		return () => setSharedTransactions([]);
 	}, [gid]);
+
+	const fetchGroupUsers = async () => {
+		const { data } = await supabaseQuery(
+			() =>
+				supabase
+					.from("profiles_groups")
+					.select("profile_id, profiles(username)")
+					.eq("group_id", gid),
+			true,
+		);
+
+		setGroupUsers(data);
+	};
 
 	const addTransactions = () => {
 		setShowAddTransactions(true);
@@ -41,6 +67,11 @@ const Group = () => {
 	return (
 		<div>
 			<p>Group: {gid}</p>
+			<div>
+				{groupUsers.map((user) => (
+					<div key={user.profile_id}>{user.profiles.username}</div>
+				))}
+			</div>
 			<div className={"text-lg font-semibold"}>Shared transactions {sharedTransactions.length}</div>
 			{!isEmpty(sharedTransactions) &&
 				sharedTransactions.map((x: Transaction) => (
