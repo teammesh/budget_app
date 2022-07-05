@@ -5,13 +5,15 @@ import { Button } from "@chakra-ui/react";
 import AddTransactions from "@/components/AddTransactions";
 import { isEmpty } from "ramda";
 import { Transaction } from "plaid";
+import { tempStore } from "@/utils/store";
 
 const Group = () => {
 	const router = useRouter();
 	const { gid }: { gid: string } = router.query;
 
 	const [showAddTransactions, setShowAddTransactions] = useState(false);
-	const [sharedTransactions, setSharedTransactions] = useState<any[]>([]);
+	const sharedTransactions = tempStore((state) => state.sharedTransactions);
+	const setSharedTransactions = tempStore.getState().setSharedTransactions;
 
 	useEffect(() => {
 		if (!gid) return;
@@ -19,12 +21,15 @@ const Group = () => {
 			.from("shared_transactions")
 			.select()
 			.eq("group_id", gid)
-			.then(({ data, error }) => setSharedTransactions(data));
+			.then(({ data, error }) =>
+				setSharedTransactions([...tempStore.getState().sharedTransactions, ...data]),
+			);
 
 		supabase
 			.from(`shared_transactions:group_id=eq.${gid}`)
 			.on("*", (payload) => {
 				console.log("Change received!", payload);
+				setSharedTransactions([...tempStore.getState().sharedTransactions, payload.new]);
 			})
 			.subscribe();
 	}, [gid]);

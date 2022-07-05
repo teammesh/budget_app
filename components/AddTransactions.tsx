@@ -93,7 +93,6 @@ export default function AddTransactions({
 			() => supabase.from("shared_transactions").upsert(req),
 			true,
 		);
-		setSharedTransactions([...sharedTransactions, data[0]]);
 	};
 
 	// account_id: '9a1a4NRBPAHKNJVbv7z8hGX9KkkBBnIV4r3bN',

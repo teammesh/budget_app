@@ -26,3 +26,13 @@ export const sessionStore = create<SessionStoreState>(
 		},
 	),
 );
+
+interface TempStoreState {
+	sharedTransactions: any[];
+	setSharedTransactions: (x: any[]) => void;
+}
+
+export const tempStore = create<TempStoreState>((set, get) => ({
+	sharedTransactions: [],
+	setSharedTransactions: (x) => set(() => ({ sharedTransactions: x })),
+}));
