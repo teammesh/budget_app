@@ -40,7 +40,6 @@ export default function Groups() {
 				true,
 			);
 			setGroups(data);
-			return data;
 		};
 
 		supabase
@@ -69,9 +68,6 @@ export default function Groups() {
 			const { data: profileData, error: profileError } = await supabase
 				.from("profiles_groups")
 				.insert({ group_id: groupsData[0].id, profile_id: supabase.auth.session()?.user?.id });
-
-			// Update list of groups in page
-			// setGroups(profileData[0].groups);
 
 			// Update members' group list
 			const req = [];
