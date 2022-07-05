@@ -1,14 +1,22 @@
 import { useEffect, useState } from "react";
-import { supabase } from "@/utils/supabaseClient";
+import { supabase, supabaseQuery } from "@/utils/supabaseClient";
 import { sessionStore } from "@/utils/store";
-import { isEmpty, reverse, sort, without } from "ramda";
+import { isEmpty, pick, reverse, sort, without } from "ramda";
 import { Transaction } from "plaid";
 import { ItemPublicTokenExchangeResponse } from "plaid/api";
 import { Button } from "@chakra-ui/react";
 import { PlaidLink } from "@/components/PlaidLink";
 import { sortByDate } from "@/utils/helper";
 
-export default function AddTransactions({ gid }: { gid: string }) {
+export default function AddTransactions({
+	gid,
+	sharedTransactions,
+	setSharedTransactions,
+}: {
+	gid: string;
+	sharedTransactions: any[];
+	setSharedTransactions: any;
+}) {
 	const [showAccounts, setShowAccounts] = useState<any>([]);
 	const [transactions, setTransactions] = useState<any>([]);
 	const accounts = sessionStore((state) => state.accounts);
@@ -60,8 +68,32 @@ export default function AddTransactions({ gid }: { gid: string }) {
 		return;
 	};
 
-	const addTransactionToGroup = (transactionId: string, amount: number) => {
-		console.log(`${transactionId}: ${amount}`);
+	const shareTransaction = async (transaction: Transaction) => {
+		const metadata = pick(
+			[
+				"account_id",
+				"amount",
+				"authorized_date",
+				"category",
+				"category_id",
+				"date",
+				"location",
+				"merchant_name",
+				"name",
+				"payment_channel",
+				"payment_meta",
+				"pending",
+				"transaction_id",
+				"transaction_type",
+			],
+			transaction,
+		);
+		const req = { ...metadata, group_id: gid, charged_to: supabase.auth.session()?.user?.id };
+		const { data } = await supabaseQuery(
+			() => supabase.from("shared_transactions").upsert(req),
+			true,
+		);
+		setSharedTransactions([...sharedTransactions, data[0]]);
 	};
 
 	// account_id: '9a1a4NRBPAHKNJVbv7z8hGX9KkkBBnIV4r3bN',
@@ -112,9 +144,11 @@ export default function AddTransactions({ gid }: { gid: string }) {
 							<div>{x.merchant_name}</div>
 							<div>{x.name}</div>
 							<div>{x.amount}</div>
-							<Button onClick={() => addTransactionToGroup(x.transaction_id, x.amount)}>
-								Add to group
-							</Button>
+							{sharedTransactions.find((y) => x.transaction_id === y.transaction_id) ? (
+								<Button onClick={() => console.log("added already")}>Added!</Button>
+							) : (
+								<Button onClick={() => shareTransaction(x)}>Add to group</Button>
+							)}
 						</div>
 					))}
 			</div>

@@ -3,13 +3,15 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/utils/supabaseClient";
 import { Button } from "@chakra-ui/react";
 import AddTransactions from "@/components/AddTransactions";
+import { isEmpty } from "ramda";
+import { Transaction } from "plaid";
 
 const Group = () => {
 	const router = useRouter();
 	const { gid }: { gid: string } = router.query;
 
 	const [showAddTransactions, setShowAddTransactions] = useState(false);
-	const [sharedTransactions, setSharedTransactions] = useState([]);
+	const [sharedTransactions, setSharedTransactions] = useState<any[]>([]);
 
 	useEffect(() => {
 		if (!gid) return;
@@ -34,8 +36,25 @@ const Group = () => {
 	return (
 		<div>
 			<p>Group: {gid}</p>
+			<div className={"text-lg font-semibold"}>Shared transactions {sharedTransactions.length}</div>
+			{!isEmpty(sharedTransactions) &&
+				sharedTransactions.map((x: Transaction) => (
+					<div key={x.transaction_id} className={"grid grid-cols-4"}>
+						<div>{x.date}</div>
+						<div>{x.merchant_name}</div>
+						<div>{x.name}</div>
+						<div>{x.amount}</div>
+					</div>
+				))}
+
 			<Button onClick={addTransactions}>Add transactions</Button>
-			{showAddTransactions && <AddTransactions gid={gid} />}
+			{showAddTransactions && (
+				<AddTransactions
+					gid={gid}
+					sharedTransactions={sharedTransactions}
+					setSharedTransactions={setSharedTransactions}
+				/>
+			)}
 		</div>
 	);
 };
