@@ -36,7 +36,7 @@ export default function Login() {
 
 	return (
 		<Main>
-			<Auth supabaseClient={supabase} providers={["google", "facebook", "github"]} />
+			<Auth supabaseClient={supabase} />
 		</Main>
 	);
 }
