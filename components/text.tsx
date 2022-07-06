@@ -8,7 +8,7 @@ export const Header = ({ children }: { children: any }) => {
 	);
 };
 
-export default function ({ children }: { children: any }) {
+export const TextGradient = ({ children }: { children: any }) => {
 	return (
 		<span
 			style={{
@@ -20,4 +20,4 @@ export default function ({ children }: { children: any }) {
 			{children}
 		</span>
 	);
-}
+};
