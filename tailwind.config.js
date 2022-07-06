@@ -3,6 +3,9 @@ module.exports = {
 	content: ["./pages/**/*.{js,ts,jsx,tsx}", "./components/**/*.{js,ts,jsx,tsx}"],
 	theme: {
 		extend: {
+			fontFamily: {
+				mono: ["Favorit Mono, Inconsolata, monospace"],
+			},
 			colors: {
 				gray: {
 					600: "rgba(115, 115, 126, 1)",

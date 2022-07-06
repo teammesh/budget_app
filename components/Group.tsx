@@ -12,6 +12,6 @@ export const Group = forwardRef(({ group, ...props }: { group: any; props?: any 
 			<div className="text-sm">{group.groups.name}</div>
 			<div className="text-sm text-gray-600">{group.groups.name}</div>
 		</div>
-		<div className="text-xl text-right">{displayAmount(group.amount)}</div>
+		<div className="text-sm text-right font-mono font-medium">{displayAmount(group.amount)}</div>
 	</div>
 ));

@@ -24,7 +24,7 @@ export const Button = forwardRef(
 			{...props}
 		>
 			<div
-				className={`grid grid-cols-[auto_auto] gap-2 items-center h-10 px-4 rounded-full${
+				className={`grid grid-cols-[auto_auto] gap-2 items-center font-medium h-10 px-4 rounded-full${
 					!background && " bg-black"
 				}`}
 			>
