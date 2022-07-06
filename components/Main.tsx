@@ -1,13 +1,10 @@
-import theme from "@/styles/theme";
+import { useEffect } from "react";
+import { sessionStore } from "@/utils/store";
 
-export const Main = ({ children }: { children: any }) => (
-	<div
-		className={"h-full"}
-		style={{
-			background: theme.colors.black,
-			color: theme.colors.white,
-		}}
-	>
-		{children}
-	</div>
-);
+export const Main = ({ children, profile }: { children: any; profile: any }) => {
+	useEffect(() => {
+		sessionStore.getState().setProfile(profile);
+	}, []);
+
+	return <div className={"h-full bg-black text-white p-3"}>{children}</div>;
+};

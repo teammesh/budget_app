@@ -1,9 +1,11 @@
 import { displayAmount } from "@/components/Amount";
+import { forwardRef } from "react";
 
-export const Group = ({ group, ...props }: { group: any; props?: any }) => (
+export const Group = forwardRef(({ group, ...props }: { group: any; props?: any }, ref) => (
 	<div
 		className="p-3 rounded-md bg-gray-900 grid grid-cols-[32px_1fr_auto] gap-3 items-center cursor-pointer"
 		{...props}
+		ref={ref}
 	>
 		<div className="flex-initial mr-3 rounded-full w-8 h-8 bg-gray-800" />
 		<div className="block">
@@ -12,4 +14,4 @@ export const Group = ({ group, ...props }: { group: any; props?: any }) => (
 		</div>
 		<div className="text-xl text-right">{displayAmount(group.amount)}</div>
 	</div>
-);
+));

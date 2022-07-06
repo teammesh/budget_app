@@ -6,17 +6,21 @@ import { isNil } from "ramda";
 import * as Dialog from "@radix-ui/react-dialog";
 import { Input } from "@/components/Input";
 import { Content } from "@/components/Modal";
-import { Header, TextGradient } from "@/components/text";
+import { Header } from "@/components/text";
 import { Widget } from "@/components/Widget";
 import { Group } from "@/components/Group";
+import dynamic from "next/dynamic";
 
-export default function Groups() {
+const TextGradient = dynamic(() => import("@/components/text"), {
+	ssr: false,
+});
+
+export default function Groups({ profile }: { profile: any }) {
 	const profile_id = supabase.auth.session()?.user?.id;
 	const [groupName, setGroupName] = useState("");
 	const [members, setMembers] = useState<string[]>([]);
 	const groups = tempStore((state) => state.groups);
 	const setGroups = tempStore.getState().setGroups;
-	const profile = sessionStore((state) => state.profile);
 
 	useEffect(() => {
 		const findGroups = async () => {
@@ -41,8 +45,6 @@ export default function Groups() {
 
 		findGroups();
 	}, []);
-
-	const amountTotal = -2200;
 
 	const handleCreateGroup = async () => {
 		// Create group
@@ -81,7 +83,7 @@ export default function Groups() {
 		<div className="grid grid-cols-1 gap-16">
 			<div className={"justify-self-start"}>
 				<Header>
-					Welcome <TextGradient>{profile.username},</TextGradient>
+					Welcome <TextGradient>{profile.username}</TextGradient>,
 				</Header>
 				<div className={"self-start grid grid-cols-[auto_auto] gap-2"}>
 					<Widget amount={200} label={"Total owed"} />
@@ -95,7 +97,7 @@ export default function Groups() {
 				<div className="grid grid-cols-1 gap-2">
 					{groups.length > 0 ? (
 						groups.map((group) => (
-							<Link href={`/group/${group.group_id}`} key={group.groups.name}>
+							<Link href={`/group/${group.group_id}`} key={group.groups.name} passHref>
 								<Group group={group} />
 							</Link>
 						))
@@ -113,14 +115,8 @@ export default function Groups() {
 					<Dialog.Description>Let's create a group!</Dialog.Description>
 					<Input placeholder="Group name" onChange={(e) => setGroupName(e.target.value)} />
 					<Input placeholder="Members" onChange={(e) => setMembers(e.target.value.split(","))} />
-					<Dialog.Close>
-						<button
-							onClick={() => {
-								handleCreateGroup();
-							}}
-						>
-							Create
-						</button>
+					<Dialog.Close asChild>
+						<button onClick={() => handleCreateGroup()}>Create</button>
 					</Dialog.Close>
 				</Content>
 			</Dialog.Root>

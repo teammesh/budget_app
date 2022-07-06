@@ -12,7 +12,8 @@ export const Input = styled("input", {
 	padding: "0 10px",
 	fontSize: 15,
 	lineHeight: 1,
-	color: theme.colors.gray["900"],
+	color: theme.colors.gray["600"],
+	background: theme.colors.gray["900"],
 	boxShadow: `0 0 0 1px ${theme.colors.gray["700"]}`,
 	height: 35,
 

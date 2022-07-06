@@ -17,7 +17,7 @@ interface SessionStoreState {
 export const sessionStore = create<SessionStoreState>(
 	persist(
 		(set, get) => ({
-			session: {},
+			session: null,
 			setSession: (x) => set(() => ({ session: x })),
 			profile: {},
 			setProfile: (x) => set(() => ({ profile: x })),

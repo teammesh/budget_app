@@ -7,3 +7,10 @@ export const sortByDate = (arr: any[]) => {
 
 	return sort(diff, arr);
 };
+
+export const fetcher = (url, token) =>
+	fetch(url, {
+		method: "GET",
+		headers: new Headers({ "Content-Type": "application/json", token }),
+		credentials: "same-origin",
+	}).then((res) => res.json());

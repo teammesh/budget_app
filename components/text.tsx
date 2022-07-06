@@ -8,14 +8,16 @@ export const Header = ({ children }: { children: any }) => {
 	);
 };
 
-export const TextGradient = ({ children }: { children: any }) => (
-	<span
-		style={{
-			background: theme.colors.gradient.a,
-			WebkitBackgroundClip: "text",
-			WebkitTextFillColor: "transparent",
-		}}
-	>
-		{children}
-	</span>
-);
+export default function ({ children }: { children: any }) {
+	return (
+		<span
+			style={{
+				background: theme.colors.gradient.a,
+				WebkitBackgroundClip: "text",
+				WebkitTextFillColor: "transparent",
+			}}
+		>
+			{children}
+		</span>
+	);
+}
