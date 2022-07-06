@@ -10,8 +10,7 @@ export const Input = styled("input", {
 	justifyContent: "center",
 	borderRadius: 4,
 	padding: "0 10px",
-	fontSize: 15,
-	lineHeight: 1,
+	fontSize: "1rem", // browsers will zoom into input if less than 16px
 	color: theme.colors.gray["600"],
 	background: theme.colors.gray["900"],
 	boxShadow: `0 0 0 1px ${theme.colors.gray["700"]}`,
