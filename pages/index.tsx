@@ -13,6 +13,7 @@ import { isNil } from "ramda";
 import { Button } from "@/components/Button";
 import { PlusIcon } from "@radix-ui/react-icons";
 import theme from "@/styles/theme";
+import { verifyUser } from "@/utils/ssr";
 
 export default function Home({ user, profile, groups }) {
 	const profile_id = supabase.auth.session()?.user?.id;
@@ -135,24 +136,12 @@ export default function Home({ user, profile, groups }) {
 }
 
 export async function getServerSideProps({ req }) {
-	const { user } = await supabase.auth.api.getUserByCookie(req);
-	const { data: profiles } = await supabase.from("profiles").select().eq("id", user?.id);
+	const { props } = await verifyUser(req);
 	const { data: groups } = await supabase
 		.from("profiles_groups")
 		.select("group_id, groups(name)")
-		.eq("profile_id", user?.id);
-
-	// If no user, redirect to index.
-	if (!user) {
-		return { props: {}, redirect: { destination: "/login", permanent: false } };
-	}
-
-	// If no profile, redirect to create account
-	if (profiles?.length === 0) {
-		const { data, error } = await supabase.from("profiles").insert({ id: user.id });
-		return { props: {}, redirect: { destination: "/account", permanent: false } };
-	}
+		.eq("profile_id", props.user?.id);
 
 	// If there is a user, return it.
-	return { props: { user, profile: profiles[0], groups } };
+	return { props: { ...props, groups } };
 }
