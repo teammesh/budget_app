@@ -73,7 +73,7 @@ export default function Home({ user, profile, groups }) {
 	};
 
 	return (
-		<Main profile={profile}>
+		<Main>
 			<Navbar />
 			<div className="grid grid-cols-1 gap-16">
 				<div className={"justify-self-start mt-6"}>
