@@ -136,12 +136,11 @@ export default function Home({ user, profile, groups }) {
 }
 
 export async function getServerSideProps({ req }) {
-	const { props } = await verifyUser(req);
+	const { props, redirect } = await verifyUser(req);
 	const { data: groups } = await supabase
 		.from("profiles_groups")
 		.select("group_id, groups(name)")
 		.eq("profile_id", props.user?.id);
 
-	// If there is a user, return it.
-	return { props: { ...props, groups } };
+	return { props: { ...props, groups }, redirect };
 }
