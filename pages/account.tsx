@@ -106,7 +106,13 @@ export default function Account({ user, profile }) {
 				</div>
 
 				<div>
-					<button className="button block" onClick={() => supabase.auth.signOut()}>
+					<button
+						className="button block"
+						onClick={async () => {
+							await supabase.auth.api.signOut(supabase.auth.session()?.access_token);
+							await supabase.auth.signOut();
+						}}
+					>
 						Sign Out
 					</button>
 				</div>
