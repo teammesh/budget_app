@@ -74,8 +74,9 @@ export default function Home({ user, profile, groups }) {
 
 	return (
 		<Main profile={profile}>
+			<Navbar />
 			<div className="grid grid-cols-1 gap-16">
-				<div className={"justify-self-start"}>
+				<div className={"justify-self-start mt-6"}>
 					<Header>
 						Welcome <TextGradient>{profile.username}</TextGradient>,
 					</Header>
@@ -115,7 +116,6 @@ export default function Home({ user, profile, groups }) {
 					</Content>
 				</Dialog.Root>
 			</div>
-			<Navbar />
 		</Main>
 	);
 }

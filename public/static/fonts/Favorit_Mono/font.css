@@ -1,0 +1,27 @@
+@font-face {
+	font-family: "Favorit Mono";
+	src: url("FavoritMono-Bold.otf") format("opentype");
+	font-weight: 700;
+	font-style: normal;
+}
+
+@font-face {
+	font-family: "Favorit Mono";
+	src: url("FavoritMono-Light.otf") format("opentype");
+	font-weight: 300;
+	font-style: normal;
+}
+
+@font-face {
+    font-family: "Favorit Mono";
+    src: url("FavoritMono-Medium.otf") format("opentype");
+    font-weight: 500;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: "Favorit Mono";
+    src: url("FavoritMono-Regular.otf") format("opentype");
+    font-weight: 400;
+    font-style: normal;
+}
