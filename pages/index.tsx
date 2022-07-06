@@ -105,16 +105,17 @@ export default function Home({ user, profile, groups }) {
 			<div className="grid grid-cols-1 gap-16">
 				<div className={"justify-self-start mt-6"}>
 					<Header>
-						Welcome <TextGradient>{profile.username}</TextGradient>,
+						Welcome{" "}
+						<TextGradient gradient={theme.colors.gradient.a}>{profile.username}</TextGradient>,
 					</Header>
 					<div className={"self-start grid grid-cols-[auto_auto] gap-2"}>
-						<Widget amount={200} label={"Total owed"} />
+						<Widget amount={-1200} label={"Total owed"} />
 						<Widget amount={200} label={"Total refund"} />
 					</div>
 				</div>
 				<div>
 					<Header>
-						Your <TextGradient>groups</TextGradient>
+						Your <TextGradient gradient={theme.colors.gradient.a}>groups</TextGradient>
 					</Header>
 					<div className="grid grid-cols-1 gap-2">
 						{userGroups.length > 0 ? (

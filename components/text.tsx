@@ -1,4 +1,4 @@
-import theme from "@/styles/theme";
+import theme, { ThemeColors } from "@/styles/theme";
 
 export const Header = ({ children }: { children: any }) => {
 	return (
@@ -8,11 +8,23 @@ export const Header = ({ children }: { children: any }) => {
 	);
 };
 
-export const TextGradient = ({ children }: { children: any }) => {
+export const TextGradient = ({
+	children,
+	gradient,
+}: {
+	children: any;
+	gradient:
+		| ThemeColors["gradient"]["a"]
+		| ThemeColors["gradient"]["b"]
+		| ThemeColors["gradient"]["c"]
+		| ThemeColors["gradient"]["d"]
+		| ThemeColors["gradient"]["e"]
+		| ThemeColors["gradient"]["f"];
+}) => {
 	return (
 		<span
 			style={{
-				background: theme.colors.gradient.a,
+				background: gradient,
 				WebkitBackgroundClip: "text",
 				WebkitTextFillColor: "transparent",
 			}}

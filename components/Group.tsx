@@ -1,5 +1,12 @@
 import { displayAmount } from "@/components/Amount";
 import { forwardRef } from "react";
+import { styled } from "@stitches/react";
+
+const Amount = styled("div", {
+	"& > span": {
+		fontFamily: "var(--custom-font-family-mono)",
+	},
+});
 
 export const Group = forwardRef(({ group, ...props }: { group: any; props?: any }, ref) => (
 	<div
@@ -12,6 +19,6 @@ export const Group = forwardRef(({ group, ...props }: { group: any; props?: any 
 			<div className="text-sm">{group.groups.name}</div>
 			<div className="text-sm text-gray-600">{group.groups.name}</div>
 		</div>
-		<div className="text-sm text-right font-mono font-medium">{displayAmount(group.amount)}</div>
+		<Amount className="text-sm font-medium">{displayAmount(group.amount)}</Amount>
 	</div>
 ));

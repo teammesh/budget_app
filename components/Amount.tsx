@@ -1,11 +1,15 @@
+import theme from "@/styles/theme";
+import { TextGradient } from "@/components/text";
+import { styled } from "@stitches/react";
+
 export const formatter = new Intl.NumberFormat("en-US", {
 	style: "currency",
 	currency: "USD",
 });
 
 export const displayAmount = (amount: number | bigint) => (
-    <div className={amount < 0 ? "text-red-700" : "text-green-700"}>
-        {amount > 0 ? "+" : null}
-        {formatter.format(amount)}
-    </div>
+	<TextGradient gradient={amount > 0 ? theme.colors.gradient.f : theme.colors.gradient.b}>
+		{amount > 0 ? "+" : null}
+		{formatter.format(amount)}
+	</TextGradient>
 );
