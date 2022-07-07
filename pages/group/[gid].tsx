@@ -53,7 +53,7 @@ const Group = ({ user, profile, transactions, users }) => {
 			() =>
 				supabase
 					.from("profiles_groups")
-					.select("profile_id, profiles(username)")
+					.select("profile_id, amount_paid_transactions, split_amount, profiles(username)")
 					.eq("group_id", gid),
 			true,
 		);
@@ -81,7 +81,7 @@ const Group = ({ user, profile, transactions, users }) => {
 			</div>
 			<div>
 				{groupUsers.map((user) => (
-					<div key={user.profile_id}>{user.profiles.username}</div>
+					<div key={user.profile_id}>{user.profiles.username} - {user.amount_paid_transactions} / {user.split_amount}</div>
 				))}
 			</div>
 			<div className={"text-lg font-semibold"}>Shared transactions {sharedTransactions.length}</div>
@@ -117,7 +117,7 @@ export async function getServerSideProps({ req }) {
 
 	const { data: users } = await supabase
 		.from("profiles_groups")
-		.select("profile_id, profiles(username), groups(name)")
+		.select("profile_id, amount_paid_transactions, split_amount, profiles(username), groups(name)")
 		.eq("group_id", gid);
 
 	return { props: { ...props, transactions, users }, redirect };
