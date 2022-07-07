@@ -20,6 +20,12 @@ export default function Home({ user, profile, groups }) {
 	const [groupName, setGroupName] = useState("");
 	const [members, setMembers] = useState<string[]>([]);
 	const [userGroups, setUserGroups] = useState(groups);
+	const totalOwed = userGroups.reduce((prev, curr) => {
+		return Math.sign(curr.amount_owed) === -1 ? curr.amount_owed - prev : 0 - prev;
+	}, 0);
+	const totalRefund = userGroups.reduce((prev, curr) => {
+		return Math.sign(curr.amount_owed) && curr.amount_owed + prev;
+	}, 0);
 
 	useEffect(() => {
 		const findGroups = async () => {
@@ -27,7 +33,7 @@ export default function Home({ user, profile, groups }) {
 				() =>
 					supabase
 						.from("profiles_groups")
-						.select("group_id, groups(name)")
+						.select("group_id, amount_owed, groups(name)")
 						.eq("profile_id", profile_id),
 				true,
 			);
@@ -42,6 +48,10 @@ export default function Home({ user, profile, groups }) {
 			})
 			.subscribe();
 	}, []);
+
+	useEffect(() => {
+		console.log(totalOwed);
+	}, [userGroups]);
 
 	const handleCreateGroup = async () => {
 		// Create group
@@ -85,8 +95,8 @@ export default function Home({ user, profile, groups }) {
 						<TextGradient gradient={theme.colors.gradient.a}>{profile.username}</TextGradient>,
 					</Header>
 					<div className={"self-start grid grid-cols-[auto_auto] gap-2"}>
-						<Widget amount={-1200} label={"Total owed"} />
-						<Widget amount={200} label={"Total refund"} />
+						<Widget amount={totalOwed} label={"Total owed"} />
+						<Widget amount={totalRefund} label={"Total refund"} />
 					</div>
 				</div>
 				<div>
@@ -139,7 +149,7 @@ export async function getServerSideProps({ req }) {
 	const { props, redirect } = await verifyUser(req);
 	const { data: groups } = await supabase
 		.from("profiles_groups")
-		.select("group_id, groups(name)")
+		.select("group_id, amount_owed, groups(name)")
 		.eq("profile_id", props.user?.id);
 
 	return { props: { ...props, groups }, redirect };
