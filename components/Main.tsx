@@ -8,13 +8,7 @@ export const Main = ({ children }: { children: any }) => {
 	useEffect(() => {
 		const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
 			if (event === "SIGNED_OUT") {
-				await fetch("/api/auth", {
-					method: "POST",
-					headers: new Headers({ "Content-Type": "application/json" }),
-					credentials: "same-origin",
-					body: JSON.stringify({ event, session }),
-				}).then((res) => res.json());
-
+				localStorage.clear();
 				sessionStorage.clear();
 				return router.push("/login");
 			}
