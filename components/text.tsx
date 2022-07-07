@@ -27,6 +27,8 @@ export const TextGradient = ({
 				background: gradient,
 				WebkitBackgroundClip: "text",
 				WebkitTextFillColor: "transparent",
+				fontFamily: "inherit",
+				fontSize: "inherit",
 			}}
 		>
 			{children}

@@ -10,8 +10,18 @@ import { verifyUser } from "@/utils/ssr";
 import { Main } from "@/components/Main";
 import { Navbar } from "@/components/Navbar";
 import { Button } from "@/components/Button";
-import { ArrowLeftIcon, MixerHorizontalIcon } from "@radix-ui/react-icons";
+import {
+	ArrowLeftIcon,
+	CheckCircledIcon,
+	MixerHorizontalIcon,
+	PlusIcon,
+} from "@radix-ui/react-icons";
 import theme from "@/styles/theme";
+import * as Avatar from "@radix-ui/react-avatar";
+import { ArrowBetweenIcon, BarChartIcon, PieChartIcon } from "@/components/icons";
+import { Separator } from "@/components/Separator";
+import { Header, TextGradient } from "@/components/text";
+import { displayAmount } from "@/components/Amount";
 
 const Group = ({ user, profile, transactions, users }) => {
 	const profile_id = supabase.auth.session()?.user?.id;
@@ -19,6 +29,7 @@ const Group = ({ user, profile, transactions, users }) => {
 	const { gid }: { gid: string } = router.query;
 	const [showAddTransactions, setShowAddTransactions] = useState(false);
 	const [groupUsers, setGroupUsers] = useState(users);
+	const [showRunningTotal, setShowRunningTotal] = useState(false);
 	const sharedTransactions = tempStore((state) => state.sharedTransactions);
 	const setSharedTransactions = tempStore.getState().setSharedTransactions;
 	const groupName = users[0].groups.name;
@@ -54,7 +65,9 @@ const Group = ({ user, profile, transactions, users }) => {
 			() =>
 				supabase
 					.from("profiles_groups")
-					.select("profile_id, amount_paid_transactions, split_amount, profiles(username)")
+					.select(
+						"profile_id, amount_paid_transactions, split_amount, amount_owed, profiles(username)",
+					)
 					.eq("group_id", gid),
 			true,
 		);
@@ -68,40 +81,135 @@ const Group = ({ user, profile, transactions, users }) => {
 
 	return (
 		<Main>
-			<Navbar />
-			<div>{groupName}</div>
-			<div className={"flex justify-between"}>
-				<Button size={"sm"} style={{ background: theme.colors.gradient.a }}>
-					<ArrowLeftIcon />
-					Return
-				</Button>
-				<Button size={"sm"} style={{ background: theme.colors.gradient.a }}>
-					<MixerHorizontalIcon />
-					Manage
-				</Button>
-			</div>
-			<div>
-				{groupUsers.map((user) => (
-					<div key={user.profile_id}>{user.profiles.username}
-						{user.profile_id === profile_id ? "(you)" : null}
-						- {user.amount_paid_transactions} / {user.split_amount}</div>
-				))}
-			</div>
-			<div className={"text-lg font-semibold"}>Shared transactions {sharedTransactions.length}</div>
-			{!isEmpty(sharedTransactions) &&
-				sharedTransactions.map((x: Transaction) => (
-					<Link href={`/transaction/${encodeURIComponent(x.id)}`} key={x.id}>
-						<div className={"grid grid-cols-4"}>
-							<div>{x.date}</div>
-							<div>{x.merchant_name}</div>
-							<div>{x.name}</div>
-							<div>{x.amount}</div>
+			<div className={"grid grid-cols-1 gap-4"}>
+				<div className={"flex justify-between"}>
+					<Button
+						size={"sm"}
+						style={{ background: theme.colors.gradient.a }}
+						onClick={() => router.back()}
+					>
+						<ArrowLeftIcon />
+						Return
+					</Button>
+					<Button size={"sm"} style={{ background: theme.colors.gradient.a }}>
+						<MixerHorizontalIcon />
+						Manage
+					</Button>
+				</div>
+				<div
+					className={
+						"p-3 rounded-md bg-gray-900 grid grid-cols-1 gap-4 items-center cursor-pointer"
+					}
+					onClick={() => setShowRunningTotal(!showRunningTotal)}
+				>
+					<div className={"grid grid-cols-[auto_1fr_auto] gap-3 items-center"}>
+						<Avatar.Root>
+							<Avatar.Image />
+							<Avatar.Fallback>
+								<div className={"bg-gray-800 rounded-full h-8 w-8"} />
+							</Avatar.Fallback>
+						</Avatar.Root>
+						<div className="block">
+							<div className="text-sm font-medium">{groupName}</div>
+							<div className="text-xs text-gray-600">{groupUsers.length} users</div>
 						</div>
-					</Link>
-				))}
-
-			<button onClick={addTransactions}>Add transactions</button>
-			{showAddTransactions && <AddTransactions gid={gid} sharedTransactions={sharedTransactions} />}
+						<div className={"grid grid-cols-3 gap-1"}>
+							<PieChartIcon gradient={!showRunningTotal} />
+							<ArrowBetweenIcon />
+							<BarChartIcon gradient={showRunningTotal} />
+						</div>
+					</div>
+					<Separator />
+					<div className={"grid grid-cols-1 gap-3"}>
+						{groupUsers.map((user) => (
+							<div
+								key={user.profile_id}
+								className={"grid grid-cols-[auto_1fr_auto] items-center text-sm gap-3"}
+							>
+								<Avatar.Root>
+									<Avatar.Image />
+									<Avatar.Fallback>
+										<div className={"bg-gray-800 rounded-full h-6 w-6"} />
+									</Avatar.Fallback>
+								</Avatar.Root>
+								<div>
+									{user.profiles.username} {user.profile_id === profile_id && " (you)"}
+								</div>
+								<div className={"font-mono font-medium tracking-tight"}>
+									{!showRunningTotal ? (
+										<>{displayAmount(user.amount_owed)}</>
+									) : (
+										<>
+											${user.amount_paid_transactions} /{" "}
+											<span className={"font-mono font-medium text-gray-600"}>
+												${user.split_amount}
+											</span>
+										</>
+									)}
+								</div>
+							</div>
+						))}
+					</div>
+				</div>
+				<div className={"mt-6"}>
+					<Header>
+						Shared <TextGradient gradient={theme.colors.gradient.a}>transactions</TextGradient>
+					</Header>
+					<div className={"grid grid-cols-1 gap-2"}>
+						{!isEmpty(sharedTransactions) &&
+							sharedTransactions.map((x: Transaction) => (
+								<Link href={`/transaction/${encodeURIComponent(x.id)}`} key={x.id}>
+									<div
+										className={
+											"p-3 rounded-md bg-gray-900 cursor-pointer grid grid-cols-1 gap-0.5 text-sm"
+										}
+									>
+										<div className={"flex justify-between items-center"}>
+											<div className={"grid grid-cols-[auto_auto] gap-2 items-center"}>
+												<Avatar.Root>
+													<Avatar.Image />
+													<Avatar.Fallback>
+														<div className={"bg-gray-800 rounded-full h-4 w-4"} />
+													</Avatar.Fallback>
+												</Avatar.Root>
+												<div className={"font-medium"}>{x.merchant_name}</div>
+											</div>
+											<div className={"font-mono font-medium tracking-tight"}>
+												${x.amount.toFixed(2)}
+											</div>
+										</div>
+										<div className={"flex justify-between"}>
+											<div className={"text-gray-600"}>{x.name}</div>
+											<div className={"font-mono font-medium tracking-tight text-gray-600"}>
+												{x.date}
+											</div>
+										</div>
+									</div>
+								</Link>
+							))}
+					</div>
+				</div>
+				{showAddTransactions && (
+					<AddTransactions gid={gid} sharedTransactions={sharedTransactions} />
+				)}
+			</div>
+			<Navbar
+				toolbar={
+					<div className={"grid grid-cols-[108px_1fr] gap-2"}>
+						<Button
+							size={"sm"}
+							style={{ background: theme.colors.gradient.a }}
+							onClick={() => router.back()}
+						>
+							<CheckCircledIcon />
+							Pay
+						</Button>
+						<Button size={"sm"} background={theme.colors.gradient.a}>
+							<PlusIcon /> Add transactions
+						</Button>
+					</div>
+				}
+			/>
 		</Main>
 	);
 };
@@ -120,7 +228,9 @@ export async function getServerSideProps({ req }) {
 
 	const { data: users } = await supabase
 		.from("profiles_groups")
-		.select("profile_id, amount_paid_transactions, split_amount, profiles(username), groups(name)")
+		.select(
+			"profile_id, amount_paid_transactions, split_amount, amount_owed, profiles(username), groups(name)",
+		)
 		.eq("group_id", gid);
 
 	return { props: { ...props, transactions, users }, redirect };

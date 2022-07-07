@@ -3,12 +3,16 @@ import { HomeIcon, PersonIcon } from "@radix-ui/react-icons";
 import theme from "@/styles/theme";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { useAtom } from "jotai";
+import { isToolbarShownAtom } from "./Main";
 
 export const Navbar = ({ toolbar }: { toolbar?: any }) => {
 	const [activeRoute, setActiveRoute] = useState("");
+	const [isToolbarShown, setIsToolbarShown] = useAtom(isToolbarShownAtom);
 
 	useEffect(() => {
 		isActive();
+		toolbar && setIsToolbarShown(true);
 	}, []);
 
 	const isActive = () => {

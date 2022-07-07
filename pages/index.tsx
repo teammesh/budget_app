@@ -78,31 +78,6 @@ export default function Home({ user, profile, groups }) {
 
 	return (
 		<Main>
-			<Navbar
-				toolbar={
-					<div className={"flex justify-end"}>
-						<Dialog.Root>
-							<Dialog.Trigger asChild>
-								<Button size={"sm"} background={theme.colors.gradient.a}>
-									<PlusIcon /> Create Group
-								</Button>
-							</Dialog.Trigger>
-							<Content>
-								<Dialog.Title>Group name</Dialog.Title>
-								<Dialog.Description>Let's create a group!</Dialog.Description>
-								<Input placeholder="Group name" onChange={(e) => setGroupName(e.target.value)} />
-								<Input
-									placeholder="Members"
-									onChange={(e) => setMembers(e.target.value.split(","))}
-								/>
-								<Dialog.Close asChild>
-									<button onClick={() => handleCreateGroup()}>Create</button>
-								</Dialog.Close>
-							</Content>
-						</Dialog.Root>
-					</div>
-				}
-			/>
 			<div className="grid grid-cols-1 gap-16">
 				<div className={"justify-self-start mt-6"}>
 					<Header>
@@ -131,6 +106,31 @@ export default function Home({ user, profile, groups }) {
 					</div>
 				</div>
 			</div>
+			<Navbar
+				toolbar={
+					<div className={"flex justify-end"}>
+						<Dialog.Root>
+							<Dialog.Trigger asChild>
+								<Button size={"sm"} background={theme.colors.gradient.a}>
+									<PlusIcon /> Create Group
+								</Button>
+							</Dialog.Trigger>
+							<Content>
+								<Dialog.Title>Group name</Dialog.Title>
+								<Dialog.Description>Let's create a group!</Dialog.Description>
+								<Input placeholder="Group name" onChange={(e) => setGroupName(e.target.value)} />
+								<Input
+									placeholder="Members"
+									onChange={(e) => setMembers(e.target.value.split(","))}
+								/>
+								<Dialog.Close asChild>
+									<button onClick={() => handleCreateGroup()}>Create</button>
+								</Dialog.Close>
+							</Content>
+						</Dialog.Root>
+					</div>
+				}
+			/>
 		</Main>
 	);
 }
