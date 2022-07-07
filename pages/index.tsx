@@ -21,14 +21,14 @@ export default function Home({ user, profile, groups }) {
 	const setGroupName = tempStore.getState().setGroupName;
 	const setGroupMembers = tempStore.getState().setGroupMembers;
 	const [userGroups, setUserGroups] = useState(groups);
-	const totalOwed = userGroups.reduce(
-		(prev, curr) => (Math.sign(curr.amount_owed) === -1 ? curr.amount_owed - prev : 0 - prev),
-		0,
-	);
-	const totalRefund = userGroups.reduce(
-		(prev, curr) => Math.sign(curr.amount_owed) && curr.amount_owed + prev,
-		0,
-	);
+	const totalOwed = userGroups.reduce((prev, curr) => {
+		if (!curr.amount_owed) return 0 - prev;
+		return Math.sign(curr.amount_owed) === -1 ? curr.amount_owed - prev : 0 - prev;
+	}, 0);
+	const totalRefund = userGroups.reduce((prev, curr) => {
+		if (!curr.amount_owed) return 0 + prev;
+		return Math.sign(curr.amount_owed) && curr.amount_owed + prev;
+	}, 0);
 
 	useEffect(() => {
 		const findGroups = async () => {
