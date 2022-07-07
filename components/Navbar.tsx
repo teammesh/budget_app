@@ -22,7 +22,11 @@ export const Navbar = ({ toolbar }: { toolbar?: any }) => {
 	};
 
 	return (
-		<div className={"fixed bottom-0 left-0 right-0 bg-black"}>
+		<div
+			className={
+				"fixed bottom-0 left-0 right-0 bg-black grid grid-cols-1 grid-rows-[auto_auto] overflow-hidden"
+			}
+		>
 			{toolbar && <Toolbar>{toolbar}</Toolbar>}
 			<div className={"grid grid-cols-[auto_auto] gap-2 pb-6 pt-2 justify-center "}>
 				<Link href={"/"} passHref>
