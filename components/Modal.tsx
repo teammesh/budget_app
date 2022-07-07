@@ -22,8 +22,6 @@ const StyledOverlay = styled(Dialog.Overlay, {
 });
 
 const StyledContent = styled(Dialog.Content, {
-	backgroundColor: "white",
-	borderRadius: 6,
 	boxShadow: "hsl(206 22% 7% / 35%) 0px 10px 38px -10px, hsl(206 22% 7% / 20%) 0px 10px 20px -15px",
 	position: "fixed",
 	top: "50%",
@@ -32,7 +30,7 @@ const StyledContent = styled(Dialog.Content, {
 	width: "90vw",
 	maxWidth: "450px",
 	maxHeight: "85vh",
-	padding: 25,
+	zIndex: 99,
 	"@media (prefers-reduced-motion: no-preference)": {
 		animation: `${contentShow} 150ms cubic-bezier(0.16, 1, 0.3, 1) forwards`,
 	},
@@ -43,7 +41,9 @@ export function Content({ children, ...props }) {
 	return (
 		<Dialog.Portal>
 			<StyledOverlay />
-			<StyledContent {...props}>{children}</StyledContent>
+			<StyledContent className={"bg-gray-800 rounded-md p-6 grid grid-cols-1 gap-2"} {...props}>
+				{children}
+			</StyledContent>
 		</Dialog.Portal>
 	);
 }
