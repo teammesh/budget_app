@@ -14,18 +14,21 @@ import { Button } from "@/components/Button";
 import { PlusIcon } from "@radix-ui/react-icons";
 import theme from "@/styles/theme";
 import { verifyUser } from "@/utils/ssr";
+import { tempStore } from "@/utils/store";
 
 export default function Home({ user, profile, groups }) {
 	const profile_id = supabase.auth.session()?.user?.id;
-	const [groupName, setGroupName] = useState("");
-	const [members, setMembers] = useState<string[]>([]);
+	const setGroupName = tempStore.getState().setGroupName;
+	const setGroupMembers = tempStore.getState().setGroupMembers;
 	const [userGroups, setUserGroups] = useState(groups);
-	const totalOwed = userGroups.reduce((prev, curr) => {
-		return Math.sign(curr.amount_owed) === -1 ? curr.amount_owed - prev : 0 - prev;
-	}, 0);
-	const totalRefund = userGroups.reduce((prev, curr) => {
-		return Math.sign(curr.amount_owed) && curr.amount_owed + prev;
-	}, 0);
+	const totalOwed = userGroups.reduce(
+		(prev, curr) => (Math.sign(curr.amount_owed) === -1 ? curr.amount_owed - prev : 0 - prev),
+		0,
+	);
+	const totalRefund = userGroups.reduce(
+		(prev, curr) => Math.sign(curr.amount_owed) && curr.amount_owed + prev,
+		0,
+	);
 
 	useEffect(() => {
 		const findGroups = async () => {
@@ -49,11 +52,10 @@ export default function Home({ user, profile, groups }) {
 			.subscribe();
 	}, []);
 
-	useEffect(() => {
-		console.log(totalOwed);
-	}, [userGroups]);
-
 	const handleCreateGroup = async () => {
+		const groupName = tempStore.getState().groupName;
+		const groupMembers = tempStore.getState().groupMembers;
+
 		// Create group
 		const { data: groupsData, error } = await supabase.from("groups").insert([{ name: groupName }]);
 
@@ -65,7 +67,7 @@ export default function Home({ user, profile, groups }) {
 
 		// Get profile_ids of invitees
 		const tmp = await Promise.all(
-			members.map(async (member) => {
+			groupMembers.map(async (member) => {
 				if (profileData[0].profiles.username === member) return;
 
 				const { data: memberData } = await supabase
@@ -131,7 +133,7 @@ export default function Home({ user, profile, groups }) {
 								<Input placeholder="Group name" onChange={(e) => setGroupName(e.target.value)} />
 								<Input
 									placeholder="Members"
-									onChange={(e) => setMembers(e.target.value.split(","))}
+									onChange={(e) => setGroupMembers(e.target.value.split(","))}
 								/>
 								<Dialog.Close asChild>
 									<button onClick={() => handleCreateGroup()}>Create</button>

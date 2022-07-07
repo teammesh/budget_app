@@ -40,6 +40,10 @@ interface TempStoreState {
 	setSharedTransactions: (x: any[]) => void;
 	groups: any[];
 	setGroups: (x: any[]) => void;
+	groupName: string;
+	setGroupName: (x: string) => void;
+	groupMembers: any;
+	setGroupMembers: (x: any) => void;
 }
 
 export const tempStore = create<TempStoreState>((set, get) => ({
@@ -47,4 +51,8 @@ export const tempStore = create<TempStoreState>((set, get) => ({
 	setSharedTransactions: (x) => set(() => ({ sharedTransactions: x })),
 	groups: [],
 	setGroups: (x) => set(() => ({ groups: x })),
+	groupName: "",
+	setGroupName: (x) => set(() => ({ groupName: x })),
+	groupMembers: null,
+	setGroupMembers: (x) => set(() => ({ groupMembers: x })),
 }));

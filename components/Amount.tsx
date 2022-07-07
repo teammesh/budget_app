@@ -8,7 +8,7 @@ export const formatter = new Intl.NumberFormat("en-US", {
 });
 
 export const displayAmount = (amount: number | bigint) => (
-	<TextGradient gradient={amount > 0 ? theme.colors.gradient.f : theme.colors.gradient.b}>
+	<TextGradient gradient={amount >= 0 ? theme.colors.gradient.f : theme.colors.gradient.b}>
 		{amount > 0 ? "+" : null}
 		{formatter.format(amount)}
 	</TextGradient>
