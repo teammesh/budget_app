@@ -18,7 +18,13 @@ const Group = ({ user, profile, transactions, users }) => {
 	const { gid }: { gid: string } = router.query;
 	const [showAddTransactions, setShowAddTransactions] = useState(false);
 	const [groupUsers, setGroupUsers] = useState(users);
-	const [sharedTransactions, setSharedTransactions] = useState(transactions);
+	const sharedTransactions = tempStore((state) => state.sharedTransactions);
+	const setSharedTransactions = tempStore.getState().setSharedTransactions;
+	const groupName = users[0].groups.name;
+
+	useEffect(() => {
+		setSharedTransactions(transactions);
+	}, []);
 
 	useEffect(() => {
 		if (!gid) return;
@@ -62,7 +68,7 @@ const Group = ({ user, profile, transactions, users }) => {
 	return (
 		<Main>
 			<Navbar />
-			<div>{groupUsers[0].groups.name}</div>
+			<div>{groupName}</div>
 			<div className={"flex justify-between"}>
 				<Button size={"sm"} style={{ background: theme.colors.gradient.a }}>
 					<ArrowLeftIcon />
