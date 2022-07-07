@@ -14,6 +14,7 @@ import { ArrowLeftIcon, MixerHorizontalIcon } from "@radix-ui/react-icons";
 import theme from "@/styles/theme";
 
 const Group = ({ user, profile, transactions, users }) => {
+	const profile_id = supabase.auth.session()?.user?.id;
 	const router = useRouter();
 	const { gid }: { gid: string } = router.query;
 	const [showAddTransactions, setShowAddTransactions] = useState(false);
@@ -81,7 +82,9 @@ const Group = ({ user, profile, transactions, users }) => {
 			</div>
 			<div>
 				{groupUsers.map((user) => (
-					<div key={user.profile_id}>{user.profiles.username} - {user.amount_paid_transactions} / {user.split_amount}</div>
+					<div key={user.profile_id}>{user.profiles.username}
+						{user.profile_id === profile_id ? "(you)" : null}
+						- {user.amount_paid_transactions} / {user.split_amount}</div>
 				))}
 			</div>
 			<div className={"text-lg font-semibold"}>Shared transactions {sharedTransactions.length}</div>
