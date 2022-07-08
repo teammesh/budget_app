@@ -27,8 +27,6 @@ export function PlaidLink() {
 				.then((res) => res.json())
 				.then(({ data }) => setAccounts([...accounts, ...data]));
 		},
-		onExit: (err, metadata) => {},
-		onEvent: (eventName, metadata) => {},
 		token: linkToken,
 		//required for OAuth; if not using OAuth, set to null or omit:
 	};
