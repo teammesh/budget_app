@@ -92,7 +92,10 @@ export default function AddTransactions({
 				<Button
 					size={"sm"}
 					style={{ background: theme.colors.gradient.a }}
-					onClick={() => setShowAddTransactions(false)}
+					onClick={() => {
+						setShowAddTransactions(false);
+						tempStore.getState().setAddTransactions([]);
+					}}
 				>
 					<ArrowLeftIcon />
 					Cancel

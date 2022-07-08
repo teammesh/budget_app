@@ -131,14 +131,14 @@ const Group = ({ user, profile, transactions, users }) => {
 								<div>
 									{user.profiles.username} {user.profile_id === profile_id && " (you)"}
 								</div>
-								<div className={"font-mono font-medium tracking-tight"}>
+								<div className={"font-mono font-medium tracking-tighter"}>
 									{!showRunningTotal ? (
 										<>{displayAmount(user.amount_owed)}</>
 									) : (
 										<>
-											${user.amount_paid_transactions} /{" "}
+											${user.amount_paid_transactions.toLocaleString()} /{" "}
 											<span className={"font-mono font-medium text-gray-600"}>
-												${user.split_amount}
+												${user.split_amount.toLocaleString()}
 											</span>
 										</>
 									)}
@@ -224,19 +224,19 @@ const AddTransactionsButton = ({ setShowAddTransactions }: { setShowAddTransacti
 	const addTransactions = tempStore((state) => state.addTransactions);
 	const setAddTransactions = tempStore.getState().setAddTransactions;
 
+	const submit = async () => {
+		if (addTransactions.length === 0) return;
+
+		const { data } = await supabaseQuery(
+			() => supabase.from("shared_transactions").upsert(tempStore.getState().addTransactions),
+			true,
+		);
+		setShowAddTransactions(false);
+		setAddTransactions([]);
+	};
+
 	return (
-		<Button
-			size={"sm"}
-			background={theme.colors.gradient.a}
-			onClick={async () => {
-				const { data } = await supabaseQuery(
-					() => supabase.from("shared_transactions").upsert(tempStore.getState().addTransactions),
-					true,
-				);
-				setShowAddTransactions(false);
-				setAddTransactions([]);
-			}}
-		>
+		<Button size={"sm"} background={theme.colors.gradient.a} onClick={submit}>
 			<PlusIcon /> Add {addTransactions.length} transactions
 		</Button>
 	);

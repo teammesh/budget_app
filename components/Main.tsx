@@ -15,6 +15,7 @@ export const Main = ({ children }: { children: any }) => {
 			overflow: "auto",
 			height: isToolbarShown ? "calc(100% - 144px)" : "calc(100% - 76px)",
 			alignContent: "start",
+			padding: "0.75rem",
 			paddingBottom: "2rem",
 		},
 	});
@@ -33,5 +34,5 @@ export const Main = ({ children }: { children: any }) => {
 		};
 	}, []);
 
-	return <Container className={"h-full bg-black text-white p-3"}>{children}</Container>;
+	return <Container className={"h-full bg-black text-white"}>{children}</Container>;
 };
