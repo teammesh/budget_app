@@ -25,6 +25,7 @@ import { displayAmount } from "@/components/Amount";
 import { definitions } from "../../types/supabase";
 import { AuthUser } from "@supabase/supabase-js";
 import { RequestData } from "next/dist/server/web/types";
+import Payments from "@/components/Payments";
 
 const Group = ({
 	user,
@@ -42,6 +43,7 @@ const Group = ({
 	// @ts-ignore
 	const { gid }: { gid: string } = router.query;
 	const [showAddTransactions, setShowAddTransactions] = useState(false);
+	const [showPayments, setShowPayments] = useState(false);
 	const [groupUsers, setGroupUsers] = useState(users);
 	const [showRunningTotal, setShowRunningTotal] = useState(false);
 	const sharedTransactions = tempStore((state) => state.sharedTransactions);
@@ -202,6 +204,9 @@ const Group = ({
 				{showAddTransactions && (
 					<AddTransactions gid={gid} setShowAddTransactions={setShowAddTransactions} />
 				)}
+				{showPayments && (
+					<Payments gid={gid} setShowPayments={setShowPayments} />
+				)}
 			</div>
 			<Navbar
 				toolbar={
@@ -209,12 +214,22 @@ const Group = ({
 						<div className={"grid grid-cols-[1fr]"}>
 							<AddTransactionsButton setShowAddTransactions={setShowAddTransactions} />
 						</div>
+					) : showPayments ? (
+						<div className={"grid grid-cols-[1fr]"}>
+							<Button
+								size={"sm"}
+								background={theme.colors.gradient.a}
+								onClick={() => console.log("Clicked mark as paid")}
+							>
+								<CheckCircledIcon /> Mark as paid
+							</Button>
+						</div>	
 					) : (
 						<div className={"grid grid-cols-[108px_1fr] gap-2"}>
 							<Button
 								size={"sm"}
 								style={{ background: theme.colors.gradient.a }}
-								onClick={() => router.back()}
+								onClick={() => setShowPayments(true)}
 							>
 								<CheckCircledIcon />
 								Pay

@@ -1,6 +1,5 @@
 import theme from "@/styles/theme";
 import { TextGradient } from "@/components/text";
-import { styled } from "@stitches/react";
 
 export const formatter = new Intl.NumberFormat("en-US", {
 	style: "currency",
