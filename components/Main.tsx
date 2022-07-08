@@ -13,7 +13,7 @@ export const Main = ({ children }: { children: any }) => {
 	const Container = styled("div", {
 		"& > div:first-of-type": {
 			overflow: "auto",
-			height: isToolbarShown ? "calc(100% - 144px)" : "calc(100% - 76px)",
+			height: isToolbarShown ? "calc(100% - 124px)" : "calc(100% - 68px)",
 			alignContent: "start",
 			padding: "0.75rem",
 			paddingBottom: "2rem",

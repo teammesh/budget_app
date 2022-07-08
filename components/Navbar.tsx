@@ -28,7 +28,7 @@ export const Navbar = ({ toolbar }: { toolbar?: any }) => {
 			}
 		>
 			{toolbar && <Toolbar>{toolbar}</Toolbar>}
-			<div className={"grid grid-cols-[auto_auto] gap-2 pb-6 pt-2 justify-center "}>
+			<div className={"grid grid-cols-[auto_auto] gap-2 py-3 justify-center "}>
 				<Link href={"/"} passHref>
 					<Button
 						size={"sm"}
@@ -56,5 +56,5 @@ export const Navbar = ({ toolbar }: { toolbar?: any }) => {
 };
 
 const Toolbar = ({ children }: { children: any }) => {
-	return <div className={"bg-black-500 w-full p-3"}>{children}</div>;
+	return <div className={"bg-black-500 w-full p-3 pb-0"}>{children}</div>;
 };

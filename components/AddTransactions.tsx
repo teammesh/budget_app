@@ -80,7 +80,7 @@ export default function AddTransactions({
 	const Container = styled("div", {
 		position: "fixed",
 		top: 0,
-		bottom: isToolbarShown ? "144px" : "76px",
+		bottom: isToolbarShown ? "124px" : "68px",
 		left: 0,
 		right: 0,
 		zIndex: 99,
