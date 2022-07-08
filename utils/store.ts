@@ -15,6 +15,7 @@ interface SessionStoreState {
 }
 
 export const sessionStore = create<SessionStoreState>(
+	// @ts-ignore
 	persist(
 		(set, get) => ({
 			session: null,
@@ -23,7 +24,7 @@ export const sessionStore = create<SessionStoreState>(
 			setProfile: (x) => set(() => ({ profile: x })),
 			transactions: [],
 			setTransactions: (x) => set(() => ({ transactions: x })),
-			transactionCursor: null,
+			transactionCursor: {},
 			setTransactionCursor: (x) => set(() => ({ transactionCursor: x })),
 			accounts: [],
 			setAccounts: (x) => set(() => ({ accounts: x })),

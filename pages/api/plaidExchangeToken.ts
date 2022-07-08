@@ -4,9 +4,11 @@ const { Configuration, PlaidApi, PlaidEnvironments } = require("plaid");
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY;
+// @ts-ignore
 const supabaseService = createClient(supabaseUrl, supabaseServiceKey);
 
 const configuration = new Configuration({
+	// @ts-ignore
 	basePath: PlaidEnvironments[process.env.PLAID_ENV],
 	baseOptions: {
 		headers: {

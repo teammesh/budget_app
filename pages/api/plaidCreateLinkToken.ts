@@ -3,6 +3,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 const { Configuration, PlaidApi, PlaidEnvironments } = require("plaid");
 
 const configuration = new Configuration({
+	// @ts-ignore
 	basePath: PlaidEnvironments[process.env.PLAID_ENV],
 	baseOptions: {
 		headers: {

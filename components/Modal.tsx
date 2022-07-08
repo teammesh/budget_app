@@ -37,7 +37,7 @@ const StyledContent = styled(Dialog.Content, {
 	"&:focus": { outline: "none" },
 });
 
-export function Content({ children, ...props }) {
+export function Content({ children, ...props }: { children: any }) {
 	return (
 		<Dialog.Portal>
 			<StyledOverlay />

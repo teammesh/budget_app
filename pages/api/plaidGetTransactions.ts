@@ -1,13 +1,10 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { createClient } from "@supabase/supabase-js";
 import { TransactionsSyncRequest } from "plaid";
+
 const { Configuration, PlaidApi, PlaidEnvironments } = require("plaid");
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY;
-const supabaseService = createClient(supabaseUrl, supabaseServiceKey);
-
 const configuration = new Configuration({
+	// @ts-ignore
 	basePath: PlaidEnvironments[process.env.PLAID_ENV],
 	baseOptions: {
 		headers: {

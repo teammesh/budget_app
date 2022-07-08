@@ -15,8 +15,19 @@ import { PlusIcon } from "@radix-ui/react-icons";
 import theme from "@/styles/theme";
 import { verifyUser } from "@/utils/ssr";
 import { tempStore } from "@/utils/store";
+import { AuthUser } from "@supabase/supabase-js";
+import { definitions } from "../types/supabase";
+import { RequestData } from "next/dist/server/web/types";
 
-export default function Home({ user, profile, groups }) {
+export default function Home({
+	user,
+	profile,
+	groups,
+}: {
+	user: AuthUser;
+	profile: definitions["profiles"];
+	groups: definitions["profiles_groups"][];
+}) {
 	const profile_id = supabase.auth.session()?.user?.id;
 	const setGroupName = tempStore.getState().setGroupName;
 	const setGroupMembers = tempStore.getState().setGroupMembers;
@@ -58,22 +69,25 @@ export default function Home({ user, profile, groups }) {
 
 		// Create group
 		const { data: groupsData, error } = await supabase.from("groups").insert([{ name: groupName }]);
+		if (!groupsData || groupsData.length === 0) return;
 
 		// Attach current user to group
 		const { data: profileData } = await supabase
 			.from("profiles_groups")
 			.insert({ group_id: groupsData[0].id, profile_id: supabase.auth.session()?.user?.id })
 			.select("*, profiles(username)");
+		if (!profileData || profileData.length === 0) return;
 
 		// Get profile_ids of invitees
 		const tmp = await Promise.all(
-			groupMembers.map(async (member) => {
+			groupMembers.map(async (member: any) => {
 				if (profileData[0].profiles.username === member) return;
 
 				const { data: memberData } = await supabase
 					.from("profiles")
 					.select()
 					.eq("username", member);
+				if (!memberData || memberData.length === 0) return;
 
 				if (memberData?.length > 0)
 					return { group_id: groupsData[0].id, profile_id: memberData[0].id };
@@ -107,7 +121,7 @@ export default function Home({ user, profile, groups }) {
 					</Header>
 					<div className="grid grid-cols-1 gap-2">
 						{userGroups.length > 0 ? (
-							userGroups.map((group) => (
+							userGroups.map((group: any) => (
 								<Link href={`/group/${group.group_id}`} key={group.groups.name} passHref>
 									<Group group={group} />
 								</Link>
@@ -147,7 +161,7 @@ export default function Home({ user, profile, groups }) {
 	);
 }
 
-export async function getServerSideProps({ req }) {
+export async function getServerSideProps({ req }: { req: RequestData }) {
 	const { props, redirect } = await verifyUser(req);
 	const { data: groups } = await supabase
 		.from("profiles_groups")

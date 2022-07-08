@@ -5,9 +5,10 @@ import { Transaction as TransactionType } from "plaid";
 
 const Transaction = () => {
 	const router = useRouter();
+	// @ts-ignore
 	const { tid }: { tid: string } = router.query;
 
-	const [transaction, setTransaction] = useState<TransactionType>({});
+	const [transaction, setTransaction] = useState<TransactionType | Record<any, any>>({});
 	const [groupUsers, setGroupUsers] = useState([]);
 
 	useEffect(() => {
@@ -18,6 +19,7 @@ const Transaction = () => {
 			.select("*, groups( name, profiles_groups( profiles(id, username) ) )")
 			.eq("id", tid)
 			.then(({ data }) => {
+				if (!data || data.length === 0) return;
 				setTransaction(data[0]);
 				setGroupUsers(data[0].groups.profiles_groups);
 			});
@@ -34,7 +36,7 @@ const Transaction = () => {
 			</div>
 			<div> {transaction.category}</div>
 			<div>
-				{groupUsers.map((user) => (
+				{groupUsers.map((user: any) => (
 					<div key={user.profiles.profile_id}>{user.profiles.username}</div>
 				))}
 			</div>

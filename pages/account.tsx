@@ -4,12 +4,21 @@ import { Navbar } from "@/components/Navbar";
 import { Main } from "@/components/Main";
 import { Input } from "@/components/Input";
 import { verifyUser } from "@/utils/ssr";
+import { AuthUser } from "@supabase/supabase-js";
+import { definitions } from "../types/supabase";
+import { RequestData } from "next/dist/server/web/types";
 
-export default function Account({ user, profile }) {
+export default function Account({
+	user,
+	profile,
+}: {
+	user: AuthUser;
+	profile: definitions["profiles"];
+}) {
 	const [loading, setLoading] = useState(true);
-	const [username, setUsername] = useState(null);
-	const [website, setWebsite] = useState(null);
-	const [avatar_url, setAvatarUrl] = useState(null);
+	const [username, setUsername] = useState<string>("");
+	const [website, setWebsite] = useState<string>("");
+	const [avatar_url, setAvatarUrl] = useState<string>("");
 
 	useEffect(() => {
 		getProfile();
@@ -18,7 +27,6 @@ export default function Account({ user, profile }) {
 	async function getProfile() {
 		try {
 			setLoading(true);
-			const user = supabase.auth.user();
 
 			const { data, error, status } = await supabase
 				.from("profiles")
@@ -35,17 +43,24 @@ export default function Account({ user, profile }) {
 				setWebsite(data.website);
 				setAvatarUrl(data.avatar_url);
 			}
-		} catch (error) {
+		} catch (error: any) {
 			alert(error.message);
 		} finally {
 			setLoading(false);
 		}
 	}
 
-	async function updateProfile({ username, website, avatar_url }) {
+	async function updateProfile({
+		username,
+		website,
+		avatar_url,
+	}: {
+		username: string;
+		website: string;
+		avatar_url: string;
+	}) {
 		try {
 			setLoading(true);
-			const user = supabase.auth.user();
 
 			const updates = {
 				id: user.id,
@@ -62,7 +77,7 @@ export default function Account({ user, profile }) {
 			if (error) {
 				throw error;
 			}
-		} catch (error) {
+		} catch (error: any) {
 			alert(error.message);
 		} finally {
 			setLoading(false);
@@ -110,7 +125,9 @@ export default function Account({ user, profile }) {
 					<button
 						className="button block"
 						onClick={async () => {
-							await supabase.auth.api.signOut(supabase.auth.session()?.access_token);
+							const access_token = supabase.auth.session()?.access_token;
+							if (!access_token) return;
+							await supabase.auth.api.signOut(access_token);
 							await supabase.auth.signOut();
 						}}
 					>
@@ -122,6 +139,6 @@ export default function Account({ user, profile }) {
 	);
 }
 
-export async function getServerSideProps({ req }) {
+export async function getServerSideProps({ req }: { req: RequestData }) {
 	return verifyUser(req);
 }

@@ -15,6 +15,8 @@ export const verifyUser = async (req: any) => {
 		return { props: {}, redirect: { destination: "/account", permanent: false } };
 	}
 
+	const profile = profiles && profiles.length > 0 && profiles[0];
+
 	// If there is a user, return it.
-	return { props: { user, profile: profiles[0] } };
+	return { props: { user, profile } };
 };

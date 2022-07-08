@@ -22,10 +22,24 @@ import { ArrowBetweenIcon, BarChartIcon, PieChartIcon } from "@/components/icons
 import { Separator } from "@/components/Separator";
 import { Header, TextGradient } from "@/components/text";
 import { displayAmount } from "@/components/Amount";
+import { definitions } from "../../types/supabase";
+import { AuthUser } from "@supabase/supabase-js";
+import { RequestData } from "next/dist/server/web/types";
 
-const Group = ({ user, profile, transactions, users }) => {
+const Group = ({
+	user,
+	profile,
+	transactions,
+	users,
+}: {
+	user: AuthUser;
+	profile: definitions["profiles"];
+	transactions: definitions["shared_transactions"][];
+	users: definitions["profiles_groups"][] | any;
+}) => {
 	const profile_id = supabase.auth.session()?.user?.id;
 	const router = useRouter();
+	// @ts-ignore
 	const { gid }: { gid: string } = router.query;
 	const [showAddTransactions, setShowAddTransactions] = useState(false);
 	const [groupUsers, setGroupUsers] = useState(users);
@@ -117,7 +131,7 @@ const Group = ({ user, profile, transactions, users }) => {
 					</div>
 					<Separator />
 					<div className={"grid grid-cols-1 gap-3"}>
-						{groupUsers.map((user) => (
+						{groupUsers.map((user: any) => (
 							<div
 								key={user.profile_id}
 								className={"grid grid-cols-[auto_1fr_auto] items-center text-sm gap-3"}
@@ -153,7 +167,7 @@ const Group = ({ user, profile, transactions, users }) => {
 					</Header>
 					<div className={"grid grid-cols-1 gap-2"}>
 						{!isEmpty(sharedTransactions) &&
-							sharedTransactions.map((x: Transaction) => (
+							sharedTransactions.map((x) => (
 								<Link href={`/transaction/${encodeURIComponent(x.id)}`} key={x.id}>
 									<div
 										className={
@@ -242,7 +256,7 @@ const AddTransactionsButton = ({ setShowAddTransactions }: { setShowAddTransacti
 	);
 };
 
-export async function getServerSideProps({ req }) {
+export async function getServerSideProps({ req }: { req: RequestData }) {
 	const { props, redirect } = await verifyUser(req);
 
 	const gidRegEx = new RegExp("(?<=gid=).*");
