@@ -1,28 +1,38 @@
 import { useEffect, useState } from "react";
-import { supabase, supabaseQuery } from "@/utils/supabaseClient";
-import { sessionStore } from "@/utils/store";
-import { isEmpty, pick, reverse, without } from "ramda";
-import { Transaction } from "plaid";
+import { supabase } from "@/utils/supabaseClient";
+import { sessionStore, tempStore } from "@/utils/store";
+import { isEmpty, reverse, without } from "ramda";
+import { Transaction as TransactionType } from "plaid";
 import { ItemPublicTokenExchangeResponse } from "plaid/api";
 import { PlaidLink } from "@/components/PlaidLink";
 import { sortByDate } from "@/utils/helper";
+import { styled } from "@stitches/react";
+import { useAtom } from "jotai";
+import { isToolbarShownAtom } from "@/components/Main";
+import { Button } from "@/components/Button";
+import theme from "@/styles/theme";
+import { ArrowLeftIcon } from "@radix-ui/react-icons";
+import Toggle from "@/components/Toggle";
+import { Transaction } from "@/components/Transaction";
+import { Header, TextGradient } from "@/components/text";
 
 export default function AddTransactions({
 	gid,
-	sharedTransactions,
+	setShowAddTransactions,
 }: {
 	gid: string;
-	sharedTransactions: any[];
+	setShowAddTransactions: any;
 }) {
+	const profile_id = supabase.auth.session()?.user?.id;
 	const [showAccounts, setShowAccounts] = useState<any>([]);
 	const [transactions, setTransactions] = useState<any>([]);
 	const accounts = sessionStore((state) => state.accounts);
+	const [isToolbarShown] = useAtom(isToolbarShownAtom);
 	const setAccounts = sessionStore.getState().setAccounts;
 	const transactionCursor = sessionStore.getState().transactionCursor;
 	const setTransactionCursor = sessionStore.getState().setTransactionCursor;
 
 	useEffect(() => {
-		const profile_id = supabase.auth.session()?.user?.id;
 		supabase
 			.from("plaid_items")
 			.select()
@@ -39,12 +49,14 @@ export default function AddTransactions({
 
 	const getTransactions = async (
 		access_token: ItemPublicTokenExchangeResponse["access_token"],
-		account_id: Transaction["account_id"],
+		account_id: TransactionType["account_id"],
 	) => {
 		// hide transactions for the pm if it is toggled again
 		if (showAccounts.includes(access_token)) {
 			setShowAccounts(without([access_token], showAccounts));
-			return setTransactions(transactions.filter((x: Transaction) => x.account_id !== account_id));
+			return setTransactions(
+				transactions.filter((x: TransactionType) => x.account_id !== account_id),
+			);
 		}
 
 		const cursor = transactionCursor?.access_token;
@@ -65,89 +77,57 @@ export default function AddTransactions({
 		return;
 	};
 
-	const shareTransaction = async (transaction: Transaction) => {
-		const metadata = pick(
-			[
-				"account_id",
-				"amount",
-				"authorized_date",
-				"category",
-				"category_id",
-				"date",
-				"location",
-				"merchant_name",
-				"name",
-				"payment_channel",
-				"payment_meta",
-				"pending",
-				"transaction_id",
-				"transaction_type",
-			],
-			transaction,
-		);
-		const req = { ...metadata, group_id: gid, charged_to: supabase.auth.session()?.user?.id };
-		const { data } = await supabaseQuery(
-			() => supabase.from("shared_transactions").upsert(req),
-			true,
-		);
-	};
-
-	// account_id: '9a1a4NRBPAHKNJVbv7z8hGX9KkkBBnIV4r3bN',
-	// account_owner: null,
-	// amount: 5.4,
-	// authorized_date: '2022-07-03',
-	// authorized_datetime: null,
-	// category: [Array],
-	// category_id: '22016000',
-	// check_number: null,
-	// date: '2022-07-04',
-	// datetime: null,
-	// iso_currency_code: 'USD',
-	// location: [Object],
-	// merchant_name: 'Uber',
-	// name: 'Uber 063015 SF**POOL**',
-	// payment_channel: 'in store',
-	// payment_meta: [Object],
-	// pending: false,
-	// pending_transaction_id: null,
-	// personal_finance_category: null,
-	// transaction_code: null,
-	// transaction_id: 'eGAG7QMZg5TEGkzZe593SQwav97DkKi7onM5q',
-	// transaction_type: 'special',
-	// unofficial_currency_code: null
+	const Container = styled("div", {
+		position: "fixed",
+		top: 0,
+		bottom: isToolbarShown ? "144px" : "76px",
+		left: 0,
+		right: 0,
+		zIndex: 99,
+	});
 
 	return (
-		<>
-			<PlaidLink />
-			{!isEmpty(accounts) &&
-				accounts.map((x: ItemPublicTokenExchangeResponse) => (
-					<div
-						className={
-							"p-3 text-purple-400 hover:text-purple-100 cursor-pointer bg-purple-100 border-2"
-						}
-						onClick={() => getTransactions(x.access_token, x.account_id)}
-						key={x.item_id}
-					>
-						{x.name}
-					</div>
-				))}
-			<div>
-				<div className={"text-lg font-semibold"}>Transactions {transactions.length}</div>
-				{!isEmpty(transactions) &&
-					transactions.map((x: Transaction) => (
-						<div key={x.transaction_id} className={"grid grid-cols-5"}>
-							<div>{x.date}</div>
-							<div>{x.merchant_name}</div>
-							<div>{x.name}</div>
-							<div>{x.amount}</div>
-							{sharedTransactions.find((y) => x.transaction_id === y.transaction_id) ? (
-								<button onClick={() => console.log("added already")}>Added!</button>
-							) : (
-								<button onClick={() => shareTransaction(x)}>Add to group</button>
-							)}
+		<Container className={"bg-black p-3 grid grid-cols-1 gap-4 content-start overflow-auto"}>
+			<div className={"flex justify-between"}>
+				<Button
+					size={"sm"}
+					style={{ background: theme.colors.gradient.a }}
+					onClick={() => setShowAddTransactions(false)}
+				>
+					<ArrowLeftIcon />
+					Cancel
+				</Button>
+				<PlaidLink />
+			</div>
+			<div className={"p-3 rounded-md bg-gray-900 grid grid-cols-1 gap-2 text-sm"}>
+				{!isEmpty(accounts) &&
+					accounts.map((x: ItemPublicTokenExchangeResponse) => (
+						<div
+							className={
+								"grid grid-cols-[auto_1fr_auto] items-center justify-between content-center gap-3 py-1"
+							}
+							onClick={() => getTransactions(x.access_token, x.account_id)}
+							key={x.item_id}
+						>
+							<Toggle checked={showAccounts.includes(x.access_token)} />
+							{x.name}
+							<span className={"font-mono font-medium tracking-tight text-gray-600"}>
+								•••• {x.last_four_digits}
+							</span>
 						</div>
 					))}
 			</div>
-		</>
+			<div className={"mt-6"}>
+				<Header>
+					Your <TextGradient gradient={theme.colors.gradient.a}>transactions</TextGradient>
+				</Header>
+				<div className={"grid grid-cols-1 gap-2"}>
+					{!isEmpty(transactions) &&
+						transactions.map((x: TransactionType) => (
+							<Transaction gid={gid} transaction={x} key={x.transaction_id} />
+						))}
+				</div>
+			</div>
+		</Container>
 	);
 }

@@ -2,6 +2,9 @@ import { PlaidLinkOptions, usePlaidLink } from "react-plaid-link";
 import { supabase } from "@/utils/supabaseClient";
 import { useEffect, useState } from "react";
 import { sessionStore } from "@/utils/store";
+import theme from "@/styles/theme";
+import { PlusIcon } from "@radix-ui/react-icons";
+import { Button } from "@/components/Button";
 
 export function PlaidLink() {
 	const [linkToken, setLinkToken] = useState("");
@@ -43,14 +46,12 @@ export function PlaidLink() {
 		);
 	}, []);
 
-	const { open, exit, ready } = usePlaidLink(config);
+	const { open, error } = usePlaidLink(config);
+
 	return (
-		<button
-			onClick={(e) => {
-				open();
-			}}
-		>
-			Add payment source
-		</button>
+		<Button size={"sm"} style={{ background: theme.colors.gradient.a }} onClick={() => open()}>
+			<PlusIcon />
+			Add payment account
+		</Button>
 	);
 }

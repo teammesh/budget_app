@@ -75,10 +75,6 @@ const Group = ({ user, profile, transactions, users }) => {
 		setGroupUsers(data);
 	};
 
-	const addTransactions = () => {
-		setShowAddTransactions(true);
-	};
-
 	return (
 		<Main>
 			<div className={"grid grid-cols-1 gap-4"}>
@@ -190,27 +186,59 @@ const Group = ({ user, profile, transactions, users }) => {
 					</div>
 				</div>
 				{showAddTransactions && (
-					<AddTransactions gid={gid} sharedTransactions={sharedTransactions} />
+					<AddTransactions gid={gid} setShowAddTransactions={setShowAddTransactions} />
 				)}
 			</div>
 			<Navbar
 				toolbar={
-					<div className={"grid grid-cols-[108px_1fr] gap-2"}>
-						<Button
-							size={"sm"}
-							style={{ background: theme.colors.gradient.a }}
-							onClick={() => router.back()}
-						>
-							<CheckCircledIcon />
-							Pay
-						</Button>
-						<Button size={"sm"} background={theme.colors.gradient.a}>
-							<PlusIcon /> Add transactions
-						</Button>
-					</div>
+					showAddTransactions ? (
+						<div className={"grid grid-cols-[1fr]"}>
+							<AddTransactionsButton setShowAddTransactions={setShowAddTransactions} />
+						</div>
+					) : (
+						<div className={"grid grid-cols-[108px_1fr] gap-2"}>
+							<Button
+								size={"sm"}
+								style={{ background: theme.colors.gradient.a }}
+								onClick={() => router.back()}
+							>
+								<CheckCircledIcon />
+								Pay
+							</Button>
+							<Button
+								size={"sm"}
+								background={theme.colors.gradient.a}
+								onClick={() => setShowAddTransactions(true)}
+							>
+								<PlusIcon /> Add transactions
+							</Button>
+						</div>
+					)
 				}
 			/>
 		</Main>
+	);
+};
+
+const AddTransactionsButton = ({ setShowAddTransactions }: { setShowAddTransactions: any }) => {
+	const addTransactions = tempStore((state) => state.addTransactions);
+	const setAddTransactions = tempStore.getState().setAddTransactions;
+
+	return (
+		<Button
+			size={"sm"}
+			background={theme.colors.gradient.a}
+			onClick={async () => {
+				const { data } = await supabaseQuery(
+					() => supabase.from("shared_transactions").upsert(tempStore.getState().addTransactions),
+					true,
+				);
+				setShowAddTransactions(false);
+				setAddTransactions([]);
+			}}
+		>
+			<PlusIcon /> Add {addTransactions.length} transactions
+		</Button>
 	);
 };
 
