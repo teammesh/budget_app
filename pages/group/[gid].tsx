@@ -25,6 +25,7 @@ import { definitions } from "../../types/supabase";
 import { AuthUser } from "@supabase/supabase-js";
 import { RequestData } from "next/dist/server/web/types";
 import Payments from "@/components/Payments";
+import DefaultAvatar from "boring-avatars";
 
 const Group = ({
 	user,
@@ -117,7 +118,12 @@ const Group = ({
 						<Avatar.Root>
 							<Avatar.Image />
 							<Avatar.Fallback>
-								<div className={"bg-gray-800 rounded-full h-8 w-8"} />
+								<DefaultAvatar
+									size={32}
+									name={groupName}
+									variant="marble"
+									colors={theme.colors.avatar}
+								/>
 							</Avatar.Fallback>
 						</Avatar.Root>
 						<div className="block">
@@ -140,7 +146,12 @@ const Group = ({
 								<Avatar.Root>
 									<Avatar.Image />
 									<Avatar.Fallback>
-										<div className={"bg-gray-800 rounded-full h-6 w-6"} />
+										<DefaultAvatar
+											size={24}
+											name={user.profiles.username}
+											variant="beam"
+											colors={theme.colors.avatar}
+										/>
 									</Avatar.Fallback>
 								</Avatar.Root>
 								<div>
@@ -180,7 +191,16 @@ const Group = ({
 												<Avatar.Root>
 													<Avatar.Image />
 													<Avatar.Fallback>
-														<div className={"bg-gray-800 rounded-full h-4 w-4"} />
+														<DefaultAvatar
+															size={16}
+															name={
+																groupUsers.find((user: any) => user.profile_id === x.charged_to)[
+																	"profiles"
+																]["username"]
+															}
+															variant="beam"
+															colors={theme.colors.avatar}
+														/>
 													</Avatar.Fallback>
 												</Avatar.Root>
 												<div className={"font-medium"}>{x.merchant_name}</div>

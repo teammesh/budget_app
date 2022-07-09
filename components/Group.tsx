@@ -1,6 +1,9 @@
 import { displayAmount } from "@/components/Amount";
 import { forwardRef } from "react";
 import { styled } from "@stitches/react";
+import * as Avatar from "@radix-ui/react-avatar";
+import DefaultAvatar from "boring-avatars";
+import theme from "@/styles/theme";
 
 const Amount = styled("div", {
 	"& > span": {
@@ -15,7 +18,17 @@ export const Group = forwardRef(({ group, ...props }: { group: any; props?: any 
 		// @ts-ignore
 		ref={ref}
 	>
-		<div className="flex-initial mr-3 rounded-full w-8 h-8 bg-gray-800" />
+		<Avatar.Root>
+			<Avatar.Image />
+			<Avatar.Fallback>
+				<DefaultAvatar
+					size={32}
+					name={group.groups.name}
+					variant="marble"
+					colors={theme.colors.avatar}
+				/>
+			</Avatar.Fallback>
+		</Avatar.Root>
 		<div className="block">
 			<div className="text-sm">{group.groups.name}</div>
 			<div className="text-sm text-gray-600">{group.groups.name}</div>
