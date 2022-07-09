@@ -32,11 +32,13 @@ const Group = ({
 	profile,
 	transactions,
 	users,
+	balances,
 }: {
 	user: AuthUser;
 	profile: definitions["profiles"];
 	transactions: definitions["shared_transactions"][];
 	users: definitions["profiles_groups"][] | any;
+	balances: definitions["balances"];
 }) => {
 	const profile_id = supabase.auth.session()?.user?.id;
 	const router = useRouter();
@@ -53,7 +55,10 @@ const Group = ({
 	useEffect(() => {
 		setSharedTransactions(transactions);
 
-		return () => setSharedTransactions([]);
+		return () => {
+			setSharedTransactions([]);
+			supabase.removeAllSubscriptions();
+		};
 	}, []);
 
 	useEffect(() => {
@@ -225,7 +230,9 @@ const Group = ({
 				{showAddTransactions && (
 					<AddTransactions gid={gid} setShowAddTransactions={setShowAddTransactions} />
 				)}
-				{showPayments && <Payments gid={gid} setShowPayments={setShowPayments} />}
+				{showPayments && (
+					<Payments gid={gid} setShowPayments={setShowPayments} balances={balances} />
+				)}
 			</div>
 			<Navbar
 				toolbar={
@@ -309,7 +316,14 @@ export async function getServerSideProps({ req }: { req: RequestData }) {
 		)
 		.eq("group_id", gid);
 
-	return { props: { ...props, transactions, users }, redirect };
+	const { data: balances } = await supabase
+		.from("balances")
+		.select(
+			"id, group_id, amount, from_profile_id, to_profile_id, from_user:from_profile_id(username), to_user:to_profile_id(username), from_avatar:from_profile_id(avatar_url), to_avatar:to_profile_id(avatar_url)",
+		)
+		.eq("group_id", gid);
+
+	return { props: { ...props, transactions, users, balances }, redirect };
 }
 
 export default Group;

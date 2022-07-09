@@ -7,14 +7,39 @@ import { styled } from "@stitches/react";
 import { useEffect, useState } from "react";
 import { Button } from "./Button";
 import { TextGradient } from "./text";
+import { definitions } from "../types/supabase";
 
-export default function Payments({ gid, setShowPayments }: { gid: string; setShowPayments: any }) {
+export default function Payments({
+	gid,
+	setShowPayments,
+	balances,
+}: {
+	gid: string;
+	setShowPayments: any;
+	balances: definitions["balances"];
+}) {
 	const profile_id = supabase.auth.session()?.user?.id;
-	const [userBalances, setUserBalances] = useState<any>([]);
+	const [userBalances, setUserBalances] = useState<any>(balances);
 	const [groupBalances, setGroupBalances] = useState<any>([]);
 
 	useEffect(() => {
 		supabase
+			.from(`balances:group_id=eq.${gid}`)
+			.on("*", (payload) => {
+				console.log("Change received!", payload);
+				fetchBalances();
+			})
+			.subscribe();
+
+		return () => {
+			supabase.removeSubscription(
+				supabase.getSubscriptions()[supabase.getSubscriptions().length - 1],
+			);
+		};
+	}, []);
+
+	const fetchBalances = () => {
+		return supabase
 			.from("balances")
 			.select(
 				"id, group_id, amount, from_profile_id, to_profile_id, from_user:from_profile_id(username), to_user:to_profile_id(username), from_avatar:from_profile_id(avatar_url), to_avatar:to_profile_id(avatar_url)",
@@ -25,7 +50,7 @@ export default function Payments({ gid, setShowPayments }: { gid: string; setSho
 				setUserBalances(data?.filter((balance) => balance.from_profile_id === profile_id));
 				setGroupBalances(data?.filter((balance) => balance.from_profile_id !== profile_id));
 			});
-	}, []);
+	};
 
 	const Container = styled("div", {
 		position: "fixed",
