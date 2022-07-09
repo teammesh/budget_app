@@ -28,7 +28,6 @@ export function PlaidLink() {
 				.then(({ data }) => setAccounts([...accounts, ...data]));
 		},
 		token: linkToken,
-		//required for OAuth; if not using OAuth, set to null or omit:
 	};
 
 	useEffect(() => {

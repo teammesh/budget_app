@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import { supabase, supabaseQuery } from "@/utils/supabaseClient";
 import AddTransactions from "@/components/AddTransactions";
 import { isEmpty } from "ramda";
-import { Transaction } from "plaid";
 import { tempStore } from "@/utils/store";
 import Link from "next/link";
 import { verifyUser } from "@/utils/ssr";
@@ -204,9 +203,7 @@ const Group = ({
 				{showAddTransactions && (
 					<AddTransactions gid={gid} setShowAddTransactions={setShowAddTransactions} />
 				)}
-				{showPayments && (
-					<Payments gid={gid} setShowPayments={setShowPayments} />
-				)}
+				{showPayments && <Payments gid={gid} setShowPayments={setShowPayments} />}
 			</div>
 			<Navbar
 				toolbar={
@@ -223,7 +220,7 @@ const Group = ({
 							>
 								<CheckCircledIcon /> Mark as paid
 							</Button>
-						</div>	
+						</div>
 					) : (
 						<div className={"grid grid-cols-[108px_1fr] gap-2"}>
 							<Button

@@ -25,16 +25,14 @@ export default function Login() {
 				credentials: "same-origin",
 				body: JSON.stringify({ event, session }),
 			}).then((res) => res.json());
+
+			if (event === "SIGNED_IN") router.push("/");
 		});
 
 		return () => {
 			authListener?.unsubscribe();
 		};
 	}, []);
-
-	useEffect(() => {
-		if (user) router.push("/");
-	}, [user]);
 
 	return (
 		<Main>
