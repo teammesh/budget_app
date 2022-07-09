@@ -52,6 +52,8 @@ const Group = ({
 
 	useEffect(() => {
 		setSharedTransactions(transactions);
+
+		return () => setSharedTransactions([]);
 	}, []);
 
 	useEffect(() => {

@@ -31,6 +31,7 @@ export default function AddTransactions({
 	const setAccounts = sessionStore.getState().setAccounts;
 	const transactionCursor = sessionStore.getState().transactionCursor;
 	const setTransactionCursor = sessionStore.getState().setTransactionCursor;
+	const setAddTransactions = tempStore.getState().setAddTransactions;
 
 	useEffect(() => {
 		supabase
@@ -45,6 +46,8 @@ export default function AddTransactions({
 					setShowAccounts([data[0].access_token]);
 				}
 			});
+
+		return () => setAddTransactions([]);
 	}, []);
 
 	const getTransactions = async (
