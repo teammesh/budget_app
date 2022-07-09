@@ -11,6 +11,7 @@ export interface ThemeColors {
 		e: string;
 		f: string;
 	};
+	avatar: string[];
 }
 
 const colors: ThemeColors = {
@@ -31,6 +32,7 @@ const colors: ThemeColors = {
 		e: "linear-gradient(152.26deg, #E1F664 0%, #DF66FD 101.41%)",
 		f: "linear-gradient(229.14deg, #94F533 -2.89%, #2AD0CA 84.74%)",
 	},
+	avatar: ["#F6B365", "#D38F9F", "#BB76C7", "#A05AF4"],
 };
 
 const theme = { colors };

@@ -17,6 +17,7 @@
     "@supabase/supabase-js": "^1.35.4",
     "@supabase/ui": "^0.36.5",
     "autoprefixer": "^10.4.7",
+    "boring-avatars": "^1.7.0",
     "framer-motion": "^6.4.1",
     "jotai": "^1.7.3",
     "next": "12.2.0",
