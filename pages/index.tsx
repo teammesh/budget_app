@@ -34,11 +34,13 @@ export default function Home({
 	const [userGroups, setUserGroups] = useState(groups);
 	const totalOwed = userGroups.reduce((prev, curr) => {
 		if (!curr.amount_owed) return prev;
-		return Math.sign(curr.amount_owed) === -1 ? curr.amount_owed - prev : prev;
+		const owed = Number(curr.amount_owed);
+		return Math.sign(owed) === -1 ? owed - prev : prev;
 	}, 0);
 	const totalRefund = userGroups.reduce((prev, curr) => {
 		if (!curr.amount_owed) return prev;
-		return Math.sign(curr.amount_owed) === 1 ? curr.amount_owed + prev : prev;
+		const owed = Number(curr.amount_owed);
+		return Math.sign(owed) === 1 ? owed + prev : prev;
 	}, 0);
 
 	useEffect(() => {
