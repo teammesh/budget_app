@@ -300,7 +300,9 @@ const AddTransactionsButton = ({ setShowAddTransactions }: { setShowAddTransacti
 export async function getServerSideProps({ req }: { req: RequestData }) {
 	const { props, redirect } = await verifyUser(req);
 
-	const gidRegEx = new RegExp("(?<=gid=).*");
+	console.log(req.url);
+
+	const gidRegEx = new RegExp("(?<=group\\/)(.*)(?=.json)");
 	const result = gidRegEx.exec(req.url);
 
 	const gid = result ? result[0] : req.url.toString().slice(7);
