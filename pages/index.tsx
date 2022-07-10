@@ -81,26 +81,28 @@ export default function Home({
 		if (!profileData || profileData.length === 0) return;
 
 		// Get profile_ids of invitees
-		const tmp = await Promise.all(
-			groupMembers.map(async (member: any) => {
-				if (profileData[0].profiles.username === member) return;
+		if (groupMembers) {
+			const tmp = await Promise.all(
+				groupMembers?.map(async (member: any) => {
+					if (profileData[0].profiles.username === member) return;
 
-				const { data: memberData } = await supabase
-					.from("profiles")
-					.select()
-					.eq("username", member);
-				if (!memberData || memberData.length === 0) return;
+					const { data: memberData } = await supabase
+						.from("profiles")
+						.select()
+						.eq("username", member);
+					if (!memberData || memberData.length === 0) return;
 
-				if (memberData?.length > 0)
-					return { group_id: groupsData[0].id, profile_id: memberData[0].id };
-				else console.error(`user: ${member} not found`);
-			}),
-		);
-		const req = tmp.filter((x) => !isNil(x));
+					if (memberData?.length > 0)
+						return { group_id: groupsData[0].id, profile_id: memberData[0].id };
+					else console.error(`user: ${member} not found`);
+				}),
+			);
+			const req = tmp?.filter((x) => !isNil(x));
 
-		// Add profiles_groups entry for invitees
-		if (req.length > 0) {
-			await supabaseQuery(() => supabase.from("profiles_groups").insert(req), true);
+			// Add profiles_groups entry for invitees
+			if (req.length > 0) {
+				await supabaseQuery(() => supabase.from("profiles_groups").insert(req), true);
+			}
 		}
 	};
 
