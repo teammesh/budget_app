@@ -74,7 +74,9 @@ export default function AddTransactions({
 
 		setTransactionCursor({ [access_token]: data.next_cursor });
 		setShowAccounts([...showAccounts, access_token]);
-		setTransactions(reverse(sortByDate([...transactions, ...data.added])));
+		setTransactions(
+			reverse(sortByDate([...transactions, ...data.added.filter((x) => x.pending === false)])),
+		);
 
 		console.log(data);
 		return;

@@ -22,25 +22,29 @@ const configuration = new Configuration({
 const client = new PlaidApi(configuration);
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-	const { public_token, profile_id } = JSON.parse(req.body);
+	try {
+		const { public_token, profile_id } = JSON.parse(req.body);
 
-	const response = await client.itemPublicTokenExchange({
-		public_token,
-	});
-	const accessToken = response.data.access_token;
-	const itemID = response.data.item_id;
+		const response = await client.itemPublicTokenExchange({
+			public_token,
+		});
+		const accessToken = response.data.access_token;
+		const itemID = response.data.item_id;
 
-	// use balance endpoint to get additional pm data
-	const balance = await client.accountsBalanceGet({ access_token: accessToken });
+		// use balance endpoint to get additional pm data
+		const balance = await client.accountsBalanceGet({ access_token: accessToken });
 
-	const { data, error } = await supabaseService.from("plaid_items").insert({
-		profile_id,
-		access_token: accessToken,
-		item_id: itemID,
-		account_id: balance.data.accounts[0].account_id,
-		last_four_digits: balance.data.accounts[0].mask,
-		name: balance.data.accounts[0].name,
-	});
+		const { data, error } = await supabaseService.from("plaid_items").insert({
+			profile_id,
+			access_token: accessToken,
+			item_id: itemID,
+			account_id: balance.data.accounts[0].account_id,
+			last_four_digits: balance.data.accounts[0].mask,
+			name: balance.data.accounts[0].name,
+		});
 
-	res.status(200).json({ data, error });
+		res.status(200).json({ data, error });
+	} catch (error) {
+		res.status(401).json({ error });
+	}
 }

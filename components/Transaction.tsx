@@ -4,6 +4,7 @@ import { Transaction as TransactionType } from "plaid";
 import { tempStore } from "@/utils/store";
 import { pick } from "ramda";
 import { supabase } from "@/utils/supabaseClient";
+import { displayAmount } from "./Amount";
 
 const TRANSACTION_METADATA = [
 	"account_id",
@@ -71,13 +72,13 @@ export const Transaction = ({ transaction, gid }: { transaction: TransactionType
 						</Avatar.Root>
 						<div className={"font-medium"}>{transaction.merchant_name}</div>
 					</div>
-					<div className={"font-mono font-medium tracking-tight"}>
-						${transaction.amount.toFixed(2)}
+					<div className={"font-mono font-medium tracking-tight shrink-0"}>
+						{displayAmount(transaction.amount)}
 					</div>
 				</div>
 				<div className={"flex justify-between"}>
 					<div className={"text-gray-600"}>{transaction.name}</div>
-					<div className={"font-mono font-medium tracking-tight text-gray-600"}>
+					<div className={"font-mono font-medium tracking-tight text-gray-600 shrink-0"}>
 						{transaction.date}
 					</div>
 				</div>
