@@ -54,33 +54,9 @@ export default function Account({
 					<label htmlFor="email">Email</label>
 					<Input id="email" type="text" value={user.email} disabled />
 				</div>
-				<div>
-					<label htmlFor="username">Name</label>
-					<Input
-						id="username"
-						type="text"
-						value={tempStore.getState().username || ""}
-						onChange={(e) => tempStore.getState().setUsername(e.target.value)}
-					/>
-				</div>
-				<div>
-					<label htmlFor="website">Website</label>
-					<Input
-						id="website"
-						type="website"
-						value={tempStore.getState().website || ""}
-						onChange={(e) => tempStore.getState().setWebsite(e.target.value)}
-					/>
-				</div>
-				<div>
-					<label htmlFor="avatar_url">Avatar URL</label>
-					<Input
-						id="avatar_url"
-						type="avatar_url"
-						value={tempStore.getState().avatarUrl || ""}
-						onChange={(e) => tempStore.getState().setAvatarUrl(e.target.value)}
-					/>
-				</div>
+				<UsernameInput />
+				<AvatarUrlInput />
+				<WebsiteInput />
 				<div>
 					<Button size={"sm"} onClick={() => updateProfile()}>
 						Update
@@ -105,6 +81,54 @@ export default function Account({
 		</Main>
 	);
 }
+
+const UsernameInput = () => {
+	const username = tempStore((state) => state.username);
+
+	return (
+		<div>
+			<label htmlFor="username">Name</label>
+			<Input
+				id="username"
+				type="text"
+				value={username || ""}
+				onChange={(e) => tempStore.getState().setUsername(e.target.value)}
+			/>
+		</div>
+	);
+};
+
+const AvatarUrlInput = () => {
+	const avatar_url = tempStore((state) => state.avatarUrl);
+
+	return (
+		<div>
+			<label htmlFor="avatar_url">Avatar URL</label>
+			<Input
+				id="avatar_url"
+				type="avatar_url"
+				value={avatar_url || ""}
+				onChange={(e) => tempStore.getState().setAvatarUrl(e.target.value)}
+			/>
+		</div>
+	);
+};
+
+const WebsiteInput = () => {
+	const website = tempStore((state) => state.website);
+
+	return (
+		<div>
+			<label htmlFor="website">Website</label>
+			<Input
+				id="website"
+				type="website"
+				value={website || ""}
+				onChange={(e) => tempStore.getState().setWebsite(e.target.value)}
+			/>
+		</div>
+	);
+};
 
 export async function getServerSideProps({ req }: { req: RequestData }) {
 	return verifyUser(req);
