@@ -26,7 +26,11 @@ export function PlaidLink({ setIsLoading }: { setIsLoading: any }) {
 				}),
 			})
 				.then((res) => res.json())
-				.then(({ data }) => setAccounts([...accounts, ...data]))
+				.then(({ data, error }) => {
+					if (error) return alert(error.message);
+					setAccounts([...accounts, ...data]);
+				})
+				.catch(({ error }) => alert(error.message))
 				.finally(() => setIsLoading(false));
 		},
 		token: linkToken,

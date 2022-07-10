@@ -64,12 +64,12 @@ export default function AddTransactions({
 		access_token: ItemPublicTokenExchangeResponse["access_token"],
 		account_id: TransactionType["account_id"],
 	) => {
+		setIsLoading(true);
 		// hide transactions for the pm if it is toggled again
 		if (showAccounts.includes(access_token)) {
 			setShowAccounts(without([access_token], showAccounts));
-			return setTransactions(
-				transactions.filter((x: TransactionType) => x.account_id !== account_id),
-			);
+			setTransactions(transactions.filter((x: TransactionType) => x.account_id !== account_id));
+			return setIsLoading(false);
 		}
 
 		const cursor = transactionCursor?.access_token;
@@ -94,7 +94,7 @@ export default function AddTransactions({
 		);
 
 		console.log(data);
-		return;
+		return setIsLoading(false);
 	};
 
 	const Container = styled("div", {
