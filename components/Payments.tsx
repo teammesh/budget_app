@@ -58,7 +58,7 @@ export default function Payments({
 		bottom: "124px",
 		left: 0,
 		right: 0,
-		zIndex: 99,
+		zIndex: 10,
 	});
 
 	return (

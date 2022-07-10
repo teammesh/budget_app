@@ -6,7 +6,7 @@ import theme from "@/styles/theme";
 import { PlusIcon } from "@radix-ui/react-icons";
 import { Button } from "@/components/Button";
 
-export function PlaidLink() {
+export function PlaidLink(setIsLoading) {
 	const [linkToken, setLinkToken] = useState("");
 	const accounts = sessionStore.getState().accounts;
 	const setAccounts = sessionStore.getState().setAccounts;
@@ -16,6 +16,7 @@ export function PlaidLink() {
 	// instead, on unmount it automatically destroys the Link instance
 	const config: PlaidLinkOptions = {
 		onSuccess: async (public_token, metadata) => {
+			setIsLoading(true);
 			setLinkToken(public_token);
 			fetch("/api/plaidExchangeToken", {
 				method: "post",
@@ -25,7 +26,8 @@ export function PlaidLink() {
 				}),
 			})
 				.then((res) => res.json())
-				.then(({ data }) => setAccounts([...accounts, ...data]));
+				.then(({ data }) => setAccounts([...accounts, ...data]))
+				.finally(() => setIsLoading(false));
 		},
 		token: linkToken,
 	};

@@ -30,7 +30,7 @@ const StyledContent = styled(Dialog.Content, {
 	width: "90vw",
 	maxWidth: "450px",
 	maxHeight: "85vh",
-	zIndex: 99,
+	zIndex: 40,
 	"@media (prefers-reduced-motion: no-preference)": {
 		animation: `${contentShow} 150ms cubic-bezier(0.16, 1, 0.3, 1) forwards`,
 	},

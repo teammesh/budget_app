@@ -16,6 +16,7 @@
     "@stitches/react": "^1.2.8",
     "@supabase/supabase-js": "^1.35.4",
     "@supabase/ui": "^0.36.5",
+    "@uiball/loaders": "^1.2.6",
     "autoprefixer": "^10.4.7",
     "boring-avatars": "^1.7.0",
     "framer-motion": "^6.4.1",

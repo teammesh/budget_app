@@ -15,6 +15,7 @@ import { ArrowLeftIcon } from "@radix-ui/react-icons";
 import Toggle from "@/components/Toggle";
 import { Transaction } from "@/components/Transaction";
 import { Header, TextGradient } from "@/components/text";
+import { Loading } from "@/components/Loading";
 
 export default function AddTransactions({
 	gid,
@@ -26,6 +27,7 @@ export default function AddTransactions({
 	const profile_id = supabase.auth.session()?.user?.id;
 	const [showAccounts, setShowAccounts] = useState<any>([]);
 	const [transactions, setTransactions] = useState<any>([]);
+	const [isLoading, setIsLoading] = useState<any>(true);
 	const accounts = sessionStore((state) => state.accounts);
 	const [isToolbarShown] = useAtom(isToolbarShownAtom);
 	const setAccounts = sessionStore.getState().setAccounts;
@@ -45,6 +47,7 @@ export default function AddTransactions({
 					await getTransactions(data[0].access_token, data[0].account_id);
 					setShowAccounts([data[0].access_token]);
 				}
+				setIsLoading(false);
 			});
 
 		return () => setAddTransactions([]);
@@ -88,7 +91,7 @@ export default function AddTransactions({
 		bottom: isToolbarShown ? "124px" : "68px",
 		left: 0,
 		right: 0,
-		zIndex: 99,
+		zIndex: 10,
 	});
 
 	return (
@@ -105,7 +108,7 @@ export default function AddTransactions({
 					<ArrowLeftIcon />
 					Cancel
 				</Button>
-				<PlaidLink />
+				<PlaidLink setIsLoading={setIsLoading} />
 			</div>
 			<div className={"p-3 rounded-md bg-gray-900 grid grid-cols-1 gap-2 text-sm"}>
 				{!isEmpty(accounts) &&
@@ -136,6 +139,7 @@ export default function AddTransactions({
 						))}
 				</div>
 			</div>
+			{isLoading && <Loading />}
 		</Container>
 	);
 }
