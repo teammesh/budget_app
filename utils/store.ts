@@ -47,6 +47,12 @@ interface TempStoreState {
 	setGroupName: (x: string) => void;
 	groupMembers: any;
 	setGroupMembers: (x: any) => void;
+	username: string;
+	setUsername: (x: string) => void;
+	website: string;
+	setWebsite: (x: string) => void;
+	avatarUrl: string;
+	setAvatarUrl: (x: string) => void;
 }
 
 export const tempStore = create<TempStoreState>((set, get) => ({
@@ -60,4 +66,10 @@ export const tempStore = create<TempStoreState>((set, get) => ({
 	setGroupName: (x) => set(() => ({ groupName: x })),
 	groupMembers: null,
 	setGroupMembers: (x) => set(() => ({ groupMembers: x })),
+	username: "",
+	setUsername: (x) => set(() => ({ username: x })),
+	website: "",
+	setWebsite: (x) => set(() => ({ website: x })),
+	avatarUrl: "",
+	setAvatarUrl: (x) => set(() => ({ avatarUrl: x })),
 }));

@@ -7,6 +7,8 @@ import { verifyUser } from "@/utils/ssr";
 import { AuthUser } from "@supabase/supabase-js";
 import { definitions } from "../types/supabase";
 import { RequestData } from "next/dist/server/web/types";
+import { tempStore } from "@/utils/store";
+import { Button } from "@/components/Button";
 
 export default function Account({
 	user,
@@ -15,53 +17,16 @@ export default function Account({
 	user: AuthUser;
 	profile: definitions["profiles"];
 }) {
-	const [loading, setLoading] = useState(true);
-	const [username, setUsername] = useState<string>("");
-	const [website, setWebsite] = useState<string>("");
-	const [avatar_url, setAvatarUrl] = useState<string>("");
+	tempStore.getState().setUsername(profile.username ? profile.username : "");
+	tempStore.getState().setWebsite(profile.website ? profile.website : "");
+	tempStore.getState().setAvatarUrl(profile.avatar_url ? profile.avatar_url : "");
 
-	useEffect(() => {
-		getProfile();
-	}, []);
+	async function updateProfile() {
+		const username = tempStore.getState().username;
+		const website = tempStore.getState().website;
+		const avatar_url = tempStore.getState().avatarUrl;
 
-	async function getProfile() {
 		try {
-			setLoading(true);
-
-			const { data, error, status } = await supabase
-				.from("profiles")
-				.select(`username, website, avatar_url`)
-				.eq("id", user.id)
-				.single();
-
-			if (error && status !== 406) {
-				throw error;
-			}
-
-			if (data) {
-				setUsername(data.username);
-				setWebsite(data.website);
-				setAvatarUrl(data.avatar_url);
-			}
-		} catch (error: any) {
-			alert(error.message);
-		} finally {
-			setLoading(false);
-		}
-	}
-
-	async function updateProfile({
-		username,
-		website,
-		avatar_url,
-	}: {
-		username: string;
-		website: string;
-		avatar_url: string;
-	}) {
-		try {
-			setLoading(true);
-
 			const updates = {
 				id: user.id,
 				username,
@@ -79,14 +44,11 @@ export default function Account({
 			}
 		} catch (error: any) {
 			alert(error.message);
-		} finally {
-			setLoading(false);
 		}
 	}
 
 	return (
 		<Main>
-			<Navbar />
 			<div className="form-widget">
 				<div>
 					<label htmlFor="email">Email</label>
@@ -97,8 +59,8 @@ export default function Account({
 					<Input
 						id="username"
 						type="text"
-						value={username || ""}
-						onChange={(e) => setUsername(e.target.value)}
+						value={tempStore.getState().username || ""}
+						onChange={(e) => tempStore.getState().setUsername(e.target.value)}
 					/>
 				</div>
 				<div>
@@ -106,24 +68,28 @@ export default function Account({
 					<Input
 						id="website"
 						type="website"
-						value={website || ""}
-						onChange={(e) => setWebsite(e.target.value)}
+						value={tempStore.getState().website || ""}
+						onChange={(e) => tempStore.getState().setWebsite(e.target.value)}
 					/>
 				</div>
-
 				<div>
-					<button
-						className="button block primary"
-						onClick={() => updateProfile({ username, website, avatar_url })}
-						disabled={loading}
-					>
-						{loading ? "Loading ..." : "Update"}
-					</button>
+					<label htmlFor="avatar_url">Avatar URL</label>
+					<Input
+						id="avatar_url"
+						type="avatar_url"
+						value={tempStore.getState().avatarUrl || ""}
+						onChange={(e) => tempStore.getState().setAvatarUrl(e.target.value)}
+					/>
+				</div>
+				<div>
+					<Button size={"sm"} onClick={() => updateProfile()}>
+						Update
+					</Button>
 				</div>
 
 				<div>
-					<button
-						className="button block"
+					<Button
+						size={"sm"}
 						onClick={async () => {
 							const access_token = supabase.auth.session()?.access_token;
 							if (!access_token) return;
@@ -132,9 +98,10 @@ export default function Account({
 						}}
 					>
 						Sign Out
-					</button>
+					</Button>
 				</div>
 			</div>
+			<Navbar />
 		</Main>
 	);
 }
