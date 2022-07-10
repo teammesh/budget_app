@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import { supabase } from "@/utils/supabaseClient";
 import { Navbar } from "@/components/Navbar";
 import { Main } from "@/components/Main";
@@ -56,7 +55,7 @@ export default function Account({
 				</div>
 				<UsernameInput />
 				<AvatarUrlInput />
-				<WebsiteInput />
+				{/*<WebsiteInput />*/}
 				<div>
 					<Button size={"sm"} onClick={() => updateProfile()}>
 						Update
@@ -87,7 +86,7 @@ const UsernameInput = () => {
 
 	return (
 		<div>
-			<label htmlFor="username">Name</label>
+			<label htmlFor="username">Username</label>
 			<Input
 				id="username"
 				type="text"

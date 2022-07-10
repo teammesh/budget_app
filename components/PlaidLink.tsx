@@ -6,7 +6,7 @@ import theme from "@/styles/theme";
 import { PlusIcon } from "@radix-ui/react-icons";
 import { Button } from "@/components/Button";
 
-export function PlaidLink(setIsLoading) {
+export function PlaidLink({ setIsLoading }: { setIsLoading: any }) {
 	const [linkToken, setLinkToken] = useState("");
 	const accounts = sessionStore.getState().accounts;
 	const setAccounts = sessionStore.getState().setAccounts;

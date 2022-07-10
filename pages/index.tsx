@@ -44,6 +44,12 @@ export default function Home({
 	}, 0);
 
 	useEffect(() => {
+		// fetch("/api/testEnv", {
+		// 	method: "post",
+		// })
+		// 	.then((res) => res.json())
+		// 	.then((data) => console.log(data));
+
 		const findGroups = async () => {
 			const { data } = await supabaseQuery(
 				() =>

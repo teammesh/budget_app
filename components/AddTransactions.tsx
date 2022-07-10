@@ -41,11 +41,18 @@ export default function AddTransactions({
 			.select()
 			.eq("profile_id", profile_id)
 			.then(async ({ data, error }) => {
-				if (!isEmpty(data) && data) {
+				if (data && !isEmpty(data)) {
 					setAccounts(data);
 					// fetch transactions for the first pm and display them
 					await getTransactions(data[0].access_token, data[0].account_id);
 					setShowAccounts([data[0].access_token]);
+
+					// await fetch("/api/plaidRemoveItem", {
+					// 	method: "post",
+					// 	body: JSON.stringify({
+					// 		access_token: "access-development-8abe0e35-22c3-416e-9be2-11ff74494d11",
+					// 	}),
+					// }).catch((error) => console.error(error));
 				}
 				setIsLoading(false);
 			});
@@ -73,7 +80,12 @@ export default function AddTransactions({
 				access_token,
 				cursor,
 			}),
-		}).then((res) => res.json());
+		})
+			.then((res) => res.json())
+			.catch((error) => {
+				console.log(error);
+				return setIsLoading(false);
+			});
 
 		setTransactionCursor({ [access_token]: data.next_cursor });
 		setShowAccounts([...showAccounts, access_token]);
