@@ -26,6 +26,7 @@ import { AuthUser } from "@supabase/supabase-js";
 import { RequestData } from "next/dist/server/web/types";
 import Payments from "@/components/Payments";
 import DefaultAvatar from "boring-avatars";
+import Manage from "@/components/Manage";
 
 const Group = ({
 	user,
@@ -46,6 +47,7 @@ const Group = ({
 	const { gid }: { gid: string } = router.query;
 	const [showAddTransactions, setShowAddTransactions] = useState(false);
 	const [showPayments, setShowPayments] = useState(false);
+	const [showManage, setShowManage] = useState(false);
 	const [groupUsers, setGroupUsers] = useState(users);
 	const [showRunningTotal, setShowRunningTotal] = useState(false);
 	const sharedTransactions = tempStore((state) => state.sharedTransactions);
@@ -110,7 +112,11 @@ const Group = ({
 						<ArrowLeftIcon />
 						Return
 					</Button>
-					<Button size={"sm"} style={{ background: theme.colors.gradient.a }}>
+					<Button 
+						size={"sm"} 
+						style={{ background: theme.colors.gradient.a }}
+						onClick={() => setShowManage(true)}
+					>
 						<MixerHorizontalIcon />
 						Manage
 					</Button>
@@ -232,6 +238,9 @@ const Group = ({
 				)}
 				{showPayments && (
 					<Payments gid={gid} setShowPayments={setShowPayments} balances={balances} />
+				)}
+				{showManage && (
+					<Manage gid={gid} setShowManage={setShowManage} />
 				)}
 			</div>
 			<Navbar

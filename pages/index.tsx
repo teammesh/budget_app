@@ -44,31 +44,15 @@ export default function Home({
 	}, 0);
 
 	useEffect(() => {
-		// fetch("/api/testEnv", {
-		// 	method: "post",
-		// })
-		// 	.then((res) => res.json())
-		// 	.then((data) => console.log(data));
-
-		const findGroups = async () => {
-			const { data } = await supabaseQuery(
-				() =>
-					supabase
-						.from("profiles_groups")
-						.select("group_id, amount_owed, groups(name)")
-						.eq("profile_id", profile_id),
-				true,
-			);
-			setUserGroups(data);
-		};
-
-		supabase
-			.from(`profiles_groups:profile_id=eq.${supabase.auth.session()?.user?.id}`)
-			.on("*", (payload) => {
-				console.log("Change received!", payload);
-				findGroups();
-			})
-			.subscribe();
+		if (profile_id) {
+			supabase
+				.from(`profiles_groups:profile_id=eq.${supabase.auth.session()?.user?.id}`)
+				.on("*", async (payload) => {
+					console.log("Change received!", payload);
+					setUserGroups(await findGroups(profile_id));
+				})
+				.subscribe();
+		}
 	}, []);
 
 	const handleCreateGroup = async () => {
@@ -173,10 +157,20 @@ export default function Home({
 
 export async function getServerSideProps({ req }: { req: RequestData }) {
 	const { props, redirect } = await verifyUser(req);
-	const { data: groups } = await supabase
-		.from("profiles_groups")
-		.select("group_id, amount_owed, groups(name)")
-		.eq("profile_id", props.user?.id);
+	const groups = await findGroups(props.user?.id);
 
 	return { props: { ...props, groups }, redirect };
 }
+
+const findGroups = async (profile_id: string) => {
+	const { data } = await supabaseQuery(
+		() =>
+			supabase
+				.from("profiles_groups")
+				.select("group_id, amount_owed, groups!inner(*)")
+				.eq("profile_id", profile_id)
+				.eq("groups.is_deleted", false),
+		true,
+	);
+	return data;
+};
