@@ -162,7 +162,9 @@ export async function getServerSideProps({ req }: { req: RequestData }) {
 	return { props: { ...props, groups }, redirect };
 }
 
-const findGroups = async (profile_id: string) => {
+const findGroups = async (profile_id?: string) => {
+	if (!profile_id) return;
+
 	const { data } = await supabaseQuery(
 		() =>
 			supabase
