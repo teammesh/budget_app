@@ -29,6 +29,7 @@ import DefaultAvatar from "boring-avatars";
 import Manage from "@/components/Manage";
 import PaymentsButton from "@/components/PaymentsButton";
 import ManageButton from "@/components/ManageButton";
+import { SharedTransaction } from "@/components/SharedTransaction";
 
 const Group = ({
 	user,
@@ -196,42 +197,8 @@ const Group = ({
 					<div className={"grid grid-cols-1 gap-2"}>
 						{!isEmpty(sharedTransactions) &&
 							sharedTransactions.map((x) => (
-								<Link href={`/transaction/${encodeURIComponent(x.id)}`} key={x.id}>
-									<div
-										className={
-											"p-3 rounded-md bg-gray-900 cursor-pointer grid grid-cols-1 gap-0.5 text-sm"
-										}
-									>
-										<div className={"flex justify-between items-center"}>
-											<div className={"grid grid-cols-[auto_auto] gap-2 items-center"}>
-												<Avatar.Root>
-													<Avatar.Image />
-													<Avatar.Fallback>
-														<DefaultAvatar
-															size={16}
-															name={
-																groupUsers.find((user: any) => user.profile_id === x.charged_to)[
-																	"profiles"
-																]["username"]
-															}
-															variant="beam"
-															colors={theme.colors.avatar}
-														/>
-													</Avatar.Fallback>
-												</Avatar.Root>
-												<div className={"font-medium"}>{x.merchant_name}</div>
-											</div>
-											<div className={"font-mono font-medium tracking-tight"}>
-												${x.amount.toFixed(2)}
-											</div>
-										</div>
-										<div className={"flex justify-between"}>
-											<div className={"text-gray-600"}>{x.name}</div>
-											<div className={"font-mono font-medium tracking-tight text-gray-600"}>
-												{x.date}
-											</div>
-										</div>
-									</div>
+								<Link href={`/transaction/${encodeURIComponent(x.id)}`} key={x.id} passHref>
+									<SharedTransaction transaction={x} groupUsers={groupUsers}/>	
 								</Link>
 							))}
 					</div>
@@ -253,7 +220,7 @@ const Group = ({
 					) : showPayments ? (
 						<PaymentsButton setShowPayments={setShowPayments} />
 					) : showManage ? (
-						<ManageButton gid={gid}/>
+						<ManageButton setShowManage={setShowManage} gid={gid}/>
 					) : (
 						<div className={"grid grid-cols-[108px_1fr] gap-2"}>
 							<Button

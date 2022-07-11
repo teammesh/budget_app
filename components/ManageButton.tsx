@@ -4,7 +4,7 @@ import { supabase } from "@/utils/supabaseClient";
 import { useRouter } from "next/router";
 import { Button } from "./Button";
 
-export default function ManageButton({ gid }: { gid: string }) {
+export default function ManageButton({ setShowManage, gid }: { setShowManage: any, gid: string }) {
     const router = useRouter();
 
     async function updateGroup() {
