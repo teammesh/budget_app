@@ -9,6 +9,9 @@ export default function ManageButton({ gid }: { gid: string }) {
 
     async function updateGroup() {
 		const groupName = tempStore.getState().groupName;
+        const groupMembers = tempStore.getState().groupMembers;
+
+        // TODO need to account for removing members from the group?
 
 		try {
 			const updates = {

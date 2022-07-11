@@ -45,13 +45,14 @@ export default function Manage({
 			</div>
             <div className="form-widget">
 				<NameInput />
+                <MembersInput />
 			</div>
 		</Container>
 	);
 }
 
 const NameInput = () => {
-	const groupName = tempStore((state) => state.groupName);
+	const field = tempStore((state) => state.groupName);
 
 	return (
 		<div>
@@ -59,8 +60,24 @@ const NameInput = () => {
 			<Input
 				id="groupName"
 				type="text"
-				value={groupName || ""}
+				value={field || ""}
                 onChange={(e) => tempStore.getState().setGroupName(e.target.value)}
+			/>
+		</div>
+	);
+};
+
+const MembersInput = () => {
+	const field = tempStore((state) => state.groupMembers);
+
+	return (
+		<div>
+			<label htmlFor="groupMembers">Group members</label>
+			<Input
+				id="groupMembers"
+				type="text"
+				value={field || ""}
+                onChange={(e) => tempStore.getState().setGroupMembers(e.target.value)}
 			/>
 		</div>
 	);

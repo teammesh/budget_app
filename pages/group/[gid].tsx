@@ -57,6 +57,7 @@ const Group = ({
 	const groupName = users[0].groups.name;
 
 	useEffect(() => {
+		tempStore.getState().setGroupMembers(groupUsers.map((user) => user.profiles.username));
 		setSharedTransactions(transactions);
 
 		return () => {
