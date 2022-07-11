@@ -27,6 +27,8 @@ import { RequestData } from "next/dist/server/web/types";
 import Payments from "@/components/Payments";
 import DefaultAvatar from "boring-avatars";
 import Manage from "@/components/Manage";
+import PaymentsButton from "@/components/PaymentsButton";
+import ManageButton from "@/components/ManageButton";
 
 const Group = ({
 	user,
@@ -246,19 +248,11 @@ const Group = ({
 			<Navbar
 				toolbar={
 					showAddTransactions ? (
-						<div className={"grid grid-cols-[1fr]"}>
-							<AddTransactionsButton setShowAddTransactions={setShowAddTransactions} />
-						</div>
+						<AddTransactionsButton setShowAddTransactions={setShowAddTransactions} />
 					) : showPayments ? (
-						<div className={"grid grid-cols-[1fr]"}>
-							<Button
-								size={"sm"}
-								background={theme.colors.gradient.a}
-								onClick={() => console.log("Clicked mark as paid")}
-							>
-								<CheckCircledIcon /> Mark as paid
-							</Button>
-						</div>
+						<PaymentsButton setShowPayments={setShowPayments} />
+					) : showManage ? (
+						<ManageButton gid={gid}/>
 					) : (
 						<div className={"grid grid-cols-[108px_1fr] gap-2"}>
 							<Button
@@ -284,6 +278,8 @@ const Group = ({
 	);
 };
 
+
+// Should this be moved to a component?
 const AddTransactionsButton = ({ setShowAddTransactions }: { setShowAddTransactions: any }) => {
 	const addTransactions = tempStore((state) => state.addTransactions);
 	const setAddTransactions = tempStore.getState().setAddTransactions;
@@ -300,9 +296,11 @@ const AddTransactionsButton = ({ setShowAddTransactions }: { setShowAddTransacti
 	};
 
 	return (
-		<Button size={"sm"} background={theme.colors.gradient.a} onClick={submit}>
-			<PlusIcon /> Add {addTransactions.length} transactions
-		</Button>
+		<div className={"grid grid-cols-[1fr]"}>
+			<Button size={"sm"} background={theme.colors.gradient.a} onClick={submit}>
+				<PlusIcon /> Add {addTransactions.length} transactions
+			</Button>
+		</div>
 	);
 };
 
