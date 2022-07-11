@@ -18,7 +18,7 @@ export function PlaidLink({ setIsLoading }: { setIsLoading: any }) {
 		onSuccess: async (public_token, metadata) => {
 			setIsLoading(true);
 			setLinkToken(public_token);
-			fetch("/api/plaidExchangeToken", {
+			return fetch("/api/plaidExchangeToken", {
 				method: "post",
 				body: JSON.stringify({
 					public_token,
@@ -26,9 +26,20 @@ export function PlaidLink({ setIsLoading }: { setIsLoading: any }) {
 				}),
 			})
 				.then((res) => res.json())
-				.then(({ data, error }) => {
-					if (error) return alert(error.message);
-					setAccounts([...accounts, ...data]);
+				.then(({ item_id, access_token }) => {
+					return fetch("/api/plaidSavePaymentMethod", {
+						method: "post",
+						body: JSON.stringify({
+							access_token,
+							item_id,
+							profile_id: supabase.auth.session()?.user?.id,
+						}),
+					})
+						.then((res) => res.json())
+						.then(({ data, error }) => {
+							if (error) return alert(error.message);
+							return setAccounts([...accounts, ...data]);
+						});
 				})
 				.catch(({ error }) => alert(error.message))
 				.finally(() => setIsLoading(false));
