@@ -55,9 +55,10 @@ const Group = ({
 	const [showRunningTotal, setShowRunningTotal] = useState(false);
 	const sharedTransactions = tempStore((state) => state.sharedTransactions);
 	const setSharedTransactions = tempStore.getState().setSharedTransactions;
-	const groupName = users[0].groups.name;
+	const groupName = tempStore.getState().groupName;
 
 	useEffect(() => {
+		tempStore.getState().setGroupName(users[0].groups.name);
 		tempStore.getState().setGroupMembers(groupUsers.map((user) => user.profiles.username));
 		setSharedTransactions(transactions);
 
