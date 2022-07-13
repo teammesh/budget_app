@@ -48,13 +48,12 @@ const Transaction = ({ data }: { data: any }) => {
 						"p-3 rounded-md bg-gray-900 grid grid-cols-1 gap-4 items-center cursor-pointer"
 					}>
 					<div className="flex justify-between">
-						<div>{transaction.location?.city || "City"}</div>
-						<div className="capitalize">{transaction.payment_channel || "N/A"}</div>
+						<div className="font-medium text-sm">{transaction.location?.city || "City"}</div>
+						<div className="font-medium text-sm capitalize">{transaction.payment_channel || "N/A"}</div>
 					</div>
-					<div>
-							
+					<div>	
 					</div>	
-					<div className="font-mono font-medium tracking-tight text-gray-600">
+					<div className="font-mono font-medium text-sm tracking-tight text-gray-600">
 						{transaction?.category.map((c) => <span key={c} className="mr-4">{c}</span>)}
 					</div>
 				</div>
