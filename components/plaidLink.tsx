@@ -36,7 +36,7 @@ export function plaidLink({ setIsLoading }: { setIsLoading: any }) {
 						.then((res) => res.json())
 						.then(({ data, error }) => {
 							if (error) return alert(error.message);
-							return setAccounts(assocPath([access_token], data, accounts));
+							return setAccounts(assocPath([access_token], data[0], accounts));
 						});
 				})
 				.catch(({ error }) => alert(error.message))

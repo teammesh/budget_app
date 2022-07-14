@@ -28,7 +28,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 		const response = await client.transactionsSync(request);
 		const data = response.data;
 		res.status(200).json(data);
-	} catch (error) {
+	} catch (error: any) {
 		// if (error.response.data.error_code === "ITEM_LOGIN_REQUIRED") {}
 		res.status(400).json({ error: { ...error.response.data } });
 	}

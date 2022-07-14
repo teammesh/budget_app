@@ -59,7 +59,7 @@ const Group = ({
 
 	useEffect(() => {
 		tempStore.getState().setGroupName(users[0].groups.name);
-		tempStore.getState().setGroupMembers(groupUsers.map((user) => user.profiles.username));
+		tempStore.getState().setGroupMembers(groupUsers.map((user: any) => user.profiles.username));
 		setSharedTransactions(transactions);
 
 		return () => {
@@ -117,8 +117,8 @@ const Group = ({
 						<ArrowLeftIcon />
 						Return
 					</Button>
-					<Button 
-						size={"sm"} 
+					<Button
+						size={"sm"}
 						style={{ background: theme.colors.gradient.a }}
 						onClick={() => setShowManage(true)}
 					>
@@ -199,7 +199,7 @@ const Group = ({
 						{!isEmpty(sharedTransactions) &&
 							sharedTransactions.map((x) => (
 								<Link href={`/transaction/${encodeURIComponent(x.id)}`} key={x.id} passHref>
-									<SharedTransaction transaction={x} groupUsers={groupUsers}/>	
+									<SharedTransaction transaction={x} groupUsers={groupUsers} />
 								</Link>
 							))}
 					</div>
@@ -210,9 +210,7 @@ const Group = ({
 				{showPayments && (
 					<Payments gid={gid} setShowPayments={setShowPayments} balances={balances} />
 				)}
-				{showManage && (
-					<Manage gid={gid} setShowManage={setShowManage} />
-				)}
+				{showManage && <Manage gid={gid} setShowManage={setShowManage} />}
 			</div>
 			<Navbar
 				toolbar={
@@ -221,7 +219,7 @@ const Group = ({
 					) : showPayments ? (
 						<PaymentsButton setShowPayments={setShowPayments} />
 					) : showManage ? (
-						<ManageButton setShowManage={setShowManage} gid={gid}/>
+						<ManageButton setShowManage={setShowManage} gid={gid} />
 					) : (
 						<div className={"grid grid-cols-[108px_1fr] gap-2"}>
 							<Button
@@ -246,7 +244,6 @@ const Group = ({
 		</Main>
 	);
 };
-
 
 // Should this be moved to a component?
 const AddTransactionsButton = ({ setShowAddTransactions }: { setShowAddTransactions: any }) => {

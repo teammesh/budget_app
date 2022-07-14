@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { createClient } from "@supabase/supabase-js";
+
 const { Configuration, PlaidApi, PlaidEnvironments } = require("plaid");
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;

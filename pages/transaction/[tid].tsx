@@ -1,5 +1,4 @@
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
 import { supabase } from "@/utils/supabaseClient";
 import { Main } from "@/components/Main";
 import { Button } from "@/components/Button";
@@ -32,8 +31,8 @@ const Transaction = ({ data }: { data: any }) => {
 						<ArrowLeftIcon />
 						Return
 					</Button>
-					<Button 
-						size={"sm"} 
+					<Button
+						size={"sm"}
 						style={{ background: theme.colors.gradient.a }}
 						// onClick={() => setShowManage(true)}
 					>
@@ -44,22 +43,31 @@ const Transaction = ({ data }: { data: any }) => {
 				<div>
 					<SharedTransaction transaction={transaction} groupUsers={groupUsers} />
 				</div>
-				<div className={
+				<div
+					className={
 						"p-3 rounded-md bg-gray-900 grid grid-cols-1 gap-4 items-center cursor-pointer"
-					}>
+					}
+				>
 					<div className="flex justify-between">
 						<div className="font-medium text-sm">{transaction.location?.city || "City"}</div>
-						<div className="font-medium text-sm capitalize">{transaction.payment_channel || "N/A"}</div>
+						<div className="font-medium text-sm capitalize">
+							{transaction.payment_channel || "N/A"}
+						</div>
 					</div>
-					<div>	
-					</div>	
+					<div></div>
 					<div className="font-mono font-medium text-sm tracking-tight text-gray-600">
-						{transaction?.category.map((c) => <span key={c} className="mr-4">{c}</span>)}
+						{transaction?.category.map((c: any) => (
+							<span key={c} className="mr-4">
+								{c}
+							</span>
+						))}
 					</div>
 				</div>
-				<div className={	
+				<div
+					className={
 						"p-3 rounded-md bg-gray-900 grid grid-cols-1 gap-4 items-center cursor-pointer"
-					}>
+					}
+				>
 					<div className={"grid grid-cols-1 gap-3"}>
 						{groupUsers.map((user: any) => (
 							<div
@@ -80,9 +88,7 @@ const Transaction = ({ data }: { data: any }) => {
 								<div>
 									{user.profiles.username} {user.profile_id === profile_id && " (you)"}
 								</div>
-								<div className={"font-mono font-medium tracking-tighter"}>
-									$XX
-								</div>
+								<div className={"font-mono font-medium tracking-tighter"}>$XX</div>
 							</div>
 						))}
 					</div>
@@ -92,10 +98,10 @@ const Transaction = ({ data }: { data: any }) => {
 	);
 };
 
-export async function getServerSideProps({ req, params }: { req: RequestData, params: Params  }) {
+export async function getServerSideProps({ req, params }: { req: RequestData; params: Params }) {
 	const { props, redirect } = await verifyUser(req);
 	const { tid } = params;
-	
+
 	const { data } = await supabase
 		.from("shared_transactions")
 		.select("*, groups( name, profiles_groups( *, profiles(id, username) ) )")

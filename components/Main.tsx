@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { supabase } from "@/utils/supabaseClient";
 import { useRouter } from "next/router";
 import { styled } from "@stitches/react";
-import { useAtom, atom } from "jotai";
+import { atom, useAtom } from "jotai";
 
 export const isToolbarShownAtom = atom(false);
 

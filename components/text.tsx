@@ -1,4 +1,4 @@
-import theme, { ThemeColors } from "@/styles/theme";
+import { ThemeColors } from "@/styles/theme";
 
 export const Header = ({ children }: { children: any }) => {
 	return (

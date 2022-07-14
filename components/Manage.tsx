@@ -2,23 +2,21 @@ import theme from "@/styles/theme";
 import { supabase } from "@/utils/supabaseClient";
 import { ArrowLeftIcon } from "@radix-ui/react-icons";
 import { styled } from "@stitches/react";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Button } from "./Button";
 import { tempStore } from "@/utils/store";
 import { Input } from "@/components/Input";
 
-export default function Manage({
-	gid,
-	setShowManage,
-}: {
-	gid: string;
-	setShowManage: any;
-}) {
-    useEffect(() => {
-        supabase.from("groups").select().eq("id", gid).then(({ data }) => {
-            tempStore.getState().setGroupName(data ? data[0].name : ""); 
-        });
-    }, [gid]);
+export default function Manage({ gid, setShowManage }: { gid: string; setShowManage: any }) {
+	useEffect(() => {
+		supabase
+			.from("groups")
+			.select()
+			.eq("id", gid)
+			.then(({ data }) => {
+				tempStore.getState().setGroupName(data ? data[0].name : "");
+			});
+	}, [gid]);
 
 	const Container = styled("div", {
 		position: "fixed",
@@ -43,9 +41,9 @@ export default function Manage({
 					Cancel
 				</Button>
 			</div>
-            <div className="form-widget">
+			<div className="form-widget">
 				<NameInput />
-                <MembersInput />
+				<MembersInput />
 			</div>
 		</Container>
 	);
@@ -61,7 +59,7 @@ const NameInput = () => {
 				id="groupName"
 				type="text"
 				value={field || ""}
-                onChange={(e) => tempStore.getState().setGroupName(e.target.value)}
+				onChange={(e) => tempStore.getState().setGroupName(e.target.value)}
 			/>
 		</div>
 	);
@@ -77,7 +75,7 @@ const MembersInput = () => {
 				id="groupMembers"
 				type="text"
 				value={field || ""}
-                onChange={(e) => tempStore.getState().setGroupMembers(e.target.value)}
+				onChange={(e) => tempStore.getState().setGroupMembers(e.target.value)}
 			/>
 		</div>
 	);

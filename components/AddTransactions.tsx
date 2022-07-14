@@ -180,7 +180,7 @@ export default function AddTransactions({
 		R.forEachObjIndexed((account: ItemPublicTokenExchangeResponse, accessToken) => {
 			if (account.invalid) {
 				arr.push(
-					<Dialog.Root>
+					<Dialog.Root key={account.item_id}>
 						<Dialog.Trigger asChild>
 							<div
 								className={
