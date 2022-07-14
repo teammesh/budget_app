@@ -17,18 +17,19 @@ const configuration = new Configuration({
 const client = new PlaidApi(configuration);
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-	const { profile_id } = JSON.parse(req.body);
+	const { profile_id, access_token } = JSON.parse(req.body);
 
 	const request = {
 		user: {
 			client_user_id: profile_id,
 		},
 		client_name: "budget_app",
-		products: ["transactions"],
+		products: access_token ? [] : ["transactions"],
 		language: "en",
 		// webhook: "https://webhook.example.com",
 		// redirect_uri: "https://domainname.com/oauth-page.html",
 		country_codes: ["US"],
+		access_token,
 	};
 
 	const response = await client.linkTokenCreate(request);

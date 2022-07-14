@@ -1,6 +1,4 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { TransactionsSyncRequest } from "plaid";
-
 const { Configuration, PlaidApi, PlaidEnvironments } = require("plaid");
 
 const configuration = new Configuration({
@@ -18,18 +16,14 @@ const configuration = new Configuration({
 const client = new PlaidApi(configuration);
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-	const { access_token, cursor } = JSON.parse(req.body);
-
-	const request: TransactionsSyncRequest = {
-		access_token,
-		cursor,
-	};
 	try {
-		const response = await client.transactionsSync(request);
-		const data = response.data;
-		res.status(200).json(data);
+		const { access_token } = JSON.parse(req.body);
+
+		// use balance endpoint to get additional pm data
+		const balance = await client.accountsBalanceGet({ access_token });
+
+		res.status(200).json({ data: balance.data });
 	} catch (error) {
-		// if (error.response.data.error_code === "ITEM_LOGIN_REQUIRED") {}
-		res.status(400).json({ error: { ...error.response.data } });
+		res.status(401).json({ error });
 	}
 }

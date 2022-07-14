@@ -10,8 +10,8 @@ interface SessionStoreState {
 	setTransactions: (x: any) => void;
 	transactionCursor: Record<string, unknown>;
 	setTransactionCursor: (x: any) => void;
-	accounts: any[];
-	setAccounts: (x: any[]) => void;
+	accounts: Record<any, any>;
+	setAccounts: (x: any) => void;
 }
 
 export const sessionStore = create<SessionStoreState>(
@@ -26,7 +26,7 @@ export const sessionStore = create<SessionStoreState>(
 			setTransactions: (x) => set(() => ({ transactions: x })),
 			transactionCursor: {},
 			setTransactionCursor: (x) => set(() => ({ transactionCursor: x })),
-			accounts: [],
+			accounts: {},
 			setAccounts: (x) => set(() => ({ accounts: x })),
 		}),
 		{
@@ -53,6 +53,8 @@ interface TempStoreState {
 	setWebsite: (x: string) => void;
 	avatarUrl: string;
 	setAvatarUrl: (x: string) => void;
+	linkToken: string;
+	setLinkToken: (x: string) => void;
 }
 
 export const tempStore = create<TempStoreState>((set, get) => ({
@@ -72,4 +74,6 @@ export const tempStore = create<TempStoreState>((set, get) => ({
 	setWebsite: (x) => set(() => ({ website: x })),
 	avatarUrl: "",
 	setAvatarUrl: (x) => set(() => ({ avatarUrl: x })),
+	linkToken: "",
+	setLinkToken: (x) => set(() => ({ linkToken: x })),
 }));

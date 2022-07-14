@@ -7,6 +7,7 @@ export const Button = forwardRef(
 			size,
 			style,
 			background,
+			border,
 			onClick,
 			...props
 		}: {
@@ -15,13 +16,16 @@ export const Button = forwardRef(
 			props?: any;
 			style?: any;
 			background?: any;
+			border?: any;
 			onClick?: any;
 		},
 		ref,
 	) => (
 		<button
 			className={"p-0.5 bg-amber-200 rounded-full text-sm"}
-			style={background ? { ...style, background } : style}
+			style={
+				background ? { ...style, background } : border ? { ...style, background: border } : style
+			}
 			// @ts-ignore
 			ref={ref}
 			onClick={onClick}

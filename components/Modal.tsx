@@ -16,6 +16,7 @@ const StyledOverlay = styled(Dialog.Overlay, {
 	backgroundColor: theme.colors.overlayBg,
 	position: "fixed",
 	inset: 0,
+	zIndex: 40,
 	"@media (prefers-reduced-motion: no-preference)": {
 		animation: `${overlayShow} 150ms cubic-bezier(0.16, 1, 0.3, 1) forwards`,
 	},
@@ -30,7 +31,7 @@ const StyledContent = styled(Dialog.Content, {
 	width: "90vw",
 	maxWidth: "450px",
 	maxHeight: "85vh",
-	zIndex: 40,
+	zIndex: 50,
 	"@media (prefers-reduced-motion: no-preference)": {
 		animation: `${contentShow} 150ms cubic-bezier(0.16, 1, 0.3, 1) forwards`,
 	},
@@ -41,7 +42,7 @@ export function Content({ children, ...props }: { children: any }) {
 	return (
 		<Dialog.Portal>
 			<StyledOverlay />
-			<StyledContent className={"bg-gray-800 rounded-md p-6 grid grid-cols-1 gap-2"} {...props}>
+			<StyledContent className={"bg-gray-900 rounded-md p-6 grid grid-cols-1 gap-8"} {...props}>
 				{children}
 			</StyledContent>
 		</Dialog.Portal>
