@@ -27,6 +27,9 @@ import { RequestData } from "next/dist/server/web/types";
 import Payments from "@/components/Payments";
 import DefaultAvatar from "boring-avatars";
 import Manage from "@/components/Manage";
+import PaymentsButton from "@/components/PaymentsButton";
+import ManageButton from "@/components/ManageButton";
+import { SharedTransaction } from "@/components/SharedTransaction";
 
 const Group = ({
 	user,
@@ -52,9 +55,11 @@ const Group = ({
 	const [showRunningTotal, setShowRunningTotal] = useState(false);
 	const sharedTransactions = tempStore((state) => state.sharedTransactions);
 	const setSharedTransactions = tempStore.getState().setSharedTransactions;
-	const groupName = users[0].groups.name;
+	const groupName = tempStore.getState().groupName;
 
 	useEffect(() => {
+		tempStore.getState().setGroupName(users[0].groups.name);
+		tempStore.getState().setGroupMembers(groupUsers.map((user) => user.profiles.username));
 		setSharedTransactions(transactions);
 
 		return () => {
@@ -193,42 +198,8 @@ const Group = ({
 					<div className={"grid grid-cols-1 gap-2"}>
 						{!isEmpty(sharedTransactions) &&
 							sharedTransactions.map((x) => (
-								<Link href={`/transaction/${encodeURIComponent(x.id)}`} key={x.id}>
-									<div
-										className={
-											"p-3 rounded-md bg-gray-900 cursor-pointer grid grid-cols-1 gap-0.5 text-sm"
-										}
-									>
-										<div className={"flex justify-between items-center"}>
-											<div className={"grid grid-cols-[auto_auto] gap-2 items-center"}>
-												<Avatar.Root>
-													<Avatar.Image />
-													<Avatar.Fallback>
-														<DefaultAvatar
-															size={16}
-															name={
-																groupUsers.find((user: any) => user.profile_id === x.charged_to)[
-																	"profiles"
-																]["username"]
-															}
-															variant="beam"
-															colors={theme.colors.avatar}
-														/>
-													</Avatar.Fallback>
-												</Avatar.Root>
-												<div className={"font-medium"}>{x.merchant_name}</div>
-											</div>
-											<div className={"font-mono font-medium tracking-tight"}>
-												${x.amount.toFixed(2)}
-											</div>
-										</div>
-										<div className={"flex justify-between"}>
-											<div className={"text-gray-600"}>{x.name}</div>
-											<div className={"font-mono font-medium tracking-tight text-gray-600"}>
-												{x.date}
-											</div>
-										</div>
-									</div>
+								<Link href={`/transaction/${encodeURIComponent(x.id)}`} key={x.id} passHref>
+									<SharedTransaction transaction={x} groupUsers={groupUsers}/>	
 								</Link>
 							))}
 					</div>
@@ -246,19 +217,11 @@ const Group = ({
 			<Navbar
 				toolbar={
 					showAddTransactions ? (
-						<div className={"grid grid-cols-[1fr]"}>
-							<AddTransactionsButton setShowAddTransactions={setShowAddTransactions} />
-						</div>
+						<AddTransactionsButton setShowAddTransactions={setShowAddTransactions} />
 					) : showPayments ? (
-						<div className={"grid grid-cols-[1fr]"}>
-							<Button
-								size={"sm"}
-								background={theme.colors.gradient.a}
-								onClick={() => console.log("Clicked mark as paid")}
-							>
-								<CheckCircledIcon /> Mark as paid
-							</Button>
-						</div>
+						<PaymentsButton setShowPayments={setShowPayments} />
+					) : showManage ? (
+						<ManageButton setShowManage={setShowManage} gid={gid}/>
 					) : (
 						<div className={"grid grid-cols-[108px_1fr] gap-2"}>
 							<Button
@@ -284,6 +247,8 @@ const Group = ({
 	);
 };
 
+
+// Should this be moved to a component?
 const AddTransactionsButton = ({ setShowAddTransactions }: { setShowAddTransactions: any }) => {
 	const addTransactions = tempStore((state) => state.addTransactions);
 	const setAddTransactions = tempStore.getState().setAddTransactions;
@@ -300,9 +265,11 @@ const AddTransactionsButton = ({ setShowAddTransactions }: { setShowAddTransacti
 	};
 
 	return (
-		<Button size={"sm"} background={theme.colors.gradient.a} onClick={submit}>
-			<PlusIcon /> Add {addTransactions.length} transactions
-		</Button>
+		<div className={"grid grid-cols-[1fr]"}>
+			<Button size={"sm"} background={theme.colors.gradient.a} onClick={submit}>
+				<PlusIcon /> Add {addTransactions.length} transactions
+			</Button>
+		</div>
 	);
 };
 
