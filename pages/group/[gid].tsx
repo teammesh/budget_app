@@ -30,6 +30,7 @@ import Manage from "@/components/Manage";
 import PaymentsButton from "@/components/PaymentsButton";
 import ManageButton from "@/components/ManageButton";
 import { SharedTransaction } from "@/components/SharedTransaction";
+import Image from "next/image";
 
 const Group = ({
 	user,
@@ -96,7 +97,7 @@ const Group = ({
 				supabase
 					.from("profiles_groups")
 					.select(
-						"profile_id, amount_paid_transactions, split_amount, amount_owed, profiles(username)",
+						"profile_id, amount_paid_transactions, split_amount, amount_owed, profiles(username, avatar_url)",
 					)
 					.eq("group_id", gid),
 			true,
@@ -134,7 +135,6 @@ const Group = ({
 				>
 					<div className={"grid grid-cols-[auto_1fr_auto] gap-3 items-center"}>
 						<Avatar.Root>
-							<Avatar.Image />
 							<Avatar.Fallback>
 								<DefaultAvatar
 									size={32}
@@ -161,17 +161,23 @@ const Group = ({
 								key={user.profile_id}
 								className={"grid grid-cols-[auto_1fr_auto] items-center text-sm gap-3"}
 							>
-								<Avatar.Root>
-									<Avatar.Image />
-									<Avatar.Fallback>
+								<div className={"flex items-center justify-center"}>
+									{user.profiles.avatar_url ? (
+										<Image
+											src={user.profiles.avatar_url}
+											className={"w-6 h-6 rounded-full"}
+											height={24}
+											width={24}
+										/>
+									) : (
 										<DefaultAvatar
 											size={24}
 											name={user.profiles.username}
 											variant="beam"
 											colors={theme.colors.avatar}
 										/>
-									</Avatar.Fallback>
-								</Avatar.Root>
+									)}
+								</div>
 								<div>
 									{user.profiles.username} {user.profile_id === profile_id && " (you)"}
 								</div>
@@ -281,13 +287,13 @@ export async function getServerSideProps({ req }: { req: RequestData }) {
 	const gid = result ? result[0] : req.url.toString().slice(7);
 	const { data: transactions } = await supabase
 		.from("shared_transactions")
-		.select()
+		.select("merchant_name, date, name, amount, profiles(username, avatar_url)")
 		.eq("group_id", gid);
 
 	const { data: users } = await supabase
 		.from("profiles_groups")
 		.select(
-			"profile_id, amount_paid_transactions, split_amount, amount_owed, profiles(username), groups(name)",
+			"profile_id, amount_paid_transactions, split_amount, amount_owed, profiles(username, avatar_url), groups(name)",
 		)
 		.eq("group_id", gid);
 

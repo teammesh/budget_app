@@ -3,6 +3,8 @@ import * as Avatar from "@radix-ui/react-avatar";
 import DefaultAvatar from "boring-avatars";
 import { forwardRef } from "react";
 import { definitions } from "../types/supabase";
+import Image from "next/image";
+import { displayAmount } from "@/components/Amount";
 
 export const SharedTransaction = forwardRef(
 	(
@@ -22,21 +24,25 @@ export const SharedTransaction = forwardRef(
 			>
 				<div className={"flex justify-between items-center"}>
 					<div className={"grid grid-cols-[auto_auto] gap-2 items-center"}>
-						<Avatar.Root>
-							<Avatar.Image />
-							<Avatar.Fallback>
-								<DefaultAvatar
-									size={16}
-									name={
-										groupUsers.find((user: any) => user.profile_id === transaction.charged_to)[
-											"profiles"
-										]["username"]
-									}
-									variant="beam"
-									colors={theme.colors.avatar}
-								/>
-							</Avatar.Fallback>
-						</Avatar.Root>
+						<div className={"flex items-center justify-center"}>
+							<div className={"flex items-center justify-center"}>
+								{transaction.profiles.avatar_url ? (
+									<Image
+										src={transaction.profiles.avatar_url}
+										className={"w-6 h-6 rounded-full"}
+										height={24}
+										width={24}
+									/>
+								) : (
+									<DefaultAvatar
+										size={16}
+										name={transaction.profiles.username}
+										variant="beam"
+										colors={theme.colors.avatar}
+									/>
+								)}
+							</div>
+						</div>
 						<div className={"font-medium"}>{transaction.merchant_name}</div>
 					</div>
 					<div className={"font-mono font-medium tracking-tight"}>
