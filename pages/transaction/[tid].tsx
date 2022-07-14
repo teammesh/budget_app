@@ -106,7 +106,7 @@ export async function getServerSideProps({ req, params }: { req: RequestData; pa
 		)
 		.eq("id", tid);
 
-	const transaction = data[0];
+	const transaction = data?.at(0);
 
 	return { props: { ...props, transaction }, redirect };
 }
