@@ -11,13 +11,10 @@ import { Params } from "next/dist/shared/lib/router/utils/route-matcher";
 import * as Avatar from "@radix-ui/react-avatar";
 import DefaultAvatar from "boring-avatars";
 
-const Transaction = ({ data }: { data: any }) => {
+const Transaction = ({ transaction }: { transaction: any }) => {
 	const router = useRouter();
 	const profile_id = supabase.auth.session()?.user?.id;
-	const transaction = data[0];
-	const groupUsers = data[0].groups.profiles_groups;
-
-	console.log(transaction);
+	const groupUsers = transaction.groups.profiles_groups;
 
 	return (
 		<Main>
@@ -104,10 +101,14 @@ export async function getServerSideProps({ req, params }: { req: RequestData; pa
 
 	const { data } = await supabase
 		.from("shared_transactions")
-		.select("*, groups( name, profiles_groups( *, profiles(id, username) ) )")
+		.select(
+			"*, groups(name, profiles_groups(*, profiles(id, username, avatar_url))), profiles(username, avatar_url)",
+		)
 		.eq("id", tid);
 
-	return { props: { ...props, data }, redirect };
+	const transaction = data[0];
+
+	return { props: { ...props, transaction }, redirect };
 }
 
 export default Transaction;

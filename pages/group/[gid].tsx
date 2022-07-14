@@ -287,7 +287,7 @@ export async function getServerSideProps({ req }: { req: RequestData }) {
 	const gid = result ? result[0] : req.url.toString().slice(7);
 	const { data: transactions } = await supabase
 		.from("shared_transactions")
-		.select("merchant_name, date, name, amount, profiles(username, avatar_url)")
+		.select("*, profiles(username, avatar_url)")
 		.eq("group_id", gid);
 
 	const { data: users } = await supabase

@@ -1,10 +1,8 @@
 import theme from "@/styles/theme";
-import * as Avatar from "@radix-ui/react-avatar";
 import DefaultAvatar from "boring-avatars";
 import { forwardRef } from "react";
 import { definitions } from "../types/supabase";
 import Image from "next/image";
-import { displayAmount } from "@/components/Amount";
 
 export const SharedTransaction = forwardRef(
 	(
@@ -12,7 +10,7 @@ export const SharedTransaction = forwardRef(
 			transaction,
 			groupUsers,
 			...props
-		}: { transaction: definitions["shared_transactions"]; groupUsers: any; props?: any },
+		}: { transaction: definitions["shared_transactions"] | any; groupUsers: any; props?: any },
 		ref,
 	) => {
 		return (
