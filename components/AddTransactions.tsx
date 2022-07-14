@@ -5,7 +5,7 @@ import * as R from "ramda";
 import { assocPath } from "ramda";
 import { Transaction as TransactionType } from "plaid";
 import { ItemPublicTokenExchangeResponse } from "plaid/api";
-import { plaidLinkUpdate } from "@/components/plaidLink";
+import { plaidLink, plaidLinkUpdate } from "@/components/plaidLink";
 import { sortByDate } from "@/utils/helper";
 import { styled } from "@stitches/react";
 import { useAtom } from "jotai";
@@ -167,7 +167,6 @@ export default function AddTransactions({
 			}),
 		}).then((res) =>
 			res.json().then((token) => {
-				tempStore.getState().setLinkToken(token);
 				return window.Plaid.create(
 					plaidLinkUpdate({ setIsLoading, linkToken: token, access_token }),
 				).open();
@@ -266,7 +265,11 @@ export default function AddTransactions({
 					<ArrowLeftIcon />
 					Cancel
 				</Button>
-				<Button size={"sm"} style={{ background: theme.colors.gradient.a }} onClick={open}>
+				<Button
+					size={"sm"}
+					style={{ background: theme.colors.gradient.a }}
+					onClick={() => window.Plaid.create(plaidLink({ setIsLoading })).open()}
+				>
 					<PlusIcon />
 					Add payment account
 				</Button>
