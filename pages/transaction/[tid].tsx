@@ -3,7 +3,7 @@ import { supabase } from "@/utils/supabaseClient";
 import { Main } from "@/components/Main";
 import { Button } from "@/components/Button";
 import theme from "@/styles/theme";
-import { ArrowLeftIcon, MixerHorizontalIcon } from "@radix-ui/react-icons";
+import { ArrowLeftIcon, TrashIcon } from "@radix-ui/react-icons";
 import { SharedTransaction } from "@/components/SharedTransaction";
 import { verifyUser } from "@/utils/ssr";
 import { RequestData } from "next/dist/server/web/types";
@@ -15,6 +15,14 @@ const Transaction = ({ transaction }: { transaction: any }) => {
 	const router = useRouter();
 	const profile_id = supabase.auth.session()?.user?.id;
 	const groupUsers = transaction.groups.profiles_groups;
+
+	const deleteTransaction = async () => {
+		await supabase
+			.from("shared_transactions")
+			.delete()
+			.eq("transaction_id", transaction.transaction_id);
+		router.push(`/group/${transaction.groups.id}`);
+	};
 
 	return (
 		<Main>
@@ -31,10 +39,10 @@ const Transaction = ({ transaction }: { transaction: any }) => {
 					<Button
 						size={"sm"}
 						style={{ background: theme.colors.gradient.a }}
-						// onClick={() => setShowManage(true)}
+						onClick={deleteTransaction}
 					>
-						<MixerHorizontalIcon />
-						Manage
+						<TrashIcon />
+						Delete
 					</Button>
 				</div>
 				<div>
@@ -108,7 +116,7 @@ export async function getServerSideProps({ req, params }: { req: RequestData; pa
 	const { data } = await supabase
 		.from("shared_transactions")
 		.select(
-			"*, groups(name, profiles_groups(*, profiles(id, username, avatar_url))), profiles(username, avatar_url)",
+			"*, groups(name, id, profiles_groups(*, profiles(id, username, avatar_url))), profiles(username, avatar_url)",
 		)
 		.eq("id", tid);
 
