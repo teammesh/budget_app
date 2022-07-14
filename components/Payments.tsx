@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import { Button } from "./Button";
 import { TextGradient } from "./text";
 import { definitions } from "../types/supabase";
+import Image from "next/image";
 
 export default function Payments({
 	gid,
@@ -16,11 +17,17 @@ export default function Payments({
 }: {
 	gid: string;
 	setShowPayments: any;
-	balances: definitions["balances"];
+	balances: definitions["balances"] | any;
 }) {
 	const profile_id = supabase.auth.session()?.user?.id;
-	const [userBalances, setUserBalances] = useState<any>(balances);
-	const [groupBalances, setGroupBalances] = useState<any>([]);
+	const [userBalances, setUserBalances] = useState<any>(
+		balances.filter((x: definitions["balances"]) => x.from_profile_id === profile_id),
+	);
+	const [groupBalances, setGroupBalances] = useState<any>(
+		balances.filter((x: definitions["balances"]) => x.from_profile_id !== profile_id),
+	);
+
+	console.log(balances);
 
 	useEffect(() => {
 		supabase
@@ -42,7 +49,7 @@ export default function Payments({
 		return supabase
 			.from("balances")
 			.select(
-				"id, group_id, amount, from_profile_id, to_profile_id, from_user:from_profile_id(username), to_user:to_profile_id(username), from_avatar:from_profile_id(avatar_url), to_avatar:to_profile_id(avatar_url)",
+				"id, group_id, amount, from_profile_id, to_profile_id, from_user:from_profile_id(username, avatar_url), to_user:to_profile_id(username, avatar_url)",
 			)
 			.eq("group_id", gid)
 			.then(({ data, error }) => {
@@ -115,19 +122,25 @@ const PaymentContainer = ({
 					balances.map((x, i) => (
 						<div key={x.id}>
 							<div className="grid grid-cols-[auto_1fr_auto] items-center">
-								<Avatar.Root>
-									<Avatar.Image />
-									<Avatar.Fallback>
+								<div className={"flex items-center justify-center"}>
+									{x.from_user.avatar_url ? (
+										<Image
+											src={x.from_user.avatar_url}
+											className={"w-12 h-12 rounded-full"}
+											height={48}
+											width={48}
+										/>
+									) : (
 										<DefaultAvatar
 											size={48}
 											name={x.from_user.username}
 											variant="beam"
 											colors={theme.colors.avatar}
 										/>
-									</Avatar.Fallback>
-								</Avatar.Root>
+									)}
+								</div>
 								<div className="text-sm text-center">
-									{x.from_user.username === profile_id ? (
+									{x.from_profile_id === profile_id ? (
 										"You pay "
 									) : (
 										<>{x.from_user.username} pays </>
@@ -139,17 +152,23 @@ const PaymentContainer = ({
 										</TextGradient>
 									</div>
 								</div>
-								<Avatar.Root>
-									<Avatar.Image />
-									<Avatar.Fallback>
+								<div className={"flex items-center justify-center"}>
+									{x.to_user.avatar_url ? (
+										<Image
+											src={x.to_user.avatar_url}
+											className={"w-12 h-12 rounded-full"}
+											height={48}
+											width={48}
+										/>
+									) : (
 										<DefaultAvatar
 											size={48}
 											name={x.to_user.username}
 											variant="beam"
 											colors={theme.colors.avatar}
 										/>
-									</Avatar.Fallback>
-								</Avatar.Root>
+									)}
+								</div>
 							</div>
 						</div>
 					))
