@@ -10,6 +10,7 @@ import { RequestData } from "next/dist/server/web/types";
 import { Params } from "next/dist/shared/lib/router/utils/route-matcher";
 import * as Avatar from "@radix-ui/react-avatar";
 import DefaultAvatar from "boring-avatars";
+import { displayAmount } from "@/components/Amount";
 
 const Transaction = ({ transaction }: { transaction: any }) => {
 	const router = useRouter();
@@ -85,7 +86,13 @@ const Transaction = ({ transaction }: { transaction: any }) => {
 								<div>
 									{user.profiles.username} {user.profile_id === profile_id && " (you)"}
 								</div>
-								<div className={"font-mono font-medium tracking-tighter"}>$XX</div>
+								<div className={"font-mono font-medium tracking-tighter"}>
+									$
+									{(transaction.amount / 3).toLocaleString(undefined, {
+										minimumFractionDigits: 2,
+										maximumFractionDigits: 2,
+									})}
+								</div>
 							</div>
 						))}
 					</div>
