@@ -28,8 +28,8 @@ export const SharedTransaction = forwardRef(
 									<Image
 										src={transaction.profiles.avatar_url}
 										className={"w-6 h-6 rounded-full"}
-										height={24}
-										width={24}
+										height={16}
+										width={16}
 									/>
 								) : (
 									<DefaultAvatar
