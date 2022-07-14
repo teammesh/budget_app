@@ -2,6 +2,7 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { supabase, supabaseQuery } from "@/utils/supabaseClient";
 import AddTransactions from "@/components/AddTransactions";
+import * as R from "ramda";
 import { isEmpty } from "ramda";
 import { tempStore } from "@/utils/store";
 import Link from "next/link";
@@ -31,6 +32,7 @@ import PaymentsButton from "@/components/PaymentsButton";
 import ManageButton from "@/components/ManageButton";
 import { SharedTransaction } from "@/components/SharedTransaction";
 import Image from "next/image";
+import { sortByDate } from "@/utils/helper";
 
 const Group = ({
 	user,
@@ -77,7 +79,7 @@ const Group = ({
 			.from(`shared_transactions:group_id=eq.${gid}`)
 			.on("*", (payload) => {
 				console.log("Change received!", payload);
-				setSharedTransactions([...tempStore.getState().sharedTransactions, payload.new]);
+				fetchSharedTransactions();
 			})
 			.subscribe();
 
@@ -99,6 +101,19 @@ const Group = ({
 					.select(
 						"profile_id, amount_paid_transactions, split_amount, amount_owed, profiles(username, avatar_url)",
 					)
+					.eq("group_id", gid),
+			true,
+		);
+
+		setSharedTransactions(data);
+	};
+
+	const fetchSharedTransactions = async () => {
+		const { data } = await supabaseQuery(
+			() =>
+				supabase
+					.from("shared_transactions")
+					.select("*, profiles(username, avatar_url)")
 					.eq("group_id", gid),
 			true,
 		);
@@ -311,7 +326,10 @@ export async function getServerSideProps({ req }: { req: RequestData }) {
 		)
 		.eq("group_id", gid);
 
-	return { props: { ...props, transactions, users, balances }, redirect };
+	const sortedTransactions =
+		transactions && transactions.length > 0 && R.reverse(sortByDate(transactions));
+
+	return { props: { ...props, transactions: sortedTransactions, users, balances }, redirect };
 }
 
 export default Group;
