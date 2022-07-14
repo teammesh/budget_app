@@ -10,7 +10,6 @@ import { RequestData } from "next/dist/server/web/types";
 import { Params } from "next/dist/shared/lib/router/utils/route-matcher";
 import * as Avatar from "@radix-ui/react-avatar";
 import DefaultAvatar from "boring-avatars";
-import { displayAmount } from "@/components/Amount";
 
 const Transaction = ({ transaction }: { transaction: any }) => {
 	const router = useRouter();

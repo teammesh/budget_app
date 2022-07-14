@@ -186,9 +186,18 @@ const Group = ({
 										<>{displayAmount(user.amount_owed)}</>
 									) : (
 										<>
-											${user.amount_paid_transactions.toLocaleString()} /{" "}
+											$
+											{user.amount_paid_transactions.toLocaleString(undefined, {
+												minimumFractionDigits: 2,
+												maximumFractionDigits: 2,
+											})}{" "}
+											/{" "}
 											<span className={"font-mono font-medium text-gray-600"}>
-												${user.split_amount.toLocaleString()}
+												$
+												{user.split_amount.toLocaleString(undefined, {
+													minimumFractionDigits: 2,
+													maximumFractionDigits: 2,
+												})}
 											</span>
 										</>
 									)}
@@ -278,8 +287,6 @@ const AddTransactionsButton = ({ setShowAddTransactions }: { setShowAddTransacti
 
 export async function getServerSideProps({ req }: { req: RequestData }) {
 	const { props, redirect } = await verifyUser(req);
-
-	console.log(req.url);
 
 	const gidRegEx = new RegExp("(?<=group\\/)(.*)(?=.json)");
 	const result = gidRegEx.exec(req.url);
