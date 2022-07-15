@@ -62,7 +62,7 @@ const Group = ({
 	useEffect(() => {
 		tempStore.getState().setGroupName(users[0].groups.name);
 		tempStore.getState().setGroupMembers(groupUsers.map((user: any) => user.profiles.username));
-		setSharedTransactions(transactions);
+		transactions &&	setSharedTransactions(transactions);
 		return () => {
 			setSharedTransactions([]);
 			supabase.removeAllSubscriptions();
