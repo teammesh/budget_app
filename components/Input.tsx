@@ -6,11 +6,11 @@ export const Input = styled("input", {
 	alignItems: "center",
 	justifyContent: "center",
 	borderRadius: 4,
-	padding: "0 10px",
+	padding: "0 12px",
 	fontSize: "1rem", // browsers will zoom into input if less than 16px
 	color: theme.colors.white,
 	background: theme.colors.gray["900"],
-	height: 35,
+	height: 48,
 
 	"::placeholder": {
 		color: theme.colors.gray["800"],

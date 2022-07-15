@@ -6,10 +6,10 @@ import { Group } from "@/components/Group";
 import * as Dialog from "@radix-ui/react-dialog";
 import { Content } from "@/components/Modal";
 import { Input } from "@/components/Input";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { isNil } from "ramda";
 import { Button } from "@/components/Button";
-import { PlusIcon } from "@radix-ui/react-icons";
+import { ArrowLeftIcon, ExitIcon, LightningBoltIcon, PlusIcon } from "@radix-ui/react-icons";
 import theme from "@/styles/theme";
 import { verifyUser } from "@/utils/ssr";
 import { tempStore, uiStore } from "@/utils/store";
@@ -104,16 +104,37 @@ export default function Home({
 					</Button>
 				</Dialog.Trigger>
 				<Content>
-					<Dialog.Title>Group name</Dialog.Title>
-					<Dialog.Description>Let's create a group!</Dialog.Description>
-					<Input placeholder="Group name" onChange={(e) => setGroupName(e.target.value)} />
-					<Input
-						placeholder="Members"
-						onChange={(e) => setGroupMembers(e.target.value.split(","))}
-					/>
-					<Dialog.Close asChild>
-						<button onClick={() => handleCreateGroup()}>Create</button>
-					</Dialog.Close>
+					<div className={"grid grid-cols-1 gap-2 text-center"}>
+						<Dialog.Title className={"font-medium text-md"}>Create a group</Dialog.Title>
+						<Dialog.Description className={"text-sm text-gray-600"}>
+							Enter the name of your group and the usernames of those you'd like to invite.
+						</Dialog.Description>
+					</div>
+					<div className={"grid grid-cols-1 gap-2"}>
+						<Input placeholder="Group name" onChange={(e) => setGroupName(e.target.value)} />
+						<Input
+							placeholder="Members"
+							onChange={(e) => setGroupMembers(e.target.value.split(","))}
+						/>
+					</div>
+					<div className={"grid grid-cols-1 gap-2"}>
+						<Dialog.Close asChild>
+							<Button size={"sm"} border={theme.colors.gradient.a}>
+								<ArrowLeftIcon />
+								Cancel
+							</Button>
+						</Dialog.Close>
+						<Dialog.Close asChild>
+							<Button
+								size={"sm"}
+								background={theme.colors.gradient.a}
+								onClick={() => handleCreateGroup()}
+							>
+								<LightningBoltIcon />
+								Create
+							</Button>
+						</Dialog.Close>
+					</div>
 				</Content>
 			</Dialog.Root>
 		</div>

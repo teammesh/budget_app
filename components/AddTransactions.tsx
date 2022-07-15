@@ -216,7 +216,7 @@ export default function AddTransactions({
 								<Dialog.Close asChild>
 									<Button size={"sm"} border={theme.colors.gradient.a}>
 										<ArrowLeftIcon />
-										Return
+										Cancel
 									</Button>
 								</Dialog.Close>
 								<Button
