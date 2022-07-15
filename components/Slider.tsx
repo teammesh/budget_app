@@ -12,11 +12,11 @@ const StyledSlider = styled(SliderPrimitive.Root, {
 	touchAction: "none",
 	width: "100%",
 
-	'&[data-orientation="horizontal"]': {
+	"&[data-orientation='horizontal']": {
 		height: 20,
 	},
 
-	'&[data-orientation="vertical"]': {
+	"&[data-orientation='vertical']": {
 		flexDirection: "column",
 		width: 20,
 		height: 100,
@@ -29,8 +29,8 @@ const StyledTrack = styled(SliderPrimitive.Track, {
 	flexGrow: 1,
 	borderRadius: "9999px",
 
-	'&[data-orientation="horizontal"]': { height: 3 },
-	'&[data-orientation="vertical"]': { width: 3 },
+	"&[data-orientation='horizontal']": { height: 3 },
+	"&[data-orientation='vertical']": { width: 3 },
 });
 
 const StyledRange = styled(SliderPrimitive.Range, {
