@@ -3,6 +3,7 @@ import DefaultAvatar from "boring-avatars";
 import { forwardRef } from "react";
 import { definitions } from "../types/supabase";
 import Image from "next/image";
+import { PrimaryBox } from "@/components/boxes";
 
 export const SharedTransaction = forwardRef(
 	(
@@ -14,8 +15,7 @@ export const SharedTransaction = forwardRef(
 		ref,
 	) => {
 		return (
-			<div
-				className={"p-3 rounded-md bg-gray-900 cursor-pointer grid grid-cols-1 gap-0.5 text-sm"}
+			<PrimaryBox
 				{...props}
 				// @ts-ignore
 				ref={ref}
@@ -53,7 +53,7 @@ export const SharedTransaction = forwardRef(
 						{transaction.date}
 					</div>
 				</div>
-			</div>
+			</PrimaryBox>
 		);
 	},
 );
