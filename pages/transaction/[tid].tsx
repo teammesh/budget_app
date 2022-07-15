@@ -40,8 +40,9 @@ const Transaction = ({
 	const groupUsers = transaction.groups.profiles_groups;
 	const [isEditing, setIsEditing] = useState(false);
 	const amountDivisor = 1 / groupUsers.length;
-	const [amountRatios, setAmountRatios] = useState(
+	const [amountRatios, setAmountRatios] = useState<any>(
 		R.indexBy(
+			// @ts-ignore
 			R.prop("profile_id"),
 			R.map((x) => {
 				return {
@@ -157,12 +158,21 @@ const Transaction = ({
 									<div>
 										{user.profiles.username} {user.profile_id === profile.id && " (you)"}
 									</div>
-									<div className={"font-mono font-medium tracking-tighter"}>
-										$
-										{amountRatios[user.profile_id].amount.toLocaleString(undefined, {
-											minimumFractionDigits: 2,
-											maximumFractionDigits: 2,
-										})}
+									<div className={"grid grid-cols-[auto_auto_auto] gap-1"}>
+										<div className={"font-mono font-medium tracking-tight"}>
+											$
+											{amountRatios[user.profile_id].amount.toLocaleString(undefined, {
+												minimumFractionDigits: 2,
+												maximumFractionDigits: 2,
+											})}
+										</div>
+										<div className={"font-mono font-medium tracking-tight"}>/</div>
+										<div className={"font-mono font-medium tracking-tight text-gray-600"}>
+											%
+											{Math.round(
+												(amountRatios[user.profile_id].amount / transaction.amount) * 100,
+											)}
+										</div>
 									</div>
 								</div>
 								<Slider
