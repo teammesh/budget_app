@@ -26,6 +26,7 @@ import { AuthUser } from "@supabase/supabase-js";
 import { FormBox, PrimaryBox } from "@/components/boxes";
 import { Separator } from "@/components/Separator";
 import * as R from "ramda";
+import Image from "next/image";
 
 const Transaction = ({
 	user,
@@ -145,15 +146,21 @@ const Transaction = ({
 							<div className={"grid grid-cols-1 gap-2"} key={user.profile_id}>
 								<div className={"grid grid-cols-[auto_1fr_auto] items-center text-sm gap-3"}>
 									<Avatar.Root>
-										<Avatar.Image />
-										<Avatar.Fallback>
+										{user.profiles.avatar_url ? (
+											<Image
+												src={user.profiles.avatar_url}
+												className={"w-6 h-6 rounded-full"}
+												height={24}
+												width={24}
+											/>
+										) : (
 											<DefaultAvatar
 												size={24}
 												name={user.profiles.username}
 												variant="beam"
 												colors={theme.colors.avatar}
 											/>
-										</Avatar.Fallback>
+										)}
 									</Avatar.Root>
 									<div>
 										{user.profiles.username} {user.profile_id === profile.id && " (you)"}
@@ -230,15 +237,21 @@ const Transaction = ({
 								className={"grid grid-cols-[auto_1fr_auto] items-center text-sm gap-3"}
 							>
 								<Avatar.Root>
-									<Avatar.Image />
-									<Avatar.Fallback>
+									{user.profiles.avatar_url ? (
+										<Image
+											src={user.profiles.avatar_url}
+											className={"w-6 h-6 rounded-full"}
+											height={24}
+											width={24}
+										/>
+									) : (
 										<DefaultAvatar
 											size={24}
 											name={user.profiles.username}
 											variant="beam"
 											colors={theme.colors.avatar}
 										/>
-									</Avatar.Fallback>
+									)}
 								</Avatar.Root>
 								<div>
 									{user.profiles.username} {user.profile_id === profile.id && " (you)"}
