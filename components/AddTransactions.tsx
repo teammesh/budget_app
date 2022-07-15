@@ -114,7 +114,7 @@ export default function AddTransactions({
 
 		// remove from showAccounts and flag the pm for re-authentication
 		if (data?.error?.error_code === "ITEM_LOGIN_REQUIRED") {
-			setAccounts(assocPath([access_token, "invalid"], true, accounts));
+			setAccounts(assocPath([access_token, "invalid"], true, sessionStore.getState().accounts));
 			setShowAccounts(R.without([access_token], showAccounts));
 			setIsLoading(false);
 			return;

@@ -31,7 +31,6 @@ import ManageButton from "@/components/ManageButton";
 import { SharedTransaction } from "@/components/SharedTransaction";
 import Image from "next/image";
 import { sortByDate } from "@/utils/helper";
-import { atom, useAtom } from "jotai";
 
 const Group = ({
 	user,
