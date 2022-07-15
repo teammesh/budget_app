@@ -37,6 +37,7 @@
 		"multiline-ternary": ["off"],
 		"no-async-promise-executor": ["off"],
 		"no-empty-pattern": ["off"],
+		"no-mixed-spaces-and-tabs": ["warn"],
 		"no-tabs": ["off"],
 		"no-undef": ["error"],
 		"no-use-before-define": ["off"],
