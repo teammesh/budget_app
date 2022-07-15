@@ -292,7 +292,21 @@ const AddTransactionsButton = ({ setShowAddTransactions }: { setShowAddTransacti
 	};
 
 	return (
-		<div className={"grid grid-cols-[1fr]"}>
+		<div className={"grid grid-cols-[auto_1fr_200px] justify-center"}>
+			<div className={"grid grid-cols-1 gap-1"}>
+				<div className={"font-mono tracking-tighter text-sm"}>Total transaction:</div>
+				<div className={"text-xl tracking-tight leading-none"}>
+					{addTransactions.length === 0
+						? "--"
+						: displayAmount(
+								addTransactions.reduce((prev, curr) => {
+									if (!curr.amount) return prev;
+									return curr.amount + prev;
+								}, 0),
+						  )}
+				</div>
+			</div>
+			<div />
 			<Button size={"sm"} background={theme.colors.gradient.a} onClick={submit}>
 				<PlusIcon /> Add {addTransactions.length} transactions
 			</Button>
