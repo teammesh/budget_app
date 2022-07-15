@@ -14,7 +14,7 @@ export default function Login() {
 	const { data, error } = useSWR(session ? ["/api/getUser", session.access_token] : null, fetcher);
 
 	useEffect(() => {
-		// setSession(supabase.auth.session());
+		console.log(session);
 
 		const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
 			console.log(event);
