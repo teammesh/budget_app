@@ -74,8 +74,8 @@ export default function Payments({
 			return;
 		}
 
-		const userPayments = userBalances?.map((userBalance) => ({
-			group_id: gid, 
+		const userPayments = userBalances?.map((userBalance: any) => ({
+			group_id: gid,
 			from_profile_id: profile_id,
 			to_profile_id: userBalance.to_profile_id,
 			amount: Math.abs(userBalance.amount),
@@ -99,7 +99,9 @@ export default function Payments({
 				</Dialog.Trigger>
 				<Content>
 					<div className={"grid grid-cols-1 gap-2 text-center"}>
-						<Dialog.Title className={"font-medium text-md"}>Are you sure you want to pay?</Dialog.Title>
+						<Dialog.Title className={"font-medium text-md"}>
+							Are you sure you want to pay?
+						</Dialog.Title>
 					</div>
 					<div className={"grid grid-cols-1 gap-2"}>
 						<Dialog.Close asChild>

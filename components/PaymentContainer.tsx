@@ -14,7 +14,7 @@ export const PaymentContainer = ({
 	description: string;
 	balances: Array<any>;
 	emptyText: string;
-	profileId: string;
+	profileId?: string;
 }) => {
 	return (
 		<div className={"p-3 rounded-md bg-gray-900 grid grid-cols-1 gap-6"}>
@@ -46,11 +46,7 @@ export const PaymentContainer = ({
 									)}
 								</div>
 								<div className="text-sm text-center">
-									{x.from_profile_id === profileId ? (
-										"You pay "
-									) : (
-										<>{x.from_user.username} pays </>
-									)}
+									{x.from_profile_id === profileId ? "You pay " : <>{x.from_user.username} pays </>}
 									{x.to_user.username}
 									<div className={"text-sm font-mono font-medium tracking-tight"}>
 										<TextGradient gradient={theme.colors.gradient.f}>
