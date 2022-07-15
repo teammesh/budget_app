@@ -131,6 +131,7 @@ const PaymentContainer = ({
 											className={"w-12 h-12 rounded-full"}
 											height={48}
 											width={48}
+											alt={"from user avatar"}
 										/>
 									) : (
 										<DefaultAvatar
@@ -161,6 +162,7 @@ const PaymentContainer = ({
 											className={"w-12 h-12 rounded-full"}
 											height={48}
 											width={48}
+											alt={"to user avatar"}
 										/>
 									) : (
 										<DefaultAvatar

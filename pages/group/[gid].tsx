@@ -95,7 +95,7 @@ const Group = ({
 			return showAddTransactions ? (
 				<AddTransactionsButton setShowAddTransactions={setShowAddTransactions} />
 			) : showPayments ? (
-				<PaymentsButton setShowPayments={setShowPayments} />
+				<PaymentsButton setShowPayments={setShowPayments} gid={gid} />
 			) : showManage ? (
 				<ManageButton setShowManage={setShowManage} gid={gid} />
 			) : (
@@ -281,6 +281,7 @@ const GroupSummary = ({
 									className={"w-6 h-6 rounded-full"}
 									height={24}
 									width={24}
+									alt={"user avatar"}
 								/>
 							) : (
 								<DefaultAvatar
