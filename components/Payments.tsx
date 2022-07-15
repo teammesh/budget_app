@@ -1,13 +1,12 @@
 import theme from "@/styles/theme";
 import { supabase } from "@/utils/supabaseClient";
-import DefaultAvatar from "boring-avatars";
 import { ArrowLeftIcon } from "@radix-ui/react-icons";
 import { styled } from "@stitches/react";
 import { useEffect, useState } from "react";
 import { Button } from "./Button";
-import { TextGradient } from "./text";
 import { definitions } from "../types/supabase";
-import Image from "next/image";
+import { Loading } from "@/components/Loading";
+import { PaymentContainer } from "./PaymentContainer";
 
 export default function Payments({
 	gid,
@@ -19,6 +18,8 @@ export default function Payments({
 	balances: definitions["balances"] | any;
 }) {
 	const profile_id = supabase.auth.session()?.user?.id;
+	const [isLoading, setIsLoading] = useState<any>(true);
+
 	const [userBalances, setUserBalances] = useState<any>(
 		balances.filter((x: definitions["balances"]) => x.from_profile_id === profile_id),
 	);
@@ -36,8 +37,8 @@ export default function Payments({
 				fetchBalances();
 			})
 			.subscribe();
-
 		console.log(supabase.getSubscriptions());
+		setIsLoading(false);
 
 		return () => {
 			supabase.removeSubscription(
@@ -89,97 +90,16 @@ export default function Payments({
 				description={"Send these amounts to the designated person(s)"}
 				balances={userBalances}
 				emptyText={"You do not have any open balances"}
+				profileId={profile_id}
 			/>
 			<PaymentContainer
 				title={"Group payments"}
 				description={"Payments that others in your group need to make"}
 				balances={groupBalances}
 				emptyText={"The group currently does not have any open balances"}
+				profileId={profile_id}
 			/>
+			{isLoading && <Loading />}
 		</Container>
 	);
 }
-
-const PaymentContainer = ({
-	title,
-	description,
-	balances,
-	emptyText,
-}: {
-	title: string;
-	description: string;
-	balances: Array<any>;
-	emptyText: string;
-}) => {
-	const profile_id = supabase.auth.session()?.user?.id;
-
-	return (
-		<div className={"p-3 rounded-md bg-gray-900 grid grid-cols-1 gap-6"}>
-			<div className={"grid grid-cols-1 gap-1"}>
-				<div className="text-sm">{title}</div>
-				<div className="text-xs text-gray-600">{description}</div>
-			</div>
-			<div className="grid grid-cols-1 gap-4">
-				{balances.length > 0 ? (
-					balances.map((x, i) => (
-						<div key={x.id}>
-							<div className="grid grid-cols-[auto_1fr_auto] items-center">
-								<div className={"flex items-center justify-center"}>
-									{x.from_user.avatar_url ? (
-										<Image
-											src={x.from_user.avatar_url}
-											className={"w-12 h-12 rounded-full"}
-											height={48}
-											width={48}
-											alt={"from user avatar"}
-										/>
-									) : (
-										<DefaultAvatar
-											size={48}
-											name={x.from_user.username}
-											variant="beam"
-											colors={theme.colors.avatar}
-										/>
-									)}
-								</div>
-								<div className="text-sm text-center">
-									{x.from_profile_id === profile_id ? (
-										"You pay "
-									) : (
-										<>{x.from_user.username} pays </>
-									)}
-									{x.to_user.username}
-									<div className={"text-sm font-mono font-medium tracking-tight"}>
-										<TextGradient gradient={theme.colors.gradient.f}>
-											${Math.abs(x.amount)}
-										</TextGradient>
-									</div>
-								</div>
-								<div className={"flex items-center justify-center"}>
-									{x.to_user.avatar_url ? (
-										<Image
-											src={x.to_user.avatar_url}
-											className={"w-12 h-12 rounded-full"}
-											height={48}
-											width={48}
-											alt={"to user avatar"}
-										/>
-									) : (
-										<DefaultAvatar
-											size={48}
-											name={x.to_user.username}
-											variant="beam"
-											colors={theme.colors.avatar}
-										/>
-									)}
-								</div>
-							</div>
-						</div>
-					))
-				) : (
-					<div className="text-xs p-3 flex justify-center text-gray-600">{emptyText}</div>
-				)}
-			</div>
-		</div>
-	);
-};

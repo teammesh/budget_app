@@ -221,7 +221,7 @@ const AddTransactionsButton = ({ setShowAddTransactions }: { setShowAddTransacti
 									if (!curr.amount) return prev;
 									return curr.amount + prev;
 								}, 0),
-						  )}
+					)}
 				</div>
 			</div>
 			<Button size={"sm"} background={theme.colors.gradient.a} onClick={submit}>
@@ -301,7 +301,7 @@ const GroupSummary = ({
 							) : (
 								<>
 									$
-									{user.amount_paid_transactions.toLocaleString(undefined, {
+									{(user.amount_paid_transactions + user.amount_paid_users).toLocaleString(undefined, {
 										minimumFractionDigits: 2,
 										maximumFractionDigits: 2,
 									})}{" "}
@@ -338,7 +338,7 @@ export async function getServerSideProps({ req }: { req: RequestData }) {
 	const { data: users } = await supabase
 		.from("profiles_groups")
 		.select(
-			"profile_id, amount_paid_transactions, split_amount, amount_owed, profiles(username, avatar_url), groups(name)",
+			"profile_id, amount_paid_transactions, amount_paid_users, split_amount, amount_owed, profiles(username, avatar_url), groups(name)",
 		)
 		.eq("group_id", gid);
 
