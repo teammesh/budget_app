@@ -70,14 +70,18 @@ export const Transaction = ({ transaction, gid }: { transaction: TransactionType
 								<div className={"bg-gray-800 rounded-full h-4 w-4"} />
 							</Avatar.Fallback>
 						</Avatar.Root>
-						<div className={"font-medium"}>{transaction.merchant_name}</div>
+						<div className={"font-medium text-ellipsis overflow-hidden whitespace-nowrap"}>
+							{transaction.merchant_name}
+						</div>
 					</div>
 					<div className={"font-mono font-medium tracking-tight shrink-0"}>
 						{displayAmount(transaction.amount)}
 					</div>
 				</div>
 				<div className={"flex justify-between"}>
-					<div className={"text-gray-600"}>{transaction.name}</div>
+					<div className={"text-gray-600 text-ellipsis overflow-hidden whitespace-nowrap"}>
+						{transaction.name}
+					</div>
 					<div className={"font-mono font-medium tracking-tight text-gray-600 shrink-0"}>
 						{transaction.date}
 					</div>

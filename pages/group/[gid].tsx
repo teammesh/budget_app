@@ -211,7 +211,7 @@ const AddTransactionsButton = ({ setShowAddTransactions }: { setShowAddTransacti
 	};
 
 	return (
-		<div className={"grid grid-cols-[auto_1fr_200px] justify-center"}>
+		<div className={"grid grid-cols-[auto_1fr] justify-center gap-8"}>
 			<div className={"grid grid-cols-1 gap-1"}>
 				<div className={"font-mono tracking-tighter text-sm"}>Total transaction:</div>
 				<div className={"text-xl tracking-tight leading-none"}>
@@ -225,7 +225,6 @@ const AddTransactionsButton = ({ setShowAddTransactions }: { setShowAddTransacti
 						  )}
 				</div>
 			</div>
-			<div />
 			<Button size={"sm"} background={theme.colors.gradient.a} onClick={submit}>
 				<PlusIcon /> Add {addTransactions.length} transactions
 			</Button>
@@ -293,7 +292,7 @@ const GroupSummary = ({
 								/>
 							)}
 						</div>
-						<div>
+						<div className={"text-ellipsis overflow-hidden whitespace-nowrap"}>
 							{user.profiles.username} {user.profile_id === profile.id && <span>(you)</span>}
 						</div>
 						<div className={"font-mono font-medium tracking-tighter"}>

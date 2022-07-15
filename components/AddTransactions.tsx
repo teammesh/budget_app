@@ -190,7 +190,9 @@ export default function AddTransactions({
 							>
 								<Toggle checked={showAccounts.includes(account.access_token)} />
 								<div
-									className={"grid grid-cols-[auto_auto] gap-2 items-center place-content-start"}
+									className={
+										"grid grid-cols-[auto_auto] gap-2 items-center place-content-start text-ellipsis overflow-hidden whitespace-nowrap"
+									}
 								>
 									{<ExclamationTriangleIcon color={theme.colors.avatar[0]} />}
 									{account.name}
@@ -239,7 +241,7 @@ export default function AddTransactions({
 						key={account.item_id}
 					>
 						<Toggle checked={showAccounts.includes(account.access_token)} />
-						{account.name}
+						<div className={"text-ellipsis overflow-hidden whitespace-nowrap"}>{account.name}</div>
 						<span className={"font-mono font-medium tracking-tight text-gray-600"}>
 							•••• {account.last_four_digits}
 						</span>
