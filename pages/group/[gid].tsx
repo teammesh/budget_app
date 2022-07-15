@@ -47,7 +47,6 @@ const Group = ({
 	users: definitions["profiles_groups"][] | any;
 	balances: definitions["balances"];
 }) => {
-	const profile_id = supabase.auth.session()?.user?.id;
 	const router = useRouter();
 	// @ts-ignore
 	const { gid }: { gid: string } = router.query;
@@ -55,10 +54,8 @@ const Group = ({
 	const [showPayments, setShowPayments] = useState(false);
 	const [showManage, setShowManage] = useState(false);
 	const [groupUsers, setGroupUsers] = useState(users);
-	const [showRunningTotal, setShowRunningTotal] = useState(false);
 	const sharedTransactions = tempStore((state) => state.sharedTransactions);
 	const setSharedTransactions = tempStore.getState().setSharedTransactions;
-	const groupName = tempStore.getState().groupName;
 
 	useEffect(() => {
 		tempStore.getState().setGroupName(users[0].groups.name);
@@ -142,85 +139,7 @@ const Group = ({
 						Manage
 					</Button>
 				</div>
-				<div
-					className={
-						"p-3 rounded-md bg-gray-900 grid grid-cols-1 gap-4 items-center cursor-pointer"
-					}
-					onClick={() => setShowRunningTotal(!showRunningTotal)}
-				>
-					<div className={"grid grid-cols-[auto_1fr_auto] gap-3 items-center"}>
-						<Avatar.Root>
-							<Avatar.Fallback>
-								<DefaultAvatar
-									size={32}
-									name={groupName}
-									variant="marble"
-									colors={theme.colors.avatar}
-								/>
-							</Avatar.Fallback>
-						</Avatar.Root>
-						<div className="block">
-							<div className="text-sm font-medium">{groupName}</div>
-							<div className="text-xs text-gray-600">{groupUsers.length} users</div>
-						</div>
-						<div className={"grid grid-cols-3 gap-1"}>
-							<PieChartIcon gradient={!showRunningTotal} />
-							<ArrowBetweenIcon />
-							<BarChartIcon gradient={showRunningTotal} />
-						</div>
-					</div>
-					<Separator />
-					<div className={"grid grid-cols-1 gap-3"}>
-						{groupUsers.map((user: any) => (
-							<div
-								key={user.profile_id}
-								className={"grid grid-cols-[auto_1fr_auto] items-center text-sm gap-3"}
-							>
-								<div className={"flex items-center justify-center"}>
-									{user.profiles.avatar_url ? (
-										<Image
-											src={user.profiles.avatar_url}
-											className={"w-6 h-6 rounded-full"}
-											height={24}
-											width={24}
-										/>
-									) : (
-										<DefaultAvatar
-											size={24}
-											name={user.profiles.username}
-											variant="beam"
-											colors={theme.colors.avatar}
-										/>
-									)}
-								</div>
-								<div>
-									{user.profiles.username} {user.profile_id === profile_id && " (you)"}
-								</div>
-								<div className={"font-mono font-medium tracking-tighter"}>
-									{!showRunningTotal ? (
-										<>{displayAmount(user.amount_owed)}</>
-									) : (
-										<>
-											$
-											{user.amount_paid_transactions.toLocaleString(undefined, {
-												minimumFractionDigits: 2,
-												maximumFractionDigits: 2,
-											})}{" "}
-											/{" "}
-											<span className={"font-mono font-medium text-gray-600"}>
-												$
-												{user.split_amount.toLocaleString(undefined, {
-													minimumFractionDigits: 2,
-													maximumFractionDigits: 2,
-												})}
-											</span>
-										</>
-									)}
-								</div>
-							</div>
-						))}
-					</div>
-				</div>
+				<GroupSummary groupUsers={groupUsers} profile={profile} />
 				<div className={"mt-6"}>
 					<Header>
 						Shared <TextGradient gradient={theme.colors.gradient.a}>transactions</TextGradient>
@@ -310,6 +229,97 @@ const AddTransactionsButton = ({ setShowAddTransactions }: { setShowAddTransacti
 			<Button size={"sm"} background={theme.colors.gradient.a} onClick={submit}>
 				<PlusIcon /> Add {addTransactions.length} transactions
 			</Button>
+		</div>
+	);
+};
+
+const GroupSummary = ({
+	groupUsers,
+	profile,
+}: {
+	groupUsers: definitions["profiles_groups"][] | any;
+	profile: definitions["profiles"];
+}) => {
+	const [showRunningTotal, setShowRunningTotal] = useState(false);
+	const groupName = tempStore.getState().groupName;
+
+	return (
+		<div
+			className={"p-3 rounded-md bg-gray-900 grid grid-cols-1 gap-4 items-center cursor-pointer"}
+			onClick={() => setShowRunningTotal(!showRunningTotal)}
+		>
+			<div className={"grid grid-cols-[auto_1fr_auto] gap-3 items-center"}>
+				<Avatar.Root>
+					<Avatar.Fallback>
+						<DefaultAvatar
+							size={32}
+							name={groupName}
+							variant="marble"
+							colors={theme.colors.avatar}
+						/>
+					</Avatar.Fallback>
+				</Avatar.Root>
+				<div className="block">
+					<div className="text-sm font-medium">{groupName}</div>
+					<div className="text-xs text-gray-600">{groupUsers.length} users</div>
+				</div>
+				<div className={"grid grid-cols-3 gap-1"}>
+					<PieChartIcon gradient={!showRunningTotal} />
+					<ArrowBetweenIcon />
+					<BarChartIcon gradient={showRunningTotal} />
+				</div>
+			</div>
+			<Separator />
+			<div className={"grid grid-cols-1 gap-3"}>
+				{groupUsers.map((user: any) => (
+					<div
+						key={user.profile_id}
+						className={"grid grid-cols-[auto_1fr_auto] items-center text-sm gap-3"}
+					>
+						<div className={"flex items-center justify-center"}>
+							{user.profiles.avatar_url ? (
+								<Image
+									src={user.profiles.avatar_url}
+									className={"w-6 h-6 rounded-full"}
+									height={24}
+									width={24}
+								/>
+							) : (
+								<DefaultAvatar
+									size={24}
+									name={user.profiles.username}
+									variant="beam"
+									colors={theme.colors.avatar}
+								/>
+							)}
+						</div>
+						<div>
+							{user.profiles.username} {user.profile_id === profile.id && <span>(you)</span>}
+						</div>
+						<div className={"font-mono font-medium tracking-tighter"}>
+							{!showRunningTotal ? (
+								<>{displayAmount(user.amount_owed)}</>
+							) : (
+								<>
+									$
+									{user.amount_paid_transactions.toLocaleString(undefined, {
+										minimumFractionDigits: 2,
+										maximumFractionDigits: 2,
+									})}{" "}
+									/{" "}
+									<span className={"font-mono font-medium text-gray-600"}>
+										$
+										{user.split_amount.toLocaleString(undefined, {
+											minimumFractionDigits: 2,
+											maximumFractionDigits: 2,
+										})}
+									</span>
+								</>
+							)}
+						</div>
+					</div>
+				))}
+			</div>
 		</div>
 	);
 };
