@@ -11,7 +11,7 @@ export const Main = ({ children }: { children: any }) => {
 	const [isToolbarShown] = useAtom(isToolbarShownAtom);
 
 	const Container = styled("div", {
-		"& > div:first-of-type": {
+		"& > main:first-of-type": {
 			overflow: "auto",
 			height: isToolbarShown ? "calc(100% - 124px)" : "calc(100% - 68px)",
 			alignContent: "start",

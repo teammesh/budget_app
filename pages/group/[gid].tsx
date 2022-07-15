@@ -4,11 +4,9 @@ import { supabase, supabaseQuery } from "@/utils/supabaseClient";
 import AddTransactions from "@/components/AddTransactions";
 import * as R from "ramda";
 import { isEmpty } from "ramda";
-import { tempStore } from "@/utils/store";
+import { tempStore, uiStore } from "@/utils/store";
 import Link from "next/link";
 import { verifyUser } from "@/utils/ssr";
-import { Main } from "@/components/Main";
-import { Navbar } from "@/components/Navbar";
 import { Button } from "@/components/Button";
 import {
 	ArrowLeftIcon,
@@ -61,7 +59,7 @@ const Group = ({
 		tempStore.getState().setGroupName(users[0].groups.name);
 		tempStore.getState().setGroupMembers(groupUsers.map((user: any) => user.profiles.username));
 		setSharedTransactions(transactions);
-
+		uiStore.getState().setToolbar(toolbarProps);
 		return () => {
 			setSharedTransactions([]);
 			supabase.removeAllSubscriptions();
@@ -118,79 +116,72 @@ const Group = ({
 		setGroupUsers(data);
 	};
 
+	const toolbarProps = showAddTransactions ? (
+		<AddTransactionsButton setShowAddTransactions={setShowAddTransactions} />
+	) : showPayments ? (
+		<PaymentsButton setShowPayments={setShowPayments} />
+	) : showManage ? (
+		<ManageButton setShowManage={setShowManage} gid={gid} />
+	) : (
+		<div className={"grid grid-cols-[108px_1fr] gap-2"}>
+			<Button
+				size={"sm"}
+				style={{ background: theme.colors.gradient.a }}
+				onClick={() => setShowPayments(true)}
+			>
+				<CheckCircledIcon />
+				Pay
+			</Button>
+			<Button
+				size={"sm"}
+				background={theme.colors.gradient.a}
+				onClick={() => setShowAddTransactions(true)}
+			>
+				<PlusIcon /> Add transactions
+			</Button>
+		</div>
+	);
+
 	return (
-		<Main>
-			<div className={"grid grid-cols-1 gap-4"}>
-				<div className={"flex justify-between"}>
-					<Button
-						size={"sm"}
-						style={{ background: theme.colors.gradient.a }}
-						onClick={() => router.back()}
-					>
-						<ArrowLeftIcon />
-						Return
-					</Button>
-					<Button
-						size={"sm"}
-						style={{ background: theme.colors.gradient.a }}
-						onClick={() => setShowManage(true)}
-					>
-						<MixerHorizontalIcon />
-						Manage
-					</Button>
-				</div>
-				<GroupSummary groupUsers={groupUsers} profile={profile} />
-				<div className={"mt-6"}>
-					<Header>
-						Shared <TextGradient gradient={theme.colors.gradient.a}>transactions</TextGradient>
-					</Header>
-					<div className={"grid grid-cols-1 gap-2"}>
-						{!isEmpty(sharedTransactions) &&
-							sharedTransactions.map((x) => (
-								<Link href={`/transaction/${encodeURIComponent(x.id)}`} key={x.id} passHref>
-									<SharedTransaction transaction={x} groupUsers={groupUsers} />
-								</Link>
-							))}
-					</div>
-				</div>
-				{showAddTransactions && (
-					<AddTransactions gid={gid} setShowAddTransactions={setShowAddTransactions} />
-				)}
-				{showPayments && (
-					<Payments gid={gid} setShowPayments={setShowPayments} balances={balances} />
-				)}
-				{showManage && <Manage gid={gid} setShowManage={setShowManage} />}
+		<div className={"grid grid-cols-1 gap-4"}>
+			<div className={"flex justify-between"}>
+				<Button
+					size={"sm"}
+					style={{ background: theme.colors.gradient.a }}
+					onClick={() => router.back()}
+				>
+					<ArrowLeftIcon />
+					Return
+				</Button>
+				<Button
+					size={"sm"}
+					style={{ background: theme.colors.gradient.a }}
+					onClick={() => setShowManage(true)}
+				>
+					<MixerHorizontalIcon />
+					Manage
+				</Button>
 			</div>
-			<Navbar
-				toolbar={
-					showAddTransactions ? (
-						<AddTransactionsButton setShowAddTransactions={setShowAddTransactions} />
-					) : showPayments ? (
-						<PaymentsButton setShowPayments={setShowPayments} />
-					) : showManage ? (
-						<ManageButton setShowManage={setShowManage} gid={gid} />
-					) : (
-						<div className={"grid grid-cols-[108px_1fr] gap-2"}>
-							<Button
-								size={"sm"}
-								style={{ background: theme.colors.gradient.a }}
-								onClick={() => setShowPayments(true)}
-							>
-								<CheckCircledIcon />
-								Pay
-							</Button>
-							<Button
-								size={"sm"}
-								background={theme.colors.gradient.a}
-								onClick={() => setShowAddTransactions(true)}
-							>
-								<PlusIcon /> Add transactions
-							</Button>
-						</div>
-					)
-				}
-			/>
-		</Main>
+			<GroupSummary groupUsers={groupUsers} profile={profile} />
+			<div className={"mt-6"}>
+				<Header>
+					Shared <TextGradient gradient={theme.colors.gradient.a}>transactions</TextGradient>
+				</Header>
+				<div className={"grid grid-cols-1 gap-2"}>
+					{!isEmpty(sharedTransactions) &&
+						sharedTransactions.map((x) => (
+							<Link href={`/transaction/${encodeURIComponent(x.id)}`} key={x.id} passHref>
+								<SharedTransaction transaction={x} groupUsers={groupUsers} />
+							</Link>
+						))}
+				</div>
+			</div>
+			{showAddTransactions && (
+				<AddTransactions gid={gid} setShowAddTransactions={setShowAddTransactions} />
+			)}
+			{showPayments && <Payments gid={gid} setShowPayments={setShowPayments} balances={balances} />}
+			{showManage && <Manage gid={gid} setShowManage={setShowManage} />}
+		</div>
 	);
 };
 

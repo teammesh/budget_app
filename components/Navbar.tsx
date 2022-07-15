@@ -5,15 +5,17 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useAtom } from "jotai";
 import { isToolbarShownAtom } from "./Main";
+import { uiStore } from "@/utils/store";
 
-export const Navbar = ({ toolbar }: { toolbar?: any }) => {
+export const Navbar = () => {
 	const [activeRoute, setActiveRoute] = useState("");
 	const [isToolbarShown, setIsToolbarShown] = useAtom(isToolbarShownAtom);
+	const toolbar = uiStore((state) => state.toolbar);
 
 	useEffect(() => {
 		isActive();
 		toolbar && setIsToolbarShown(true);
-	}, []);
+	}, [toolbar]);
 
 	const isActive = () => {
 		if (!window) return;

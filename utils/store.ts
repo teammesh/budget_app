@@ -77,3 +77,17 @@ export const tempStore = create<TempStoreState>((set, get) => ({
 	linkToken: "",
 	setLinkToken: (x) => set(() => ({ linkToken: x })),
 }));
+
+interface UIStoreState {
+	globalLoading: boolean;
+	setGlobalLoading: (x: boolean) => void;
+	toolbar: any;
+	setToolbar: (x: any) => void;
+}
+
+export const uiStore = create<UIStoreState>((set, get) => ({
+	globalLoading: false,
+	setGlobalLoading: (x) => set(() => ({ globalLoading: x })),
+	toolbar: null,
+	setToolbar: (x) => set(() => ({ toolbar: x })),
+}));

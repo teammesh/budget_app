@@ -1,6 +1,5 @@
 import theme from "@/styles/theme";
 import { supabase } from "@/utils/supabaseClient";
-import * as Avatar from "@radix-ui/react-avatar";
 import DefaultAvatar from "boring-avatars";
 import { ArrowLeftIcon } from "@radix-ui/react-icons";
 import { styled } from "@stitches/react";
@@ -38,9 +37,12 @@ export default function Payments({
 			})
 			.subscribe();
 
+		console.log(supabase.getSubscriptions());
+
 		return () => {
 			supabase.removeSubscription(
-				supabase.getSubscriptions()[supabase.getSubscriptions().length - 1],
+				// @ts-ignore
+				supabase.getSubscriptions().at(supabase.getSubscriptions().length - 1),
 			);
 		};
 	}, []);

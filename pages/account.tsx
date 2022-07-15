@@ -1,13 +1,12 @@
 import { supabase } from "@/utils/supabaseClient";
-import { Navbar } from "@/components/Navbar";
-import { Main } from "@/components/Main";
 import { Input } from "@/components/Input";
 import { verifyUser } from "@/utils/ssr";
 import { AuthUser } from "@supabase/supabase-js";
 import { definitions } from "../types/supabase";
 import { RequestData } from "next/dist/server/web/types";
-import { tempStore } from "@/utils/store";
+import { tempStore, uiStore } from "@/utils/store";
 import { Button } from "@/components/Button";
+import { useEffect } from "react";
 
 export default function Account({
 	user,
@@ -19,6 +18,10 @@ export default function Account({
 	tempStore.getState().setUsername(profile.username ? profile.username : "");
 	tempStore.getState().setWebsite(profile.website ? profile.website : "");
 	tempStore.getState().setAvatarUrl(profile.avatar_url ? profile.avatar_url : "");
+
+	useEffect(() => {
+		uiStore.getState().setToolbar(null);
+	}, []);
 
 	async function updateProfile() {
 		const username = tempStore.getState().username;
@@ -47,37 +50,34 @@ export default function Account({
 	}
 
 	return (
-		<Main>
-			<div className="form-widget">
-				<div>
-					<label htmlFor="email">Email</label>
-					<Input id="email" type="text" value={user.email} disabled />
-				</div>
-				<UsernameInput />
-				<AvatarUrlInput />
-				{/*<WebsiteInput />*/}
-				<div>
-					<Button size={"sm"} onClick={() => updateProfile()}>
-						Update
-					</Button>
-				</div>
-
-				<div>
-					<Button
-						size={"sm"}
-						onClick={async () => {
-							const access_token = supabase.auth.session()?.access_token;
-							if (!access_token) return;
-							await supabase.auth.api.signOut(access_token);
-							await supabase.auth.signOut();
-						}}
-					>
-						Sign Out
-					</Button>
-				</div>
+		<div className="form-widget">
+			<div>
+				<label htmlFor="email">Email</label>
+				<Input id="email" type="text" value={user.email} disabled />
 			</div>
-			<Navbar />
-		</Main>
+			<UsernameInput />
+			<AvatarUrlInput />
+			{/*<WebsiteInput />*/}
+			<div>
+				<Button size={"sm"} onClick={() => updateProfile()}>
+					Update
+				</Button>
+			</div>
+
+			<div>
+				<Button
+					size={"sm"}
+					onClick={async () => {
+						const access_token = supabase.auth.session()?.access_token;
+						if (!access_token) return;
+						await supabase.auth.api.signOut(access_token);
+						await supabase.auth.signOut();
+					}}
+				>
+					Sign Out
+				</Button>
+			</div>
+		</div>
 	);
 }
 

@@ -1,5 +1,3 @@
-import { Navbar } from "@/components/Navbar";
-import { Main } from "@/components/Main";
 import { supabase, supabaseQuery } from "@/utils/supabaseClient";
 import { Header, TextGradient } from "@/components/text";
 import { Widget } from "@/components/Widget";
@@ -14,7 +12,7 @@ import { Button } from "@/components/Button";
 import { PlusIcon } from "@radix-ui/react-icons";
 import theme from "@/styles/theme";
 import { verifyUser } from "@/utils/ssr";
-import { tempStore } from "@/utils/store";
+import { tempStore, uiStore } from "@/utils/store";
 import { AuthUser } from "@supabase/supabase-js";
 import { definitions } from "../types/supabase";
 import { RequestData } from "next/dist/server/web/types";
@@ -53,6 +51,7 @@ export default function Home({
 				})
 				.subscribe();
 		}
+		uiStore.getState().setToolbar(toolbarProps);
 	}, []);
 
 	const handleCreateGroup = async () => {
@@ -96,62 +95,59 @@ export default function Home({
 		}
 	};
 
+	const toolbarProps = (
+		<div className={"flex justify-end"}>
+			<Dialog.Root>
+				<Dialog.Trigger asChild>
+					<Button size={"sm"} background={theme.colors.gradient.a}>
+						<PlusIcon /> Create Group
+					</Button>
+				</Dialog.Trigger>
+				<Content>
+					<Dialog.Title>Group name</Dialog.Title>
+					<Dialog.Description>Let's create a group!</Dialog.Description>
+					<Input placeholder="Group name" onChange={(e) => setGroupName(e.target.value)} />
+					<Input
+						placeholder="Members"
+						onChange={(e) => setGroupMembers(e.target.value.split(","))}
+					/>
+					<Dialog.Close asChild>
+						<button onClick={() => handleCreateGroup()}>Create</button>
+					</Dialog.Close>
+				</Content>
+			</Dialog.Root>
+		</div>
+	);
+
 	return (
-		<Main>
-			<div className="grid grid-cols-1 gap-16">
-				<div className={"justify-self-start mt-6"}>
-					<Header>
-						Welcome{" "}
-						<TextGradient gradient={theme.colors.gradient.a}>{profile.username}</TextGradient>,
-					</Header>
-					<div className={"self-start grid grid-cols-[auto_auto] gap-2"}>
-						<Widget amount={totalOwed} label={"Total owed"} />
-						<Widget amount={totalRefund} label={"Total refund"} />
-					</div>
-				</div>
-				<div>
-					<Header>
-						Your <TextGradient gradient={theme.colors.gradient.a}>groups</TextGradient>
-					</Header>
-					<div className="grid grid-cols-1 gap-2">
-						{userGroups.length > 0 ? (
-							userGroups.map((group: any) => (
-								<Link href={`/group/${group.group_id}`} key={group.groups.name} passHref>
-									<Group group={group} />
-								</Link>
-							))
-						) : (
-							<div>You are currently not in any groups</div>
-						)}
-					</div>
+		<div className="grid grid-cols-1 gap-16">
+			<div className={"justify-self-start mt-6"}>
+				<Header>
+					Welcome <TextGradient gradient={theme.colors.gradient.a}>{profile.username}</TextGradient>
+					,
+				</Header>
+				<div className={"self-start grid grid-cols-[auto_auto] gap-2"}>
+					<Widget amount={totalOwed} label={"Total owed"} />
+					<Widget amount={totalRefund} label={"Total refund"} />
 				</div>
 			</div>
-			<Navbar
-				toolbar={
-					<div className={"flex justify-end"}>
-						<Dialog.Root>
-							<Dialog.Trigger asChild>
-								<Button size={"sm"} background={theme.colors.gradient.a}>
-									<PlusIcon /> Create Group
-								</Button>
-							</Dialog.Trigger>
-							<Content>
-								<Dialog.Title>Group name</Dialog.Title>
-								<Dialog.Description>Let's create a group!</Dialog.Description>
-								<Input placeholder="Group name" onChange={(e) => setGroupName(e.target.value)} />
-								<Input
-									placeholder="Members"
-									onChange={(e) => setGroupMembers(e.target.value.split(","))}
-								/>
-								<Dialog.Close asChild>
-									<button onClick={() => handleCreateGroup()}>Create</button>
-								</Dialog.Close>
-							</Content>
-						</Dialog.Root>
-					</div>
-				}
-			/>
-		</Main>
+			<div>
+				<Header>
+					Your <TextGradient gradient={theme.colors.gradient.a}>groups</TextGradient>
+				</Header>
+				<div className="grid grid-cols-1 gap-2">
+					{userGroups.length > 0 ? (
+						userGroups.map((group: any) => (
+							<Link href={`/group/${group.group_id}`} key={group.groups.name} passHref>
+								<Group group={group} />
+							</Link>
+						))
+					) : (
+						<div>You are currently not in any groups</div>
+					)}
+				</div>
+			</div>
+		</div>
 	);
 }
 
