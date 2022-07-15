@@ -9,7 +9,7 @@ import { Input } from "@/components/Input";
 import React, { useEffect, useState } from "react";
 import { isNil } from "ramda";
 import { Button } from "@/components/Button";
-import { ArrowLeftIcon, ExitIcon, LightningBoltIcon, PlusIcon } from "@radix-ui/react-icons";
+import { ArrowLeftIcon, LightningBoltIcon, PlusIcon } from "@radix-ui/react-icons";
 import theme from "@/styles/theme";
 import { verifyUser } from "@/utils/ssr";
 import { tempStore, uiStore } from "@/utils/store";
@@ -42,6 +42,7 @@ export default function Home({
 	}, 0);
 
 	useEffect(() => {
+		uiStore.getState().setToolbar(toolbar);
 		if (profile_id) {
 			supabase
 				.from(`profiles_groups:profile_id=eq.${supabase.auth.session()?.user?.id}`)
@@ -51,7 +52,6 @@ export default function Home({
 				})
 				.subscribe();
 		}
-		uiStore.getState().setToolbar(toolbarProps);
 	}, []);
 
 	const handleCreateGroup = async () => {
@@ -95,7 +95,7 @@ export default function Home({
 		}
 	};
 
-	const toolbarProps = () => (
+	const toolbar = () => (
 		<div className={"flex justify-end"}>
 			<Dialog.Root>
 				<Dialog.Trigger asChild>

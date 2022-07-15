@@ -26,8 +26,6 @@ import { RequestData } from "next/dist/server/web/types";
 import Payments from "@/components/Payments";
 import DefaultAvatar from "boring-avatars";
 import Manage from "@/components/Manage";
-import PaymentsButton from "@/components/PaymentsButton";
-import ManageButton from "@/components/ManageButton";
 import { SharedTransaction } from "@/components/SharedTransaction";
 import Image from "next/image";
 import { sortByDate } from "@/utils/helper";
@@ -69,6 +67,10 @@ const Group = ({
 	}, []);
 
 	useEffect(() => {
+		uiStore.getState().setToolbar(toolbar);
+	}, [showPayments, showManage, showAddTransactions]);
+
+	useEffect(() => {
 		if (!gid) return;
 
 		// subscribe to shared_transactions table based on group_id
@@ -89,38 +91,6 @@ const Group = ({
 			})
 			.subscribe();
 	}, [gid]);
-
-	useEffect(() => {
-		const toolbarProps = () => {
-			return showAddTransactions ? (
-				<AddTransactionsButton setShowAddTransactions={setShowAddTransactions} />
-			) : showPayments ? (
-				<PaymentsButton setShowPayments={setShowPayments} gid={gid} />
-			) : showManage ? (
-				<ManageButton setShowManage={setShowManage} gid={gid} />
-			) : (
-				<div className={"grid grid-cols-[108px_1fr] gap-2"}>
-					<Button
-						size={"sm"}
-						style={{ background: theme.colors.gradient.a }}
-						onClick={() => setShowPayments(true)}
-					>
-						<CheckCircledIcon />
-						Pay
-					</Button>
-					<Button
-						size={"sm"}
-						background={theme.colors.gradient.a}
-						onClick={() => setShowAddTransactions(true)}
-					>
-						<PlusIcon /> Add transactions
-					</Button>
-				</div>
-			);
-		};
-
-		uiStore.getState().setToolbar(toolbarProps);
-	}, [showPayments, showManage, showAddTransactions]);
 
 	const fetchGroupUsers = async () => {
 		const { data } = await supabaseQuery(
@@ -149,6 +119,25 @@ const Group = ({
 
 		setGroupUsers(data);
 	};
+
+	const toolbar = () => (
+		<div className={"grid grid-cols-[108px_1fr] gap-2"}>
+			<Button
+				size={"sm"}
+				style={{ background: theme.colors.gradient.a }}
+				onClick={() => setShowPayments(true)}
+			>
+				<CheckCircledIcon /> Pay
+			</Button>
+			<Button
+				size={"sm"}
+				background={theme.colors.gradient.a}
+				onClick={() => setShowAddTransactions(true)}
+			>
+				<PlusIcon /> Add transactions
+			</Button>
+		</div>
+	);
 
 	return (
 		<div className={"grid grid-cols-1 gap-4"}>
@@ -189,44 +178,6 @@ const Group = ({
 			)}
 			{showPayments && <Payments gid={gid} setShowPayments={setShowPayments} balances={balances} />}
 			{showManage && <Manage gid={gid} setShowManage={setShowManage} />}
-		</div>
-	);
-};
-
-// Should this be moved to a component?
-const AddTransactionsButton = ({ setShowAddTransactions }: { setShowAddTransactions: any }) => {
-	const addTransactions = tempStore((state) => state.addTransactions);
-	const setAddTransactions = tempStore.getState().setAddTransactions;
-
-	const submit = async () => {
-		if (addTransactions.length === 0) return;
-
-		const { data } = await supabaseQuery(
-			() => supabase.from("shared_transactions").upsert(tempStore.getState().addTransactions),
-			true,
-		);
-		setShowAddTransactions(false);
-		setAddTransactions([]);
-	};
-
-	return (
-		<div className={"grid grid-cols-[auto_1fr] justify-center gap-8"}>
-			<div className={"grid grid-cols-1 gap-1"}>
-				<div className={"font-mono tracking-tighter text-sm"}>Total transaction:</div>
-				<div className={"text-xl tracking-tight leading-none"}>
-					{addTransactions.length === 0
-						? "--"
-						: displayAmount(
-								addTransactions.reduce((prev, curr) => {
-									if (!curr.amount) return prev;
-									return curr.amount + prev;
-								}, 0),
-					)}
-				</div>
-			</div>
-			<Button size={"sm"} background={theme.colors.gradient.a} onClick={submit}>
-				<PlusIcon /> Add {addTransactions.length} transactions
-			</Button>
 		</div>
 	);
 };

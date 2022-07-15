@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { supabase } from "@/utils/supabaseClient";
-import { sessionStore, tempStore } from "@/utils/store";
+import { supabase, supabaseQuery } from "@/utils/supabaseClient";
+import { sessionStore, tempStore, uiStore } from "@/utils/store";
 import * as R from "ramda";
 import { assocPath } from "ramda";
 import { Transaction as TransactionType } from "plaid";
@@ -20,6 +20,7 @@ import { Loading } from "@/components/Loading";
 import Script from "next/script";
 import * as Dialog from "@radix-ui/react-dialog";
 import { Content } from "./Modal";
+import { displayAmount } from "./Amount";
 
 export default function AddTransactions({
 	gid,
@@ -37,9 +38,12 @@ export default function AddTransactions({
 	const setAccounts = sessionStore.getState().setAccounts;
 	const transactionCursor = sessionStore.getState().transactionCursor;
 	const setTransactionCursor = sessionStore.getState().setTransactionCursor;
+	const addTransactions = tempStore((state) => state.addTransactions);
 	const setAddTransactions = tempStore.getState().setAddTransactions;
 
 	useEffect(() => {
+		uiStore.getState().setToolbar(toolbar);
+		
 		supabase
 			.from("plaid_items")
 			.select()
@@ -147,6 +151,38 @@ export default function AddTransactions({
 		console.log(data);
 		return setIsLoading(false);
 	};
+	
+	const onAddTransactions = async () => {
+		if (addTransactions.length === 0) return;
+
+		const { data } = await supabaseQuery(
+			() => supabase.from("shared_transactions").upsert(tempStore.getState().addTransactions),
+			true,
+		);
+		setShowAddTransactions(false);
+		setAddTransactions([]);
+	};
+
+	const toolbar = () => (
+		<div className={"grid grid-cols-[auto_1fr] justify-center gap-8"}>
+			<div className={"grid grid-cols-1 gap-1"}>
+				<div className={"font-mono tracking-tighter text-sm"}>Total transaction:</div>
+				<div className={"text-xl tracking-tight leading-none"}>
+					{addTransactions.length === 0
+						? "--"
+						: displayAmount(
+							addTransactions.reduce((prev, curr) => {
+								if (!curr.amount) return prev;
+								return curr.amount + prev;
+							}, 0),
+					)}
+				</div>
+			</div>
+			<Button size={"sm"} background={theme.colors.gradient.a} onClick={onAddTransactions}>
+				<PlusIcon /> Add {addTransactions.length} transactions
+			</Button>
+		</div>
+	);
 
 	const Container = styled("div", {
 		position: "fixed",

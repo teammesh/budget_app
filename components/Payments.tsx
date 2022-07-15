@@ -1,12 +1,16 @@
 import theme from "@/styles/theme";
 import { supabase } from "@/utils/supabaseClient";
-import { ArrowLeftIcon } from "@radix-ui/react-icons";
+import { ArrowLeftIcon, CheckCircledIcon } from "@radix-ui/react-icons";
 import { styled } from "@stitches/react";
 import { useEffect, useState } from "react";
 import { Button } from "./Button";
 import { definitions } from "../types/supabase";
 import { Loading } from "@/components/Loading";
 import { PaymentContainer } from "./PaymentContainer";
+import * as Dialog from "@radix-ui/react-dialog";
+import { Content } from "@/components/Modal";
+import { uiStore } from "@/utils/store";
+import { isEmpty } from "ramda";
 
 export default function Payments({
 	gid,
@@ -30,6 +34,8 @@ export default function Payments({
 	console.log(balances);
 
 	useEffect(() => {
+		uiStore.getState().setToolbar(toolbar);
+
 		supabase
 			.from(`balances:group_id=eq.${gid}`)
 			.on("*", (payload) => {
@@ -61,6 +67,62 @@ export default function Payments({
 				setGroupBalances(data?.filter((balance) => balance.from_profile_id !== profile_id));
 			});
 	};
+
+	const handleMarkAsPaid = async () => {
+		if (isEmpty(userBalances)) {
+			alert("You do not have any pending balances!");
+			return;
+		}
+
+		const userPayments = userBalances?.map((userBalance) => ({
+			group_id: gid, 
+			from_profile_id: profile_id,
+			to_profile_id: userBalance.to_profile_id,
+			amount: Math.abs(userBalance.amount),
+		}));
+		const { error } = await supabase.from("payments").insert(userPayments);
+
+		if (error) {
+			alert(error);
+		} else {
+			alert("Payment successful!");
+		}
+	};
+
+	const toolbar = () => (
+		<div className={"grid grid-cols-[1fr]"}>
+			<Dialog.Root>
+				<Dialog.Trigger asChild>
+					<Button size={"sm"} background={theme.colors.gradient.a}>
+						<CheckCircledIcon /> Mark as paid
+					</Button>
+				</Dialog.Trigger>
+				<Content>
+					<div className={"grid grid-cols-1 gap-2 text-center"}>
+						<Dialog.Title className={"font-medium text-md"}>Are you sure you want to pay?</Dialog.Title>
+					</div>
+					<div className={"grid grid-cols-1 gap-2"}>
+						<Dialog.Close asChild>
+							<Button size={"sm"} border={theme.colors.gradient.a}>
+								<ArrowLeftIcon />
+								Cancel
+							</Button>
+						</Dialog.Close>
+						<Dialog.Close asChild>
+							<Button
+								size={"sm"}
+								background={theme.colors.gradient.a}
+								onClick={() => handleMarkAsPaid()}
+							>
+								<CheckCircledIcon />
+								Pay
+							</Button>
+						</Dialog.Close>
+					</div>
+				</Content>
+			</Dialog.Root>
+		</div>
+	);
 
 	const Container = styled("div", {
 		position: "fixed",

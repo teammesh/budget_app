@@ -6,17 +6,12 @@ import { useEffect, useState } from "react";
 import { useAtom } from "jotai";
 import { isToolbarShownAtom } from "./Main";
 import { uiStore } from "@/utils/store";
+import { Toolbar } from "./Toolbar";
 
 export const Navbar = () => {
 	const [activeRoute, setActiveRoute] = useState("");
 	const [isToolbarShown, setIsToolbarShown] = useAtom(isToolbarShownAtom);
 	const toolbar = uiStore((state) => state.toolbar);
-	const showAddTransactions = uiStore((state) => state.showAddTransactions);
-	const setShowAddTransactions = uiStore.getState().setShowAddTransactions;
-	const showPayments = uiStore((state) => state.showPayments);
-	const setShowPayments = uiStore.getState().setShowPayments;
-	const showManage = uiStore((state) => state.showManage);
-	const setShowManage = uiStore.getState().setShowManage;
 
 	useEffect(() => {
 		isActive();
@@ -61,8 +56,4 @@ export const Navbar = () => {
 			</div>
 		</div>
 	);
-};
-
-const Toolbar = ({ children }: { children: any }) => {
-	return <div className={"bg-black-500 w-full p-3 pb-0"}>{children}</div>;
 };
