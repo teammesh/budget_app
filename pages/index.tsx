@@ -95,7 +95,7 @@ export default function Home({
 		}
 	};
 
-	const toolbarProps = (
+	const toolbarProps = () => (
 		<div className={"flex justify-end"}>
 			<Dialog.Root>
 				<Dialog.Trigger asChild>

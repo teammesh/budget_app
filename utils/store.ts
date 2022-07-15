@@ -81,6 +81,12 @@ export const tempStore = create<TempStoreState>((set, get) => ({
 interface UIStoreState {
 	globalLoading: boolean;
 	setGlobalLoading: (x: boolean) => void;
+	showAddTransactions: boolean;
+	setShowAddTransactions: (x: boolean) => void;
+	showPayments: boolean;
+	setShowPayments: (x: boolean) => void;
+	showManage: boolean;
+	setShowManage: (x: boolean) => void;
 	toolbar: any;
 	setToolbar: (x: any) => void;
 }
@@ -90,4 +96,10 @@ export const uiStore = create<UIStoreState>((set, get) => ({
 	setGlobalLoading: (x) => set(() => ({ globalLoading: x })),
 	toolbar: null,
 	setToolbar: (x) => set(() => ({ toolbar: x })),
+	showAddTransactions: false,
+	setShowAddTransactions: (x) => set(() => ({ showAddTransactions: x })),
+	showPayments: false,
+	setShowPayments: (x) => set(() => ({ showPayments: x })),
+	showManage: false,
+	setShowManage: (x) => set(() => ({ showManage: x })),
 }));

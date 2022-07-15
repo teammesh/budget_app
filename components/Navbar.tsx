@@ -11,6 +11,12 @@ export const Navbar = () => {
 	const [activeRoute, setActiveRoute] = useState("");
 	const [isToolbarShown, setIsToolbarShown] = useAtom(isToolbarShownAtom);
 	const toolbar = uiStore((state) => state.toolbar);
+	const showAddTransactions = uiStore((state) => state.showAddTransactions);
+	const setShowAddTransactions = uiStore.getState().setShowAddTransactions;
+	const showPayments = uiStore((state) => state.showPayments);
+	const setShowPayments = uiStore.getState().setShowPayments;
+	const showManage = uiStore((state) => state.showManage);
+	const setShowManage = uiStore.getState().setShowManage;
 
 	useEffect(() => {
 		isActive();
@@ -29,7 +35,7 @@ export const Navbar = () => {
 				"fixed bottom-0 left-0 right-0 bg-black grid grid-cols-1 grid-rows-[auto_auto] overflow-hidden"
 			}
 		>
-			{toolbar && <Toolbar>{toolbar}</Toolbar>}
+			{toolbar && <Toolbar>{toolbar()}</Toolbar>}
 			<div className={"grid grid-cols-[auto_auto] gap-2 py-3 justify-center "}>
 				<Link href={"/"} passHref>
 					<Button

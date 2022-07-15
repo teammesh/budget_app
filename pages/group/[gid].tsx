@@ -31,6 +31,7 @@ import ManageButton from "@/components/ManageButton";
 import { SharedTransaction } from "@/components/SharedTransaction";
 import Image from "next/image";
 import { sortByDate } from "@/utils/helper";
+import { atom, useAtom } from "jotai";
 
 const Group = ({
 	user,
@@ -48,9 +49,12 @@ const Group = ({
 	const router = useRouter();
 	// @ts-ignore
 	const { gid }: { gid: string } = router.query;
-	const [showAddTransactions, setShowAddTransactions] = useState(false);
-	const [showPayments, setShowPayments] = useState(false);
-	const [showManage, setShowManage] = useState(false);
+	const showAddTransactions = uiStore((state) => state.showAddTransactions);
+	const setShowAddTransactions = uiStore.getState().setShowAddTransactions;
+	const showPayments = uiStore((state) => state.showPayments);
+	const setShowPayments = uiStore.getState().setShowPayments;
+	const showManage = uiStore((state) => state.showManage);
+	const setShowManage = uiStore.getState().setShowManage;
 	const [groupUsers, setGroupUsers] = useState(users);
 	const sharedTransactions = tempStore((state) => state.sharedTransactions);
 	const setSharedTransactions = tempStore.getState().setSharedTransactions;
@@ -59,7 +63,6 @@ const Group = ({
 		tempStore.getState().setGroupName(users[0].groups.name);
 		tempStore.getState().setGroupMembers(groupUsers.map((user: any) => user.profiles.username));
 		setSharedTransactions(transactions);
-		uiStore.getState().setToolbar(toolbarProps);
 		return () => {
 			setSharedTransactions([]);
 			supabase.removeAllSubscriptions();
@@ -88,6 +91,38 @@ const Group = ({
 			.subscribe();
 	}, [gid]);
 
+	useEffect(() => {
+		const toolbarProps = () => {
+			return showAddTransactions ? (
+				<AddTransactionsButton setShowAddTransactions={setShowAddTransactions} />
+			) : showPayments ? (
+				<PaymentsButton setShowPayments={setShowPayments} />
+			) : showManage ? (
+				<ManageButton setShowManage={setShowManage} gid={gid} />
+			) : (
+				<div className={"grid grid-cols-[108px_1fr] gap-2"}>
+					<Button
+						size={"sm"}
+						style={{ background: theme.colors.gradient.a }}
+						onClick={() => setShowPayments(true)}
+					>
+						<CheckCircledIcon />
+						Pay
+					</Button>
+					<Button
+						size={"sm"}
+						background={theme.colors.gradient.a}
+						onClick={() => setShowAddTransactions(true)}
+					>
+						<PlusIcon /> Add transactions
+					</Button>
+				</div>
+			);
+		};
+
+		uiStore.getState().setToolbar(toolbarProps);
+	}, [showPayments, showManage, showAddTransactions]);
+
 	const fetchGroupUsers = async () => {
 		const { data } = await supabaseQuery(
 			() =>
@@ -115,32 +150,6 @@ const Group = ({
 
 		setGroupUsers(data);
 	};
-
-	const toolbarProps = showAddTransactions ? (
-		<AddTransactionsButton setShowAddTransactions={setShowAddTransactions} />
-	) : showPayments ? (
-		<PaymentsButton setShowPayments={setShowPayments} />
-	) : showManage ? (
-		<ManageButton setShowManage={setShowManage} gid={gid} />
-	) : (
-		<div className={"grid grid-cols-[108px_1fr] gap-2"}>
-			<Button
-				size={"sm"}
-				style={{ background: theme.colors.gradient.a }}
-				onClick={() => setShowPayments(true)}
-			>
-				<CheckCircledIcon />
-				Pay
-			</Button>
-			<Button
-				size={"sm"}
-				background={theme.colors.gradient.a}
-				onClick={() => setShowAddTransactions(true)}
-			>
-				<PlusIcon /> Add transactions
-			</Button>
-		</div>
-	);
 
 	return (
 		<div className={"grid grid-cols-1 gap-4"}>
