@@ -98,11 +98,11 @@ export default function Payments({
 					{userBalances.length === 0
 						? "--"
 						: displayAmount(
-							userBalances.reduce((prev, curr) => {
-								if (!curr.amount) return prev;
-								return curr.amount + prev;
-							}, 0),
-					)}
+								userBalances.reduce((prev: any, curr: any) => {
+									if (!curr.amount) return prev;
+									return curr.amount + prev;
+								}, 0),
+						  )}
 				</div>
 			</div>
 			<Dialog.Root>
