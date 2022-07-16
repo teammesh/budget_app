@@ -406,7 +406,7 @@ export async function getServerSideProps({ req, params }: { req: RequestData; pa
 
 	const transaction = data?.at(0);
 
-	return { props: { ...props, transaction: transactions }, redirect };
+	return { props: { ...props, transaction }, redirect };
 }
 
 export default Transaction;
