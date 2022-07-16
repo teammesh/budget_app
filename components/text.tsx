@@ -5,7 +5,15 @@ export const Header = ({ children, active }: { children: any; active?: boolean }
 	return <h1 className={"text-2xl font-semibold tracking-tight relative mb-6 pb-2"}>{children}</h1>;
 };
 
-export const PaginatedHeader = ({ children, active }: { children: any; active?: boolean }) => {
+export const PaginatedHeader = ({
+	children,
+	active,
+	onClick,
+}: {
+	children: any;
+	active?: boolean;
+	onClick?: any;
+}) => {
 	const HeaderStyle = styled("h1", {
 		color: active ? theme.colors.white : theme.colors.gray[700],
 
@@ -20,7 +28,10 @@ export const PaginatedHeader = ({ children, active }: { children: any; active?: 
 	});
 
 	return (
-		<HeaderStyle className={"text-2xl font-semibold tracking-tight relative"}>
+		<HeaderStyle
+			className={"text-2xl font-semibold tracking-tight relative transition-all"}
+			onClick={onClick}
+		>
 			{children}
 		</HeaderStyle>
 	);

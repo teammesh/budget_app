@@ -5,20 +5,20 @@ import { TextGradient } from "./text";
 import { definitions } from "types/supabase";
 
 export const Payment = ({
-    profile_id,
+	profile_id,
 	from_user,
 	to_user,
-    amount,
-    paid = false, 
+	amount,
+	paid = false,
 }: {
-    profile_id: string | any;
+	profile_id: string | any;
 	from_user: definitions["profiles"] | any;
 	to_user: definitions["profiles"] | any;
-    amount: number | any;
-    paid?: boolean;
+	amount: number | any;
+	paid?: boolean;
 }) => {
-    const word = paid ? "paid" : "pay";
-    const wordPlural = paid ? "paid" : "pays";
+	const word = paid ? "paid" : "pay";
+	const wordPlural = paid ? "paid" : "pays";
 
 	return (
 		<div className="grid grid-cols-[auto_1fr_auto] items-center">
@@ -41,8 +41,14 @@ export const Payment = ({
 				)}
 			</div>
 			<div className="text-sm text-center">
-				{from_user.id === profile_id ? `You ${word} ` 
-                : <>{from_user.username} {wordPlural} </>} {to_user.username}
+				{from_user.id === profile_id ? (
+					`You ${word} `
+				) : (
+					<>
+						{from_user.username} {wordPlural}{" "}
+					</>
+				)}{" "}
+				{to_user.username}
 				<div className={"text-sm font-mono font-medium tracking-tight"}>
 					<TextGradient gradient={theme.colors.gradient.f}>${Math.abs(amount)}</TextGradient>
 				</div>

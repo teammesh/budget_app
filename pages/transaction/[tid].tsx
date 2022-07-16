@@ -31,6 +31,7 @@ import * as R from "ramda";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { defaultAnimations } from "@/utils/animation";
+import { EDIT_TRANSACTION_AMOUNT_MODE } from "@/constants/components.constants";
 
 const Transaction = ({
 	user,
@@ -206,12 +207,7 @@ const EditTransactionAmount = ({
 	profile,
 	amountDivisor,
 }: any) => {
-	const MODE = {
-		slider: "slider",
-		custom: "custom",
-	};
-
-	const [mode, setMode] = useState<any>(MODE.custom);
+	const [mode, setMode] = useState<any>(EDIT_TRANSACTION_AMOUNT_MODE.custom);
 	const [amountRatios, setAmountRatios] = useState<any>(
 		R.indexBy(
 			// @ts-ignore
@@ -254,9 +250,12 @@ const EditTransactionAmount = ({
 						"bg-gray-800 p-3 rounded-bl-md rounded-tl-md grid grid-cols-[auto_auto] gap-1 justify-center items-center font-mono text-sm tracking-tighter leading-none"
 					}
 					style={{
-						background: mode === MODE.custom ? theme.colors.gradient.a : theme.colors.gray[800],
+						background:
+							mode === EDIT_TRANSACTION_AMOUNT_MODE.custom
+								? theme.colors.gradient.a
+								: theme.colors.gray[800],
 					}}
-					onClick={() => setMode(MODE.custom)}
+					onClick={() => setMode(EDIT_TRANSACTION_AMOUNT_MODE.custom)}
 				>
 					<MixIcon />
 					Custom
@@ -266,14 +265,17 @@ const EditTransactionAmount = ({
 						"bg-gray-800 p-3 rounded-br-md rounded-tr-md grid grid-cols-[auto_auto] gap-1 justify-center items-center font-mono text-sm tracking-tighter leading-none"
 					}
 					style={{
-						background: mode === MODE.slider ? theme.colors.gradient.a : theme.colors.gray[800],
+						background:
+							mode === EDIT_TRANSACTION_AMOUNT_MODE.slider
+								? theme.colors.gradient.a
+								: theme.colors.gray[800],
 					}}
-					onClick={() => setMode(MODE.slider)}
+					onClick={() => setMode(EDIT_TRANSACTION_AMOUNT_MODE.slider)}
 				>
 					<MixerHorizontalIcon /> Slider
 				</div>
 			</div>
-			{mode === MODE.custom && (
+			{mode === EDIT_TRANSACTION_AMOUNT_MODE.custom && (
 				<motion.div className={"grid grid-cols-1 gap-3"} {...defaultAnimations}>
 					{groupUsers.map((user: any) => (
 						<div
@@ -318,7 +320,7 @@ const EditTransactionAmount = ({
 					))}
 				</motion.div>
 			)}
-			{mode === MODE.slider && (
+			{mode === EDIT_TRANSACTION_AMOUNT_MODE.slider && (
 				<motion.div className={"grid grid-cols-1 gap-3"} {...defaultAnimations}>
 					{groupUsers.map((user: any) => (
 						<div className={"grid grid-cols-1 gap-2"} key={user.profile_id}>
@@ -404,7 +406,7 @@ export async function getServerSideProps({ req, params }: { req: RequestData; pa
 
 	const transaction = data?.at(0);
 
-	return { props: { ...props, transaction }, redirect };
+	return { props: { ...props, transaction: transactions }, redirect };
 }
 
 export default Transaction;

@@ -16,7 +16,7 @@ import {
 } from "@radix-ui/react-icons";
 import theme from "@/styles/theme";
 import * as Avatar from "@radix-ui/react-avatar";
-import { ActivityPaidIcon, ArrowBetweenIcon, BarChartIcon, PieChartIcon } from "@/components/icons";
+import { ArrowBetweenIcon, BarChartIcon, PieChartIcon } from "@/components/icons";
 import { Separator } from "@/components/Separator";
 import { Header, PaginatedHeader, TextGradient } from "@/components/text";
 import { displayAmount } from "@/components/Amount";
@@ -32,8 +32,8 @@ import { sortByDate } from "@/utils/helper";
 import { Payment } from "@/components/Payment";
 import { Params } from "next/dist/shared/lib/router/utils/route-matcher";
 import { styled } from "@stitches/react";
-import { PrimaryBox } from "@/components/boxes";
 import { Activity } from "@/components/Activity";
+import { GROUP_FEED_MODE } from "@/constants/components.constants";
 
 const Group = ({
 	user,
@@ -59,6 +59,7 @@ const Group = ({
 	const setShowPayments = uiStore.getState().setShowPayments;
 	const showManage = uiStore((state) => state.showManage);
 	const setShowManage = uiStore.getState().setShowManage;
+	const [mode, setMode] = useState(GROUP_FEED_MODE.activity);
 
 	const [groupUsers, setGroupUsers] = useState(users);
 	const setSharedTransactions = tempStore.getState().setSharedTransactions;
@@ -215,9 +216,24 @@ const Group = ({
 						"grid grid-cols-[auto_auto_auto] gap-2 overflow-x-auto mb-4 pl-3 pr-40 pb-2 scroll"
 					}
 				>
-					<PaginatedHeader active={true}>Activity</PaginatedHeader>
-					<PaginatedHeader>Payments</PaginatedHeader>
-					<PaginatedHeader>Transactions</PaginatedHeader>
+					<PaginatedHeader
+						active={mode === GROUP_FEED_MODE.activity}
+						onClick={() => setMode(GROUP_FEED_MODE.activity)}
+					>
+						{GROUP_FEED_MODE.activity}
+					</PaginatedHeader>
+					<PaginatedHeader
+						active={mode === GROUP_FEED_MODE.payments}
+						onClick={() => setMode(GROUP_FEED_MODE.payments)}
+					>
+						{GROUP_FEED_MODE.payments}
+					</PaginatedHeader>
+					<PaginatedHeader
+						active={mode === GROUP_FEED_MODE.transactions}
+						onClick={() => setMode(GROUP_FEED_MODE.transactions)}
+					>
+						{GROUP_FEED_MODE.transactions}
+					</PaginatedHeader>
 				</PaginatedHeaderCont>
 				<div className={"grid grid-cols-1 gap-2"}>
 					<Activity />
