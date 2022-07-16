@@ -218,9 +218,7 @@ const Group = ({
 			<GroupSummary groupUsers={groupUsers} profile={profile} />
 			<div className={"mt-6"}>
 				<PaginatedHeaderCont
-					className={
-						"grid grid-cols-[auto_auto_auto] gap-2 overflow-x-auto mb-4 pl-3 pr-40 pb-2 scroll"
-					}
+					className={"grid grid-cols-[auto_auto_auto] gap-2 overflow-x-auto pl-3 pr-40 pb-1 scroll"}
 				>
 					<PaginatedHeader
 						active={mode === GROUP_FEED_MODE.activity}
@@ -268,18 +266,18 @@ const Group = ({
 				</SwiperSlide>
 				<SwiperSlide className={"w-full"}>
 					<div className={"grid grid-cols-1 gap-2"}>
+						{!isEmpty(userPayments) &&
+							userPayments.map((x) => <PaymentActivity payment={x} key={x.id} />)}
+					</div>
+				</SwiperSlide>
+				<SwiperSlide className={"w-full"}>
+					<div className={"grid grid-cols-1 gap-2"}>
 						{!isEmpty(filteredTransactions) &&
 							filteredTransactions.map((x) => (
 								<Link href={`/transaction/${encodeURIComponent(x.id)}`} key={x.id} passHref>
 									<SharedTransaction transaction={x} groupUsers={groupUsers} />
 								</Link>
 							))}
-					</div>
-				</SwiperSlide>
-				<SwiperSlide className={"w-full"}>
-					<div className={"grid grid-cols-1 gap-2"}>
-						{!isEmpty(userPayments) &&
-							userPayments.map((x) => <PaymentActivity payment={x} key={x.id} />)}
 					</div>
 				</SwiperSlide>
 			</Swiper>
