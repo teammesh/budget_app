@@ -30,6 +30,7 @@ export const SharedTransaction = forwardRef(
 										className={"w-6 h-6 rounded-full"}
 										height={16}
 										width={16}
+										alt={"user avatar"}
 									/>
 								) : (
 									<DefaultAvatar

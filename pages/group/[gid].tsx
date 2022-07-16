@@ -55,13 +55,17 @@ const Group = ({
 	const [groupUsers, setGroupUsers] = useState(users);
 	const sharedTransactions = tempStore((state) => state.sharedTransactions);
 	const setSharedTransactions = tempStore.getState().setSharedTransactions;
+	const filteredTransactions = tempStore((state) => state.filteredTransactions);
+	const setFilteredTransactions = tempStore.getState().setFilteredTransactions;
 
 	useEffect(() => {
 		tempStore.getState().setGroupName(users[0].groups.name);
 		tempStore.getState().setGroupMembers(groupUsers.map((user: any) => user.profiles.username));
 		transactions &&	setSharedTransactions(transactions);
+		transactions && setFilteredTransactions(transactions);
 		return () => {
 			setSharedTransactions([]);
+			setFilteredTransactions([]);
 			supabase.removeAllSubscriptions();
 		};
 	}, []);
@@ -105,6 +109,7 @@ const Group = ({
 		);
 
 		setSharedTransactions(data);
+		setFilteredTransactions(data);
 	};
 
 	const fetchSharedTransactions = async () => {
@@ -165,8 +170,8 @@ const Group = ({
 					Shared <TextGradient gradient={theme.colors.gradient.a}>transactions</TextGradient>
 				</Header>
 				<div className={"grid grid-cols-1 gap-2"}>
-					{!isEmpty(sharedTransactions) &&
-						sharedTransactions.map((x) => (
+					{!isEmpty(filteredTransactions) &&
+						filteredTransactions.map((x) => (
 							<Link href={`/transaction/${encodeURIComponent(x.id)}`} key={x.id} passHref>
 								<SharedTransaction transaction={x} groupUsers={groupUsers} />
 							</Link>
@@ -191,28 +196,35 @@ const GroupSummary = ({
 }) => {
 	const [showRunningTotal, setShowRunningTotal] = useState(false);
 	const groupName = tempStore.getState().groupName;
+	const sharedTransactions = tempStore.getState().sharedTransactions;
+	const setFilteredTransactions = tempStore.getState().setFilteredTransactions;
+
+	const filterTransactionsByUser = (profileId: string) => {
+		setFilteredTransactions(sharedTransactions.filter(x => x.charged_to === profileId));
+	};
 
 	return (
 		<div
-			className={"p-3 rounded-md bg-gray-900 grid grid-cols-1 gap-4 items-center cursor-pointer"}
-			onClick={() => setShowRunningTotal(!showRunningTotal)}
+			className={"p-3 rounded-md bg-gray-900 grid grid-cols-1 gap-4 items-center cursor-pointer"}			
 		>
 			<div className={"grid grid-cols-[auto_1fr_auto] gap-3 items-center"}>
-				<Avatar.Root>
-					<Avatar.Fallback>
-						<DefaultAvatar
-							size={32}
-							name={groupName}
-							variant="marble"
-							colors={theme.colors.avatar}
-						/>
-					</Avatar.Fallback>
-				</Avatar.Root>
+				<div onClick={() => setFilteredTransactions(sharedTransactions)}>
+					<Avatar.Root>
+						<Avatar.Fallback>
+							<DefaultAvatar
+								size={32}
+								name={groupName}
+								variant="marble"
+								colors={theme.colors.avatar}
+							/>
+						</Avatar.Fallback>
+					</Avatar.Root>
+				</div>
 				<div className="block">
 					<div className="text-sm font-medium">{groupName}</div>
 					<div className="text-xs text-gray-600">{groupUsers.length} users</div>
 				</div>
-				<div className={"grid grid-cols-3 gap-1"}>
+				<div className={"grid grid-cols-3 gap-1"} onClick={() => setShowRunningTotal(!showRunningTotal)}>
 					<PieChartIcon gradient={!showRunningTotal} />
 					<ArrowBetweenIcon />
 					<BarChartIcon gradient={showRunningTotal} />
@@ -224,6 +236,7 @@ const GroupSummary = ({
 					<div
 						key={user.profile_id}
 						className={"grid grid-cols-[auto_1fr_auto] items-center text-sm gap-3"}
+						onClick={() => filterTransactionsByUser(user.profile_id)}
 					>
 						<div className={"flex items-center justify-center"}>
 							{user.profiles.avatar_url ? (
