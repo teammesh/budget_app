@@ -233,7 +233,6 @@ const GroupFeed = ({ groupUsers }: { groupUsers: any }) => {
 
 	return (
 		<>
-			<DummyComponent headerContRef={headerContRef} />
 			<div className={"mt-6"}>
 				<PaginatedHeaderCont
 					className={"grid grid-cols-[auto_auto_auto] gap-2 overflow-x-auto pl-3 pr-40 pb-1"}
@@ -268,6 +267,7 @@ const GroupFeed = ({ groupUsers }: { groupUsers: any }) => {
 			<Swiper
 				spaceBetween={16}
 				slidesPerView={"auto"}
+				autoHeight={true}
 				onSlideChange={(e) => {
 					if (e.activeIndex === 0) setGroupFeedMode(GROUP_FEED_MODE.activity);
 					if (e.activeIndex === 1) setGroupFeedMode(GROUP_FEED_MODE.payments);
@@ -297,6 +297,7 @@ const GroupFeed = ({ groupUsers }: { groupUsers: any }) => {
 					</div>
 				</SwiperSlide>
 			</Swiper>
+			<DummyComponent headerContRef={headerContRef} />
 		</>
 	);
 };
