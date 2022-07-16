@@ -91,7 +91,17 @@ export const ToastAction = StyledAction;
 export const ToastClose = ToastPrimitive.Close;
 
 // Your app...
-const ToastDemo = ({ open, setOpen }: { open: boolean; setOpen: any }) => {
+const ToastDemo = ({
+	open,
+	setOpen,
+	title,
+	description,
+}: {
+	open: boolean;
+	setOpen: any;
+	title: string;
+	description: string;
+}) => {
 	const eventDateRef = React.useRef(new Date());
 	const timerRef = React.useRef(0);
 
@@ -102,8 +112,8 @@ const ToastDemo = ({ open, setOpen }: { open: boolean; setOpen: any }) => {
 	return (
 		<ToastProvider swipeDirection="right">
 			<Toast open={open} onOpenChange={setOpen} className={"p-4 rounded-md bg-gray-900"}>
-				<ToastTitle className={"text-white"}>Your session expired</ToastTitle>
-				<ToastDescription className={"text-gray-600"}>Please sign in again.</ToastDescription>
+				<ToastTitle className={"text-white"}>{title}</ToastTitle>
+				<ToastDescription className={"text-gray-600"}>{description}</ToastDescription>
 			</Toast>
 			<ToastViewport />
 		</ToastProvider>

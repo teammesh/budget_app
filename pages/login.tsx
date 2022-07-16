@@ -52,7 +52,12 @@ export default function Login({ user }: { user: AuthUser }) {
 		<>
 			{/*<button onClick={() => setShowSessionExpired(true)}>test</button>*/}
 			<Auth supabaseClient={supabase} />
-			<Toast open={showSessionExpired} setOpen={setShowSessionExpired} />
+			<Toast
+				open={showSessionExpired}
+				setOpen={setShowSessionExpired}
+				title={"Your session expired"}
+				description={"Please sign in again."}
+			/>
 		</>
 	);
 }
