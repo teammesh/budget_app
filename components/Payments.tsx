@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { Button } from "./Button";
 import { definitions } from "../types/supabase";
 import { Loading } from "@/components/Loading";
-import { PaymentContainer } from "./PaymentContainer";
+import { PaymentsContainer } from "./PaymentsContainer";
 import * as Dialog from "@radix-ui/react-dialog";
 import { Content } from "@/components/Modal";
 import { uiStore } from "@/utils/store";
@@ -149,14 +149,14 @@ export default function Payments({
 					Cancel
 				</Button>
 			</div>
-			<PaymentContainer
+			<PaymentsContainer
 				title={"Your payments"}
 				description={"Send these amounts to the designated person(s)"}
 				balances={userBalances}
 				emptyText={"You do not have any open balances"}
 				profileId={profile_id}
 			/>
-			<PaymentContainer
+			<PaymentsContainer
 				title={"Group payments"}
 				description={"Payments that others in your group need to make"}
 				balances={groupBalances}

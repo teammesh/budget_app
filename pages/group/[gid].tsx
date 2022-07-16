@@ -29,6 +29,8 @@ import Manage from "@/components/Manage";
 import { SharedTransaction } from "@/components/SharedTransaction";
 import Image from "next/image";
 import { sortByDate } from "@/utils/helper";
+import { Payment } from "@/components/Payment";
+import { Params } from "next/dist/shared/lib/router/utils/route-matcher";
 
 const Group = ({
 	user,
@@ -36,12 +38,14 @@ const Group = ({
 	transactions,
 	users,
 	balances,
+	userPayments,
 }: {
 	user: AuthUser;
 	profile: definitions["profiles"];
 	transactions: definitions["shared_transactions"][];
 	users: definitions["profiles_groups"][] | any;
 	balances: definitions["balances"];
+	userPayments: [] | any;
 }) => {
 	const router = useRouter();
 	// @ts-ignore
@@ -52,20 +56,26 @@ const Group = ({
 	const setShowPayments = uiStore.getState().setShowPayments;
 	const showManage = uiStore((state) => state.showManage);
 	const setShowManage = uiStore.getState().setShowManage;
+	
 	const [groupUsers, setGroupUsers] = useState(users);
 	const sharedTransactions = tempStore((state) => state.sharedTransactions);
 	const setSharedTransactions = tempStore.getState().setSharedTransactions;
 	const filteredTransactions = tempStore((state) => state.filteredTransactions);
 	const setFilteredTransactions = tempStore.getState().setFilteredTransactions;
+	// const userPayments = tempStore((state) => state.userPayments);
+	// const setUserPayments = tempStore.getState().setUserPayments;
 
 	useEffect(() => {
 		tempStore.getState().setGroupName(users[0].groups.name);
 		tempStore.getState().setGroupMembers(groupUsers.map((user: any) => user.profiles.username));
 		transactions &&	setSharedTransactions(transactions);
 		transactions && setFilteredTransactions(transactions);
+		// console.log(payments);
+		// payments && setUserPayments(payments);
 		return () => {
 			setSharedTransactions([]);
 			setFilteredTransactions([]);
+			// setUserPayments([]);
 			supabase.removeAllSubscriptions();
 		};
 	}, []);
@@ -83,6 +93,15 @@ const Group = ({
 			.on("*", (payload) => {
 				console.log("Change received!", payload);
 				fetchSharedTransactions();
+			})
+			.subscribe();
+
+		// subscribe to payments changes
+		supabase
+			.from(`payments:group_id=eq.${gid}`)
+			.on("*", (payload) => {
+				console.log("Change received!", payload);
+				fetchUserPayments();
 			})
 			.subscribe();
 
@@ -110,6 +129,20 @@ const Group = ({
 
 		setSharedTransactions(data);
 		setFilteredTransactions(data);
+	};
+
+	const fetchUserPayments = async () => {
+		const { data } = await supabaseQuery(
+			() =>
+				supabase
+					.from("payments")
+					.select(
+						"id, group_id, amount, from_user:from_profile_id(username, avatar_url), to_user:to_profile_id(username, avatar_url)",
+					).eq("group_id", gid),
+			true,
+		);
+
+		// setUserPayments(data);
 	};
 
 	const fetchSharedTransactions = async () => {
@@ -176,7 +209,20 @@ const Group = ({
 								<SharedTransaction transaction={x} groupUsers={groupUsers} />
 							</Link>
 						))}
-				</div>
+				</div>	
+			</div>
+			<div className={"mt-6"}>
+				<Header>
+					User <TextGradient gradient={theme.colors.gradient.a}>payments</TextGradient>
+				</Header>
+				<div className={"grid grid-cols-1 gap-2"}>
+					{!isEmpty(userPayments) &&
+						userPayments.map((x) => (
+							<div key={x.id}>
+								<Payment profile_id={profile.id} from_user={x.from_user} to_user={x.to_user} amount={x.amount} paid={true}/>
+							</div>
+						))}
+				</div>	
 			</div>
 			{showAddTransactions && (
 				<AddTransactions gid={gid} setShowAddTransactions={setShowAddTransactions} />
@@ -287,13 +333,10 @@ const GroupSummary = ({
 	);
 };
 
-export async function getServerSideProps({ req }: { req: RequestData }) {
+export async function getServerSideProps({ req, params }: { req: RequestData, params: Params }) {
 	const { props, redirect } = await verifyUser(req);
+	const { gid } = params;
 
-	const gidRegEx = new RegExp("(?<=group\\/)(.*)(?=.json)");
-	const result = gidRegEx.exec(req.url);
-
-	const gid = result ? result[0] : req.url.toString().slice(7);
 	const { data: transactions } = await supabase
 		.from("shared_transactions")
 		.select("*, profiles(username, avatar_url)")
@@ -313,10 +356,17 @@ export async function getServerSideProps({ req }: { req: RequestData }) {
 		)
 		.eq("group_id", gid);
 
+	const { data: userPayments } = await supabase
+		.from("payments")
+		.select(
+			"id, group_id, amount, from_user:from_profile_id(id, username, avatar_url), to_user:to_profile_id(id, username, avatar_url)",
+		)
+		.eq("group_id", gid);
+
 	const sortedTransactions =
 		transactions && transactions.length > 0 && R.reverse(sortByDate(transactions));
 
-	return { props: { ...props, transactions: sortedTransactions, users, balances }, redirect };
+	return { props: { ...props, transactions: sortedTransactions, users, balances, userPayments }, redirect };
 }
 
 export default Group;
