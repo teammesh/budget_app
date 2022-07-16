@@ -18,7 +18,7 @@ import theme from "@/styles/theme";
 import * as Avatar from "@radix-ui/react-avatar";
 import { ArrowBetweenIcon, BarChartIcon, PieChartIcon } from "@/components/icons";
 import { Separator } from "@/components/Separator";
-import { Header, TextGradient } from "@/components/text";
+import { Header, PaginatedHeader, TextGradient } from "@/components/text";
 import { displayAmount } from "@/components/Amount";
 import { definitions } from "../../types/supabase";
 import { AuthUser } from "@supabase/supabase-js";
@@ -31,6 +31,7 @@ import Image from "next/image";
 import { sortByDate } from "@/utils/helper";
 import { Payment } from "@/components/Payment";
 import { Params } from "next/dist/shared/lib/router/utils/route-matcher";
+import { styled } from "@stitches/react";
 
 const Group = ({
 	user,
@@ -56,9 +57,8 @@ const Group = ({
 	const setShowPayments = uiStore.getState().setShowPayments;
 	const showManage = uiStore((state) => state.showManage);
 	const setShowManage = uiStore.getState().setShowManage;
-	
+
 	const [groupUsers, setGroupUsers] = useState(users);
-	const sharedTransactions = tempStore((state) => state.sharedTransactions);
 	const setSharedTransactions = tempStore.getState().setSharedTransactions;
 	const filteredTransactions = tempStore((state) => state.filteredTransactions);
 	const setFilteredTransactions = tempStore.getState().setFilteredTransactions;
@@ -68,7 +68,7 @@ const Group = ({
 	useEffect(() => {
 		tempStore.getState().setGroupName(users[0].groups.name);
 		tempStore.getState().setGroupMembers(groupUsers.map((user: any) => user.profiles.username));
-		transactions &&	setSharedTransactions(transactions);
+		transactions && setSharedTransactions(transactions);
 		transactions && setFilteredTransactions(transactions);
 		payments && setUserPayments(payments);
 		return () => {
@@ -137,7 +137,8 @@ const Group = ({
 					.from("payments")
 					.select(
 						"id, group_id, amount, from_user:from_profile_id(username, avatar_url), to_user:to_profile_id(username, avatar_url)",
-					).eq("group_id", gid),
+					)
+					.eq("group_id", gid),
 			true,
 		);
 
@@ -176,6 +177,15 @@ const Group = ({
 		</div>
 	);
 
+	const PaginatedHeaderCont = styled("div", {
+		"-ms-overflow-style": "none",
+		scrollbarWidth: "none",
+
+		"&::-webkit-scrollbar": {
+			display: "none",
+		},
+	});
+
 	return (
 		<div className={"grid grid-cols-1 gap-4"}>
 			<div className={"flex justify-between"}>
@@ -198,9 +208,15 @@ const Group = ({
 			</div>
 			<GroupSummary groupUsers={groupUsers} profile={profile} />
 			<div className={"mt-6"}>
-				<Header>
-					Shared <TextGradient gradient={theme.colors.gradient.a}>transactions</TextGradient>
-				</Header>
+				<PaginatedHeaderCont
+					className={
+						"grid grid-cols-[auto_auto_auto] gap-2 overflow-x-auto mb-4 pl-3 pr-40 pb-2 scroll"
+					}
+				>
+					<PaginatedHeader active={true}>Activity</PaginatedHeader>
+					<PaginatedHeader>Payments</PaginatedHeader>
+					<PaginatedHeader>Transactions</PaginatedHeader>
+				</PaginatedHeaderCont>
 				<div className={"grid grid-cols-1 gap-2"}>
 					{!isEmpty(filteredTransactions) &&
 						filteredTransactions.map((x) => (
@@ -208,7 +224,7 @@ const Group = ({
 								<SharedTransaction transaction={x} groupUsers={groupUsers} />
 							</Link>
 						))}
-				</div>	
+				</div>
 			</div>
 			<div className={"mt-6"}>
 				<Header>
@@ -218,10 +234,16 @@ const Group = ({
 					{!isEmpty(userPayments) &&
 						userPayments.map((x) => (
 							<div key={x.id}>
-								<Payment profile_id={profile.id} from_user={x.from_user} to_user={x.to_user} amount={x.amount} paid={true}/>
+								<Payment
+									profile_id={profile.id}
+									from_user={x.from_user}
+									to_user={x.to_user}
+									amount={x.amount}
+									paid={true}
+								/>
 							</div>
 						))}
-				</div>	
+				</div>
 			</div>
 			{showAddTransactions && (
 				<AddTransactions gid={gid} setShowAddTransactions={setShowAddTransactions} />
@@ -245,12 +267,12 @@ const GroupSummary = ({
 	const setFilteredTransactions = tempStore.getState().setFilteredTransactions;
 
 	const filterTransactionsByUser = (profileId: string) => {
-		setFilteredTransactions(sharedTransactions.filter(x => x.charged_to === profileId));
+		setFilteredTransactions(sharedTransactions.filter((x) => x.charged_to === profileId));
 	};
 
 	return (
 		<div
-			className={"p-3 rounded-md bg-gray-900 grid grid-cols-1 gap-4 items-center cursor-pointer"}			
+			className={"p-3 rounded-md bg-gray-900 grid grid-cols-1 gap-4 items-center cursor-pointer"}
 		>
 			<div className={"grid grid-cols-[auto_1fr_auto] gap-3 items-center"}>
 				<div onClick={() => setFilteredTransactions(sharedTransactions)}>
@@ -269,7 +291,10 @@ const GroupSummary = ({
 					<div className="text-sm font-medium">{groupName}</div>
 					<div className="text-xs text-gray-600">{groupUsers.length} users</div>
 				</div>
-				<div className={"grid grid-cols-3 gap-1"} onClick={() => setShowRunningTotal(!showRunningTotal)}>
+				<div
+					className={"grid grid-cols-3 gap-1"}
+					onClick={() => setShowRunningTotal(!showRunningTotal)}
+				>
 					<PieChartIcon gradient={!showRunningTotal} />
 					<ArrowBetweenIcon />
 					<BarChartIcon gradient={showRunningTotal} />
@@ -310,10 +335,13 @@ const GroupSummary = ({
 							) : (
 								<>
 									$
-									{(user.amount_paid_transactions + user.amount_paid_users).toLocaleString(undefined, {
-										minimumFractionDigits: 2,
-										maximumFractionDigits: 2,
-									})}{" "}
+									{(user.amount_paid_transactions + user.amount_paid_users).toLocaleString(
+										undefined,
+										{
+											minimumFractionDigits: 2,
+											maximumFractionDigits: 2,
+										},
+									)}{" "}
 									/{" "}
 									<span className={"font-mono font-medium text-gray-600"}>
 										$
@@ -332,7 +360,7 @@ const GroupSummary = ({
 	);
 };
 
-export async function getServerSideProps({ req, params }: { req: RequestData, params: Params }) {
+export async function getServerSideProps({ req, params }: { req: RequestData; params: Params }) {
 	const { props, redirect } = await verifyUser(req);
 	const { gid } = params;
 
@@ -365,7 +393,10 @@ export async function getServerSideProps({ req, params }: { req: RequestData, pa
 	const sortedTransactions =
 		transactions && transactions.length > 0 && R.reverse(sortByDate(transactions));
 
-	return { props: { ...props, transactions: sortedTransactions, users, balances, payments }, redirect };
+	return {
+		props: { ...props, transactions: sortedTransactions, users, balances, payments },
+		redirect,
+	};
 }
 
 export default Group;
