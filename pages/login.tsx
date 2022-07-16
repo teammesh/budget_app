@@ -2,23 +2,18 @@ import { Main } from "@/components/Main";
 import { supabase } from "@/utils/supabaseClient";
 import { Auth } from "@supabase/ui";
 import { sessionStore } from "@/utils/store";
-import useSWR from "swr";
-import { fetcher } from "@/utils/helper";
 import { useEffect } from "react";
 import { useRouter } from "next/router";
+import { RequestData } from "next/dist/server/web/types";
+import { AuthUser } from "@supabase/supabase-js";
 
-export default function Login() {
+export default function Login({ user }: { user: AuthUser }) {
 	const router = useRouter();
-	const { user, session } = Auth.useUser();
+	const { user: authUser, session } = Auth.useUser();
 	const setSession = sessionStore.getState().setSession;
-	const { data, error } = useSWR(session ? ["/api/getUser", session.access_token] : null, fetcher);
 
 	useEffect(() => {
-		console.log(session);
-
 		const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
-			console.log(event);
-			console.log(session);
 			setSession(session);
 
 			fetch("/api/auth", {
@@ -37,12 +32,25 @@ export default function Login() {
 	}, []);
 
 	useEffect(() => {
-		if (data) router.push("/");
-	}, [data]);
+		if (user) router.push("/");
+		else signOut();
+	}, [user]);
+
+	const signOut = async () => {
+		if (!session) return;
+		await supabase.auth.api.signOut(session.access_token);
+		await supabase.auth.signOut();
+	};
 
 	return (
 		<Main>
 			<Auth supabaseClient={supabase} />
 		</Main>
 	);
+}
+
+export async function getServerSideProps({ req, res }: { req: RequestData; res: any }) {
+	const { user, error: userError } = await supabase.auth.api.getUserByCookie(req, res);
+
+	return { props: { user } };
 }
