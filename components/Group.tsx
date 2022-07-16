@@ -177,19 +177,13 @@ export const GroupSummary = ({
 }) => {
 	const [showRunningTotal, setShowRunningTotal] = useState(false);
 	const groupName = tempStore.getState().groupName;
-	const sharedTransactions = tempStore.getState().sharedTransactions;
-	const setFilteredTransactions = tempStore.getState().setFilteredTransactions;
-
-	const filterTransactionsByUser = (profileId: string) => {
-		setFilteredTransactions(sharedTransactions.filter((x) => x.charged_to === profileId));
-	};
 
 	return (
 		<div
 			className={"p-3 rounded-md bg-gray-900 grid grid-cols-1 gap-4 items-center cursor-pointer"}
 		>
 			<div className={"grid grid-cols-[auto_1fr_auto] gap-3 items-center"}>
-				<div onClick={() => setFilteredTransactions(sharedTransactions)}>
+				<div>
 					<Avatar.Root>
 						<Avatar.Fallback>
 							<DefaultAvatar
@@ -215,61 +209,90 @@ export const GroupSummary = ({
 				</div>
 			</div>
 			<Separator />
-			<div className={"grid grid-cols-1 gap-3"}>
+			<div className={"grid grid-cols-1 gap-0"}>
 				{groupUsers.map((user: any) => (
-					<div
+					<GroupUser
 						key={user.profile_id}
-						className={"grid grid-cols-[auto_1fr_auto] items-center text-sm gap-3"}
-						onClick={() => filterTransactionsByUser(user.profile_id)}
-					>
-						<div className={"flex items-center justify-center"}>
-							{user.profiles.avatar_url ? (
-								<Image
-									src={user.profiles.avatar_url}
-									className={"w-6 h-6 rounded-full"}
-									height={24}
-									width={24}
-									alt={"user avatar"}
-								/>
-							) : (
-								<DefaultAvatar
-									size={24}
-									name={user.profiles.username}
-									variant="beam"
-									colors={theme.colors.avatar}
-								/>
-							)}
-						</div>
-						<div className={"text-ellipsis overflow-hidden whitespace-nowrap"}>
-							{user.profiles.username} {user.profile_id === profile.id && <span>(you)</span>}
-						</div>
-						<div className={"font-mono font-medium tracking-tighter"}>
-							{!showRunningTotal ? (
-								<>{displayAmount(user.amount_owed)}</>
-							) : (
-								<>
-									$
-									{(user.amount_paid_transactions + user.amount_paid_users).toLocaleString(
-										undefined,
-										{
-											minimumFractionDigits: 2,
-											maximumFractionDigits: 2,
-										},
-									)}{" "}
-									/{" "}
-									<span className={"font-mono font-medium text-gray-600"}>
-										$
-										{user.split_amount.toLocaleString(undefined, {
-											minimumFractionDigits: 2,
-											maximumFractionDigits: 2,
-										})}
-									</span>
-								</>
-							)}
-						</div>
-					</div>
+						user={user}
+						profile={profile}
+						showRunningTotal={showRunningTotal}
+					/>
 				))}
 			</div>
 		</div>
+	);
+};
+
+const GroupUser = ({ user, profile, showRunningTotal }: any) => {
+	const setFilteredTransactions = tempStore.getState().setFilteredTransactions;
+	const groupFilterbyUser = uiStore((state) => state.groupFilterbyUser);
+	const setGroupFilterbyUser = uiStore.getState().setGroupFilterbyUser;
+	const sharedTransactions = tempStore.getState().sharedTransactions;
+	const isSelected = groupFilterbyUser === user.profile_id;
+
+	const filterTransactionsByUser = (profileId: string) => {
+		if (isSelected && profileId === user.profile_id) {
+			setGroupFilterbyUser(null);
+			setFilteredTransactions(sharedTransactions);
+		} else {
+			setGroupFilterbyUser(profileId);
+			setFilteredTransactions(sharedTransactions.filter((x) => x.charged_to === profileId));
+		}
+	};
+
+	const WrapperStyle = styled("div", {
+		// background: isSelected ? theme.colors.gray[700] : "none",
+	});
+
+	return (
+		<WrapperStyle
+			className={`grid grid-cols-[auto_1fr_auto] items-center text-sm gap-3 p-2 rounded-md ${
+				isSelected && "bg-blue-700"
+			}`}
+			onClick={() => filterTransactionsByUser(user.profile_id)}
+		>
+			<div className={"flex items-center justify-center"}>
+				{user.profiles.avatar_url ? (
+					<Image
+						src={user.profiles.avatar_url}
+						className={"w-6 h-6 rounded-full"}
+						height={24}
+						width={24}
+						alt={"user avatar"}
+					/>
+				) : (
+					<DefaultAvatar
+						size={24}
+						name={user.profiles.username}
+						variant="beam"
+						colors={theme.colors.avatar}
+					/>
+				)}
+			</div>
+			<div className={"text-ellipsis overflow-hidden whitespace-nowrap"}>
+				{user.profiles.username} {user.profile_id === profile.id && <span>(you)</span>}
+			</div>
+			<div className={"font-mono font-medium tracking-tighter"}>
+				{!showRunningTotal ? (
+					<>{displayAmount(user.amount_owed)}</>
+				) : (
+					<>
+						$
+						{(user.amount_paid_transactions + user.amount_paid_users).toLocaleString(undefined, {
+							minimumFractionDigits: 2,
+							maximumFractionDigits: 2,
+						})}{" "}
+						/{" "}
+						<span className={"font-mono font-medium text-gray-600"}>
+							$
+							{user.split_amount.toLocaleString(undefined, {
+								minimumFractionDigits: 2,
+								maximumFractionDigits: 2,
+							})}
+						</span>
+					</>
+				)}
+			</div>
+		</WrapperStyle>
 	);
 };

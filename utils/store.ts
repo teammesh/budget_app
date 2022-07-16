@@ -102,6 +102,8 @@ interface UIStoreState {
 	setToolbar: (x: any) => void;
 	groupFeedMode: any;
 	setGroupFeedMode: (x: any) => void;
+	groupFilterbyUser: any;
+	setGroupFilterbyUser: (x: any) => void;
 }
 
 export const uiStore = create<UIStoreState>((set, get) => ({
@@ -119,4 +121,6 @@ export const uiStore = create<UIStoreState>((set, get) => ({
 	setShowManage: (x) => set(() => ({ showManage: x })),
 	groupFeedMode: GROUP_FEED_MODE.activity,
 	setGroupFeedMode: (x) => set(() => ({ groupFeedMode: x })),
+	groupFilterbyUser: null,
+	setGroupFilterbyUser: (x) => set(() => ({ groupFilterbyUser: x })),
 }));
