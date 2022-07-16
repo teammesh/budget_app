@@ -16,7 +16,7 @@ import {
 } from "@radix-ui/react-icons";
 import theme from "@/styles/theme";
 import * as Avatar from "@radix-ui/react-avatar";
-import { ArrowBetweenIcon, BarChartIcon, PieChartIcon } from "@/components/icons";
+import { ActivityPaidIcon, ArrowBetweenIcon, BarChartIcon, PieChartIcon } from "@/components/icons";
 import { Separator } from "@/components/Separator";
 import { Header, PaginatedHeader, TextGradient } from "@/components/text";
 import { displayAmount } from "@/components/Amount";
@@ -32,6 +32,8 @@ import { sortByDate } from "@/utils/helper";
 import { Payment } from "@/components/Payment";
 import { Params } from "next/dist/shared/lib/router/utils/route-matcher";
 import { styled } from "@stitches/react";
+import { PrimaryBox } from "@/components/boxes";
+import { Activity } from "@/components/Activity";
 
 const Group = ({
 	user,
@@ -218,6 +220,7 @@ const Group = ({
 					<PaginatedHeader>Transactions</PaginatedHeader>
 				</PaginatedHeaderCont>
 				<div className={"grid grid-cols-1 gap-2"}>
+					<Activity />
 					{!isEmpty(filteredTransactions) &&
 						filteredTransactions.map((x) => (
 							<Link href={`/transaction/${encodeURIComponent(x.id)}`} key={x.id} passHref>
