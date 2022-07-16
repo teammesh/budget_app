@@ -12,6 +12,7 @@ export const Navbar = () => {
 	const [activeRoute, setActiveRoute] = useState("");
 	const [isToolbarShown, setIsToolbarShown] = useAtom(isToolbarShownAtom);
 	const toolbar = uiStore((state) => state.toolbar);
+	const showNavbar = uiStore((state) => state.showNavbar);
 
 	useEffect(() => {
 		isActive();
@@ -23,6 +24,8 @@ export const Navbar = () => {
 
 		setActiveRoute(window.location.pathname);
 	};
+
+	if (!showNavbar) return null;
 
 	return (
 		<div

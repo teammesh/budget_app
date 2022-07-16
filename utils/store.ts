@@ -88,6 +88,8 @@ export const tempStore = create<TempStoreState>((set, get) => ({
 }));
 
 interface UIStoreState {
+	showNavbar: boolean;
+	setShowNavbar: (x: boolean) => void;
 	globalLoading: boolean;
 	setGlobalLoading: (x: boolean) => void;
 	showAddTransactions: boolean;
@@ -103,6 +105,8 @@ interface UIStoreState {
 }
 
 export const uiStore = create<UIStoreState>((set, get) => ({
+	showNavbar: true,
+	setShowNavbar: (x) => set(() => ({ showNavbar: x })),
 	globalLoading: false,
 	setGlobalLoading: (x) => set(() => ({ globalLoading: x })),
 	toolbar: null,

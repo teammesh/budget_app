@@ -1,7 +1,7 @@
 import { Main } from "@/components/Main";
 import { supabase } from "@/utils/supabaseClient";
 import { Auth } from "@supabase/ui";
-import { sessionStore } from "@/utils/store";
+import { sessionStore, uiStore } from "@/utils/store";
 import { useEffect } from "react";
 import { useRouter } from "next/router";
 import { RequestData } from "next/dist/server/web/types";
@@ -13,6 +13,9 @@ export default function Login({ user }: { user: AuthUser }) {
 	const setSession = sessionStore.getState().setSession;
 
 	useEffect(() => {
+		uiStore.getState().setToolbar(null);
+		uiStore.getState().setShowNavbar(false);
+
 		const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
 			setSession(session);
 
@@ -28,6 +31,7 @@ export default function Login({ user }: { user: AuthUser }) {
 
 		return () => {
 			authListener?.unsubscribe();
+			uiStore.getState().setShowNavbar(true);
 		};
 	}, []);
 
