@@ -94,6 +94,10 @@ export default function AddTransactions({
 		return () => setAddTransactions([]);
 	}, []);
 
+	useEffect(() => {
+		uiStore.getState().setToolbar(toolbar);	
+	}, [addTransactions]);
+
 	const getTransactions = async (
 		access_token: ItemPublicTokenExchangeResponse["access_token"],
 		account_id: TransactionType["account_id"],
