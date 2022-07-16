@@ -1,5 +1,5 @@
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { supabase, supabaseQuery } from "@/utils/supabaseClient";
 import AddTransactions from "@/components/AddTransactions";
 import * as R from "ramda";
@@ -35,6 +35,8 @@ import { styled } from "@stitches/react";
 import { Activity } from "@/components/Activity";
 import { GROUP_FEED_MODE } from "@/constants/components.constants";
 import { PaymentActivity } from "@/components/PaymentActivity";
+import { Swiper, SwiperSlide, useSwiper } from "swiper/react";
+import "swiper/css";
 
 const Group = ({
 	user,
@@ -52,6 +54,9 @@ const Group = ({
 	payments: [] | any;
 }) => {
 	const router = useRouter();
+	const swiper = useSwiper();
+	const swiperRef = useRef<any>();
+
 	// @ts-ignore
 	const { gid }: { gid: string } = router.query;
 	const showAddTransactions = uiStore((state) => state.showAddTransactions);
@@ -191,7 +196,7 @@ const Group = ({
 	});
 
 	return (
-		<div className={"grid grid-cols-1 gap-4"}>
+		<div className={"grid grid-cols-1 gap-4 overflow-x-hidden"}>
 			<div className={"flex justify-between"}>
 				<Button
 					size={"sm"}
@@ -219,42 +224,65 @@ const Group = ({
 				>
 					<PaginatedHeader
 						active={mode === GROUP_FEED_MODE.activity}
-						onClick={() => setMode(GROUP_FEED_MODE.activity)}
+						onClick={() => {
+							setMode(GROUP_FEED_MODE.activity);
+							swiperRef.current.slideTo(0);
+						}}
 					>
 						{GROUP_FEED_MODE.activity}
 					</PaginatedHeader>
 					<PaginatedHeader
 						active={mode === GROUP_FEED_MODE.payments}
-						onClick={() => setMode(GROUP_FEED_MODE.payments)}
+						onClick={() => {
+							setMode(GROUP_FEED_MODE.payments);
+							swiperRef.current.slideTo(1);
+						}}
 					>
 						{GROUP_FEED_MODE.payments}
 					</PaginatedHeader>
 					<PaginatedHeader
 						active={mode === GROUP_FEED_MODE.transactions}
-						onClick={() => setMode(GROUP_FEED_MODE.transactions)}
+						onClick={() => {
+							setMode(GROUP_FEED_MODE.transactions);
+							swiperRef.current.slideTo(2);
+						}}
 					>
 						{GROUP_FEED_MODE.transactions}
 					</PaginatedHeader>
 				</PaginatedHeaderCont>
-				<div className={"grid grid-cols-1 gap-2"}>
-					<Activity />
-					{!isEmpty(filteredTransactions) &&
-						filteredTransactions.map((x) => (
-							<Link href={`/transaction/${encodeURIComponent(x.id)}`} key={x.id} passHref>
-								<SharedTransaction transaction={x} groupUsers={groupUsers} />
-							</Link>
-						))}
-				</div>
 			</div>
-			<div className={"mt-6"}>
-				<Header>
-					User <TextGradient gradient={theme.colors.gradient.a}>payments</TextGradient>
-				</Header>
-				<div className={"grid grid-cols-1 gap-2"}>
-					{!isEmpty(userPayments) &&
-						userPayments.map((x) => <PaymentActivity payment={x} key={x.id} />)}
-				</div>
-			</div>
+			<Swiper
+				spaceBetween={16}
+				slidesPerView={"auto"}
+				onSlideChange={(e) => {
+					if (e.activeIndex === 0) setMode(GROUP_FEED_MODE.activity);
+					if (e.activeIndex === 1) setMode(GROUP_FEED_MODE.payments);
+					if (e.activeIndex === 2) setMode(GROUP_FEED_MODE.transactions);
+				}}
+				onSwiper={(swiper) => (swiperRef.current = swiper)}
+			>
+				<SwiperSlide className={"w-full"}>
+					<div className={"grid grid-cols-1 gap-2"}>
+						<Activity />
+					</div>
+				</SwiperSlide>
+				<SwiperSlide className={"w-full"}>
+					<div className={"grid grid-cols-1 gap-2"}>
+						{!isEmpty(filteredTransactions) &&
+							filteredTransactions.map((x) => (
+								<Link href={`/transaction/${encodeURIComponent(x.id)}`} key={x.id} passHref>
+									<SharedTransaction transaction={x} groupUsers={groupUsers} />
+								</Link>
+							))}
+					</div>
+				</SwiperSlide>
+				<SwiperSlide className={"w-full"}>
+					<div className={"grid grid-cols-1 gap-2"}>
+						{!isEmpty(userPayments) &&
+							userPayments.map((x) => <PaymentActivity payment={x} key={x.id} />)}
+					</div>
+				</SwiperSlide>
+			</Swiper>
 			{showAddTransactions && (
 				<AddTransactions gid={gid} setShowAddTransactions={setShowAddTransactions} />
 			)}
