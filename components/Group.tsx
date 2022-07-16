@@ -178,6 +178,11 @@ export const GroupSummary = ({
 	const [showRunningTotal, setShowRunningTotal] = useState(false);
 	const groupName = tempStore.getState().groupName;
 
+	useEffect(() => {
+		uiStore.getState().setGroupFilterbyUser(null);
+		tempStore.getState().setFilteredTransactions(tempStore.getState().sharedTransactions);
+	}, []);
+
 	return (
 		<div
 			className={"p-3 rounded-md bg-gray-900 grid grid-cols-1 gap-4 items-center cursor-pointer"}
