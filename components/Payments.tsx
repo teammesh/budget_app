@@ -11,6 +11,7 @@ import * as Dialog from "@radix-ui/react-dialog";
 import { Content } from "@/components/Modal";
 import { uiStore } from "@/utils/store";
 import { isEmpty } from "ramda";
+import { displayAmount } from "./Amount";
 
 export default function Payments({
 	gid,
@@ -90,7 +91,20 @@ export default function Payments({
 	};
 
 	const toolbar = () => (
-		<div className={"grid grid-cols-[1fr]"}>
+		<div className={"grid grid-cols-[auto_1fr] justify-center gap-8"}>
+			<div className={"grid grid-cols-1 gap-1"}>
+				<div className={"font-mono tracking-tighter text-sm"}>Your total payment:</div>
+				<div className={"text-xl tracking-tight leading-none"}>
+					{userBalances.length === 0
+						? "--"
+						: displayAmount(
+							userBalances.reduce((prev, curr) => {
+								if (!curr.amount) return prev;
+								return curr.amount + prev;
+							}, 0),
+					)}
+				</div>
+			</div>
 			<Dialog.Root>
 				<Dialog.Trigger asChild>
 					<Button size={"sm"} background={theme.colors.gradient.a}>
