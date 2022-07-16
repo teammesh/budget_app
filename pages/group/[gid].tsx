@@ -415,7 +415,7 @@ export async function getServerSideProps({ req, params }: { req: RequestData; pa
 	const { data: balances } = await supabase
 		.from("balances")
 		.select(
-			"id, group_id, amount, from_profile_id, to_profile_id, from_user:from_profile_id(username, avatar_url), to_user:to_profile_id(username, avatar_url)",
+			"id, group_id, amount, from_profile_id, to_profile_id, from_user:from_profile_id(id, username, avatar_url), to_user:to_profile_id(id, username, avatar_url)",
 		)
 		.eq("group_id", gid);
 
