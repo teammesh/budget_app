@@ -215,7 +215,6 @@ const GroupFeed = ({ groupUsers }: { groupUsers: any }) => {
 	const swiperRef = useRef<any>();
 	const headerContRef = useRef<any>();
 	const setGroupFeedMode = uiStore.getState().setGroupFeedMode;
-	const filteredTransactions = tempStore((state) => state.filteredTransactions);
 	const userPayments = tempStore((state) => state.userPayments);
 
 	const PaginatedHeaderCont = styled("div", {
@@ -287,18 +286,26 @@ const GroupFeed = ({ groupUsers }: { groupUsers: any }) => {
 					</div>
 				</SwiperSlide>
 				<SwiperSlide className={"w-full"}>
-					<div className={"grid grid-cols-1 gap-2"}>
-						{!isEmpty(filteredTransactions) &&
-							filteredTransactions.map((x) => (
-								<Link href={`/transaction/${encodeURIComponent(x.id)}`} key={x.id} passHref>
-									<SharedTransaction transaction={x} groupUsers={groupUsers} />
-								</Link>
-							))}
-					</div>
+					<TransactionList groupUsers={groupUsers} />
 				</SwiperSlide>
 			</Swiper>
 			<DummyComponent headerContRef={headerContRef} />
 		</>
+	);
+};
+
+const TransactionList = ({ groupUsers }: { groupUsers: any }) => {
+	const filteredTransactions = tempStore((state) => state.filteredTransactions);
+
+	return (
+		<div className={"grid grid-cols-1 gap-2"}>
+			{!isEmpty(filteredTransactions) &&
+				filteredTransactions.map((x) => (
+					<Link href={`/transaction/${encodeURIComponent(x.id)}`} key={x.id} passHref>
+						<SharedTransaction transaction={x} groupUsers={groupUsers} />
+					</Link>
+				))}
+		</div>
 	);
 };
 
