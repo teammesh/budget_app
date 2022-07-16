@@ -38,14 +38,14 @@ const Group = ({
 	transactions,
 	users,
 	balances,
-	userPayments,
+	payments,
 }: {
 	user: AuthUser;
 	profile: definitions["profiles"];
 	transactions: definitions["shared_transactions"][];
 	users: definitions["profiles_groups"][] | any;
 	balances: definitions["balances"];
-	userPayments: [] | any;
+	payments: [] | any;
 }) => {
 	const router = useRouter();
 	// @ts-ignore
@@ -62,20 +62,19 @@ const Group = ({
 	const setSharedTransactions = tempStore.getState().setSharedTransactions;
 	const filteredTransactions = tempStore((state) => state.filteredTransactions);
 	const setFilteredTransactions = tempStore.getState().setFilteredTransactions;
-	// const userPayments = tempStore((state) => state.userPayments);
-	// const setUserPayments = tempStore.getState().setUserPayments;
+	const userPayments = tempStore((state) => state.userPayments);
+	const setUserPayments = tempStore.getState().setUserPayments;
 
 	useEffect(() => {
 		tempStore.getState().setGroupName(users[0].groups.name);
 		tempStore.getState().setGroupMembers(groupUsers.map((user: any) => user.profiles.username));
 		transactions &&	setSharedTransactions(transactions);
 		transactions && setFilteredTransactions(transactions);
-		// console.log(payments);
-		// payments && setUserPayments(payments);
+		payments && setUserPayments(payments);
 		return () => {
 			setSharedTransactions([]);
 			setFilteredTransactions([]);
-			// setUserPayments([]);
+			setUserPayments([]);
 			supabase.removeAllSubscriptions();
 		};
 	}, []);
@@ -142,7 +141,7 @@ const Group = ({
 			true,
 		);
 
-		// setUserPayments(data);
+		setUserPayments(data);
 	};
 
 	const fetchSharedTransactions = async () => {
@@ -356,7 +355,7 @@ export async function getServerSideProps({ req, params }: { req: RequestData, pa
 		)
 		.eq("group_id", gid);
 
-	const { data: userPayments } = await supabase
+	const { data: payments } = await supabase
 		.from("payments")
 		.select(
 			"id, group_id, amount, from_user:from_profile_id(id, username, avatar_url), to_user:to_profile_id(id, username, avatar_url)",
@@ -366,7 +365,7 @@ export async function getServerSideProps({ req, params }: { req: RequestData, pa
 	const sortedTransactions =
 		transactions && transactions.length > 0 && R.reverse(sortByDate(transactions));
 
-	return { props: { ...props, transactions: sortedTransactions, users, balances, userPayments }, redirect };
+	return { props: { ...props, transactions: sortedTransactions, users, balances, payments }, redirect };
 }
 
 export default Group;

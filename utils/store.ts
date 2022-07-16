@@ -69,7 +69,7 @@ export const tempStore = create<TempStoreState>((set, get) => ({
 	filteredTransactions: [],
 	setFilteredTransactions: (x) => set(() => ({ filteredTransactions: x })),
 	userPayments: [],
-	setUserPayments: (x) => set(() => ({ filteredTransactions: x })),
+	setUserPayments: (x) => set(() => ({ userPayments: x })),
 	groups: [],
 	setGroups: (x) => set(() => ({ groups: x })),
 	groupName: "",
