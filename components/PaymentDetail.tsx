@@ -4,7 +4,7 @@ import DefaultAvatar from "boring-avatars";
 import { TextGradient } from "./text";
 import { definitions } from "types/supabase";
 
-export const Payment = ({
+export const PaymentDetail = ({
 	profile_id,
 	from_user,
 	to_user,

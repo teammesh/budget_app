@@ -1,4 +1,4 @@
-import { Payment } from "./Payment";
+import { PaymentDetail } from "./PaymentDetail";
 
 export const PaymentsContainer = ({
 	title,
@@ -23,7 +23,12 @@ export const PaymentsContainer = ({
 				{balances.length > 0 ? (
 					balances.map((x, i) => (
 						<div key={x.id}>
-							<Payment profile_id={profileId} from_user={x.from_user} to_user={x.to_user} amount={x.amount} />	
+							<PaymentDetail
+								profile_id={profileId}
+								from_user={x.from_user}
+								to_user={x.to_user}
+								amount={x.amount}
+							/>
 						</div>
 					))
 				) : (

@@ -29,11 +29,12 @@ import Manage from "@/components/Manage";
 import { SharedTransaction } from "@/components/SharedTransaction";
 import Image from "next/image";
 import { sortByDate } from "@/utils/helper";
-import { Payment } from "@/components/Payment";
+import { PaymentDetail } from "@/components/PaymentDetail";
 import { Params } from "next/dist/shared/lib/router/utils/route-matcher";
 import { styled } from "@stitches/react";
 import { Activity } from "@/components/Activity";
 import { GROUP_FEED_MODE } from "@/constants/components.constants";
+import { PaymentActivity } from "@/components/PaymentActivity";
 
 const Group = ({
 	user,
@@ -139,7 +140,7 @@ const Group = ({
 				supabase
 					.from("payments")
 					.select(
-						"id, group_id, amount, from_user:from_profile_id(username, avatar_url), to_user:to_profile_id(username, avatar_url)",
+						"id, group_id, amount, from_user:from_profile_id(username, avatar_url), to_user:to_profile_id(username, avatar_url), created_at",
 					)
 					.eq("group_id", gid),
 			true,
@@ -251,17 +252,7 @@ const Group = ({
 				</Header>
 				<div className={"grid grid-cols-1 gap-2"}>
 					{!isEmpty(userPayments) &&
-						userPayments.map((x) => (
-							<div key={x.id}>
-								<Payment
-									profile_id={profile.id}
-									from_user={x.from_user}
-									to_user={x.to_user}
-									amount={x.amount}
-									paid={true}
-								/>
-							</div>
-						))}
+						userPayments.map((x) => <PaymentActivity payment={x} key={x.id} />)}
 				</div>
 			</div>
 			{showAddTransactions && (
@@ -405,7 +396,7 @@ export async function getServerSideProps({ req, params }: { req: RequestData; pa
 	const { data: payments } = await supabase
 		.from("payments")
 		.select(
-			"id, group_id, amount, from_user:from_profile_id(id, username, avatar_url), to_user:to_profile_id(id, username, avatar_url)",
+			"id, group_id, amount, from_user:from_profile_id(id, username, avatar_url), to_user:to_profile_id(id, username, avatar_url), created_at",
 		)
 		.eq("group_id", gid);
 
