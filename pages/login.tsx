@@ -1,16 +1,17 @@
-import { Main } from "@/components/Main";
 import { supabase } from "@/utils/supabaseClient";
 import { Auth } from "@supabase/ui";
 import { sessionStore, uiStore } from "@/utils/store";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { RequestData } from "next/dist/server/web/types";
 import { AuthUser } from "@supabase/supabase-js";
+import Toast from "@/components/Toast";
 
 export default function Login({ user }: { user: AuthUser }) {
 	const router = useRouter();
 	const { user: authUser, session } = Auth.useUser();
 	const setSession = sessionStore.getState().setSession;
+	const [showSessionExpired, setShowSessionExpired] = useState(false);
 
 	useEffect(() => {
 		uiStore.getState().setToolbar(null);
@@ -42,14 +43,17 @@ export default function Login({ user }: { user: AuthUser }) {
 
 	const signOut = async () => {
 		if (!session) return;
+		setShowSessionExpired(true);
 		await supabase.auth.api.signOut(session.access_token);
 		await supabase.auth.signOut();
 	};
 
 	return (
-		<Main>
+		<>
+			{/*<button onClick={() => setShowSessionExpired(true)}>test</button>*/}
 			<Auth supabaseClient={supabase} />
-		</Main>
+			<Toast open={showSessionExpired} setOpen={setShowSessionExpired} />
+		</>
 	);
 }
 
