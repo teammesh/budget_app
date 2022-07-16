@@ -6,12 +6,17 @@ import { definitions } from "../types/supabase";
 import { RequestData } from "next/dist/server/web/types";
 import { tempStore, uiStore } from "@/utils/store";
 import { Button } from "@/components/Button";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import theme from "@/styles/theme";
 import { ArrowLeftIcon, ExitIcon } from "@radix-ui/react-icons";
 import { useRouter } from "next/router";
 import { Field } from "@/components/Field";
 import { Label } from "@/components/Label";
+import Image from "next/image";
+import DefaultAvatar from "boring-avatars";
+import * as Dialog from "@radix-ui/react-dialog";
+import { Content } from "@/components/Modal";
+import { v4 } from "uuid";
 
 export default function Account({
 	user,
@@ -81,6 +86,7 @@ export default function Account({
 				</Button>
 			</div>
 			<div className="grid grid-cols-1 gap-4 pt-4">
+				<Avatar />
 				<Field>
 					<Label htmlFor="email">Email</Label>
 					<Input id="email" type="text" value={user.email} disabled />
@@ -97,6 +103,115 @@ export default function Account({
 		</div>
 	);
 }
+
+const Avatar = () => {
+	const profile_id = supabase.auth.session()?.user?.id;
+	const avatar_url = tempStore((state) => state.avatarUrl);
+	const set_avatar_url = tempStore.getState().setAvatarUrl;
+	const username = tempStore((state) => state.username);
+	const [userAvatar, setUserAvatar] = useState(avatar_url);
+	const [userAvatarURL, setUserAvatarURL] = useState(avatar_url);
+
+	const uploadToClient = (e) => {
+		setUserAvatar("");
+		setUserAvatarURL("");
+		const avatar = e.target.files ? e.target.files[0] : null;
+		if (avatar) {
+			setUserAvatar(avatar);
+			setUserAvatarURL(URL.createObjectURL(avatar));
+		} else {
+			alert("Error with uploading user avatar");
+		}
+	};
+
+	const uploadToServer = async (e) => {
+		try {
+			const filePath = `public/${profile_id}/${v4()}.jpg`;
+			const { data, error } = await supabase.storage.from("avatars").upload(filePath, userAvatar, {
+				upsert: true,
+			});
+			if (error) {
+				throw error;
+			}
+
+			const { data: publicAvatarURL } = supabase.storage.from("avatars").getPublicUrl(filePath);
+
+			const { error: profileUpdateError } = await supabase
+				.from("profiles")
+				.update({ avatar_url: publicAvatarURL.publicURL })
+				.eq("id", profile_id);
+			if (profileUpdateError) {
+				throw profileUpdateError;
+			}
+			set_avatar_url(publicAvatarURL?.publicURL);
+
+		} catch (error: any) {
+			alert(error.message);
+		}
+	};
+
+	return (
+		<div className="place-self-center">
+			{avatar_url ? (
+				<Image
+					src={avatar_url}
+					className={"w-12 h-12 rounded-full"}
+					height={128}
+					width={128}
+					alt={"from user avatar"}
+				/>
+			) : (
+				<DefaultAvatar size={128} name={username} variant="beam" colors={theme.colors.avatar} />
+			)}
+			<div className="mt-3">
+				<Dialog.Root>
+					<Dialog.Trigger asChild>
+						<Button size={"sm"} background={theme.colors.gradient.a}>
+							Upload avatar
+						</Button>
+					</Dialog.Trigger>
+					<Content>
+						<div className={"grid grid-cols-1 gap-2 text-center"}>
+							<Dialog.Title className={"font-medium text-md"}>Upload avatar</Dialog.Title>
+						</div>
+						<div className="place-self-center">
+							{userAvatarURL ? (
+								<Image
+									src={userAvatarURL}
+									className={"w-12 h-12 rounded-full"}
+									height={128}
+									width={128}
+									alt={"from user avatar"}
+								/>
+							) : (
+								<DefaultAvatar
+									size={128}
+									name={username}
+									variant="beam"
+									colors={theme.colors.avatar}
+								/>
+							)}
+						</div>
+						<input type="file" name="avatar" onChange={uploadToClient} />
+						<div className={"grid grid-cols-1 gap-2"}>
+							<Dialog.Close asChild>
+								<Button size={"sm"} border={theme.colors.gradient.a}>
+									<ArrowLeftIcon />
+									Cancel
+								</Button>
+							</Dialog.Close>
+							<Dialog.Close asChild>
+								<Button size={"sm"} background={theme.colors.gradient.a} onClick={uploadToServer}>
+									Upload
+								</Button>
+							</Dialog.Close>
+						</div>
+					</Content>
+				</Dialog.Root>
+			</div>
+		</div>
+	);
+};
 
 const UsernameInput = () => {
 	const username = tempStore((state) => state.username);
