@@ -7,7 +7,6 @@ export const Header = ({ children, active }: { children: any; active?: boolean }
 
 export const PaginatedHeader = ({
 	children,
-	active,
 	onClick,
 }: {
 	children: any;
@@ -15,7 +14,7 @@ export const PaginatedHeader = ({
 	onClick?: any;
 }) => {
 	const HeaderStyle = styled("h1", {
-		color: active ? theme.colors.white : theme.colors.gray[700],
+		color: theme.colors.gray[700],
 
 		"&:before": {
 			content: "",
@@ -23,7 +22,16 @@ export const PaginatedHeader = ({
 			top: "calc(100% - 4px)",
 			width: "100%",
 			height: 2,
-			background: active ? theme.colors.gradient.a : "transparent",
+			background: "transparent",
+			transition: "200ms all ease",
+		},
+
+		"&[data-active]": {
+			color: theme.colors.white,
+
+			"&:before": {
+				background: theme.colors.gradient.a,
+			},
 		},
 	});
 

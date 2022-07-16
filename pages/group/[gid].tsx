@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { supabase, supabaseQuery } from "@/utils/supabaseClient";
 import AddTransactions from "@/components/AddTransactions";
 import * as R from "ramda";
-import { isEmpty } from "ramda";
+import { isEmpty, isNil } from "ramda";
 import { tempStore, uiStore } from "@/utils/store";
 import Link from "next/link";
 import { verifyUser } from "@/utils/ssr";
@@ -18,7 +18,7 @@ import theme from "@/styles/theme";
 import * as Avatar from "@radix-ui/react-avatar";
 import { ArrowBetweenIcon, BarChartIcon, PieChartIcon } from "@/components/icons";
 import { Separator } from "@/components/Separator";
-import { Header, PaginatedHeader, TextGradient } from "@/components/text";
+import { PaginatedHeader } from "@/components/text";
 import { displayAmount } from "@/components/Amount";
 import { definitions } from "../../types/supabase";
 import { AuthUser } from "@supabase/supabase-js";
@@ -29,7 +29,6 @@ import Manage from "@/components/Manage";
 import { SharedTransaction } from "@/components/SharedTransaction";
 import Image from "next/image";
 import { sortByDate } from "@/utils/helper";
-import { PaymentDetail } from "@/components/PaymentDetail";
 import { Params } from "next/dist/shared/lib/router/utils/route-matcher";
 import { styled } from "@stitches/react";
 import { Activity } from "@/components/Activity";
@@ -54,8 +53,6 @@ const Group = ({
 	payments: [] | any;
 }) => {
 	const router = useRouter();
-	const swiper = useSwiper();
-	const swiperRef = useRef<any>();
 
 	// @ts-ignore
 	const { gid }: { gid: string } = router.query;
@@ -65,13 +62,10 @@ const Group = ({
 	const setShowPayments = uiStore.getState().setShowPayments;
 	const showManage = uiStore((state) => state.showManage);
 	const setShowManage = uiStore.getState().setShowManage;
-	const [mode, setMode] = useState(GROUP_FEED_MODE.activity);
 
 	const [groupUsers, setGroupUsers] = useState(users);
 	const setSharedTransactions = tempStore.getState().setSharedTransactions;
-	const filteredTransactions = tempStore((state) => state.filteredTransactions);
 	const setFilteredTransactions = tempStore.getState().setFilteredTransactions;
-	const userPayments = tempStore((state) => state.userPayments);
 	const setUserPayments = tempStore.getState().setUserPayments;
 
 	useEffect(() => {
@@ -186,15 +180,6 @@ const Group = ({
 		</div>
 	);
 
-	const PaginatedHeaderCont = styled("div", {
-		"-ms-overflow-style": "none",
-		scrollbarWidth: "none",
-
-		"&::-webkit-scrollbar": {
-			display: "none",
-		},
-	});
-
 	return (
 		<div className={"grid grid-cols-1 gap-4 overflow-x-hidden"}>
 			<div className={"flex justify-between"}>
@@ -216,32 +201,63 @@ const Group = ({
 				</Button>
 			</div>
 			<GroupSummary groupUsers={groupUsers} profile={profile} />
+			<GroupFeed groupUsers={groupUsers} />
+			{showAddTransactions && (
+				<AddTransactions gid={gid} setShowAddTransactions={setShowAddTransactions} />
+			)}
+			{showPayments && <Payments gid={gid} setShowPayments={setShowPayments} balances={balances} />}
+			{showManage && <Manage gid={gid} setShowManage={setShowManage} />}
+		</div>
+	);
+};
+
+const GroupFeed = ({ groupUsers }: { groupUsers: any }) => {
+	const swiperRef = useRef<any>();
+	const headerContRef = useRef<any>();
+	const setGroupFeedMode = uiStore.getState().setGroupFeedMode;
+	const filteredTransactions = tempStore((state) => state.filteredTransactions);
+	const userPayments = tempStore((state) => state.userPayments);
+
+	const PaginatedHeaderCont = styled("div", {
+		"-ms-overflow-style": "none",
+		scrollbarWidth: "none",
+
+		"&::-webkit-scrollbar": {
+			display: "none",
+		},
+	});
+
+	useEffect(() => {
+		setGroupFeedMode(GROUP_FEED_MODE.activity);
+	}, []);
+
+	return (
+		<>
+			<DummyComponent headerContRef={headerContRef} />
 			<div className={"mt-6"}>
 				<PaginatedHeaderCont
-					className={"grid grid-cols-[auto_auto_auto] gap-2 overflow-x-auto pl-3 pr-40 pb-1 scroll"}
+					className={"grid grid-cols-[auto_auto_auto] gap-2 overflow-x-auto pl-3 pr-40 pb-1"}
+					ref={headerContRef}
 				>
 					<PaginatedHeader
-						active={mode === GROUP_FEED_MODE.activity}
 						onClick={() => {
-							setMode(GROUP_FEED_MODE.activity);
+							setGroupFeedMode(GROUP_FEED_MODE.activity);
 							swiperRef.current.slideTo(0);
 						}}
 					>
 						{GROUP_FEED_MODE.activity}
 					</PaginatedHeader>
 					<PaginatedHeader
-						active={mode === GROUP_FEED_MODE.payments}
 						onClick={() => {
-							setMode(GROUP_FEED_MODE.payments);
+							setGroupFeedMode(GROUP_FEED_MODE.payments);
 							swiperRef.current.slideTo(1);
 						}}
 					>
 						{GROUP_FEED_MODE.payments}
 					</PaginatedHeader>
 					<PaginatedHeader
-						active={mode === GROUP_FEED_MODE.transactions}
 						onClick={() => {
-							setMode(GROUP_FEED_MODE.transactions);
+							setGroupFeedMode(GROUP_FEED_MODE.transactions);
 							swiperRef.current.slideTo(2);
 						}}
 					>
@@ -253,9 +269,9 @@ const Group = ({
 				spaceBetween={16}
 				slidesPerView={"auto"}
 				onSlideChange={(e) => {
-					if (e.activeIndex === 0) setMode(GROUP_FEED_MODE.activity);
-					if (e.activeIndex === 1) setMode(GROUP_FEED_MODE.payments);
-					if (e.activeIndex === 2) setMode(GROUP_FEED_MODE.transactions);
+					if (e.activeIndex === 0) setGroupFeedMode(GROUP_FEED_MODE.activity);
+					if (e.activeIndex === 1) setGroupFeedMode(GROUP_FEED_MODE.payments);
+					if (e.activeIndex === 2) setGroupFeedMode(GROUP_FEED_MODE.transactions);
 				}}
 				onSwiper={(swiper) => (swiperRef.current = swiper)}
 			>
@@ -281,13 +297,27 @@ const Group = ({
 					</div>
 				</SwiperSlide>
 			</Swiper>
-			{showAddTransactions && (
-				<AddTransactions gid={gid} setShowAddTransactions={setShowAddTransactions} />
-			)}
-			{showPayments && <Payments gid={gid} setShowPayments={setShowPayments} balances={balances} />}
-			{showManage && <Manage gid={gid} setShowManage={setShowManage} />}
-		</div>
+		</>
 	);
+};
+
+const DummyComponent = ({ headerContRef }: { headerContRef: any }) => {
+	const groupFeedMode = uiStore((state) => state.groupFeedMode);
+
+	useEffect(() => {
+		for (let i = 0; i <= headerContRef.current.children.length - 1; i++) {
+			headerContRef.current.children.item(i).removeAttribute("data-active");
+		}
+
+		if (groupFeedMode === GROUP_FEED_MODE.activity)
+			headerContRef.current.children[0].setAttribute("data-active", "true");
+		if (groupFeedMode === GROUP_FEED_MODE.payments)
+			headerContRef.current.children[1].setAttribute("data-active", "true");
+		if (groupFeedMode === GROUP_FEED_MODE.transactions)
+			headerContRef.current.children[2].setAttribute("data-active", "true");
+	}, [groupFeedMode]);
+
+	return <div />;
 };
 
 const GroupSummary = ({

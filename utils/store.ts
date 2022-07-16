@@ -1,5 +1,6 @@
 import create from "zustand";
 import { persist } from "zustand/middleware";
+import { GROUP_FEED_MODE } from "@/constants/components.constants";
 
 interface SessionStoreState {
 	session: any;
@@ -97,6 +98,8 @@ interface UIStoreState {
 	setShowManage: (x: boolean) => void;
 	toolbar: any;
 	setToolbar: (x: any) => void;
+	groupFeedMode: any;
+	setGroupFeedMode: (x: any) => void;
 }
 
 export const uiStore = create<UIStoreState>((set, get) => ({
@@ -110,4 +113,6 @@ export const uiStore = create<UIStoreState>((set, get) => ({
 	setShowPayments: (x) => set(() => ({ showPayments: x })),
 	showManage: false,
 	setShowManage: (x) => set(() => ({ showManage: x })),
+	groupFeedMode: GROUP_FEED_MODE.activity,
+	setGroupFeedMode: (x) => set(() => ({ groupFeedMode: x })),
 }));
