@@ -115,18 +115,18 @@ export const GroupFeed = ({ groupUsers }: { groupUsers: any }) => {
 				}}
 				onSwiper={(swiper) => (swiperRef.current = swiper)}
 			>
-				<SwiperSlide className={"w-full"}>
+				<SwiperSlide className={"w-full min-h-8"}>
 					<div className={"grid grid-cols-1 gap-2"}>
 						<Activity />
 					</div>
 				</SwiperSlide>
-				<SwiperSlide className={"w-full"}>
+				<SwiperSlide className={"w-full min-h-8"}>
 					<div className={"grid grid-cols-1 gap-2"}>
 						{!isEmpty(userPayments) &&
 							userPayments.map((x) => <PaymentActivity payment={x} key={x.id} />)}
 					</div>
 				</SwiperSlide>
-				<SwiperSlide className={"w-full"}>
+				<SwiperSlide className={"w-full min-h-8"}>
 					<TransactionList groupUsers={groupUsers} />
 				</SwiperSlide>
 			</Swiper>

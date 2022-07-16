@@ -6,6 +6,9 @@ module.exports = {
 			fontFamily: {
 				mono: ["Favorit Mono, Inconsolata, monospace"],
 			},
+			minHeight: {
+				8: "24rem",
+			},
 			colors: {
 				gray: {
 					600: "rgba(115, 115, 126, 1)",
