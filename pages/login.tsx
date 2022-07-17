@@ -9,7 +9,6 @@ import Toast from "@/components/Toast";
 
 export default function Login({ user }: { user: AuthUser }) {
 	const router = useRouter();
-	const { user: authUser, session } = Auth.useUser();
 	const setSession = sessionStore.getState().setSession;
 	const [showSessionExpired, setShowSessionExpired] = useState(false);
 
@@ -42,9 +41,9 @@ export default function Login({ user }: { user: AuthUser }) {
 	}, [user]);
 
 	const signOut = async () => {
-		if (!session) return;
+		if (!sessionStore.getState().session) return;
 		setShowSessionExpired(true);
-		await supabase.auth.api.signOut(session.access_token);
+		await supabase.auth.api.signOut(sessionStore.getState().session.access_token);
 		await supabase.auth.signOut();
 	};
 
