@@ -17,6 +17,7 @@ import DefaultAvatar from "boring-avatars";
 import * as Dialog from "@radix-ui/react-dialog";
 import { ModalContent } from "@/components/Modal";
 import { v4 } from "uuid";
+import { Content } from "@/components/Main";
 
 export default function Account({
 	user,
@@ -57,7 +58,7 @@ export default function Account({
 	}
 
 	return (
-		<div className={"grid grid-cols-1 gap-8"}>
+		<Content className={"grid grid-cols-1 gap-8"}>
 			<div className={"flex justify-between"}>
 				<Button
 					size={"sm"}
@@ -70,11 +71,12 @@ export default function Account({
 				<Button
 					size={"sm"}
 					style={{ background: theme.colors.gradient.a }}
-					onClick={() => async () => {
+					onClick={async () => {
 						const access_token = supabase.auth.session()?.access_token;
 						if (!access_token) return;
 						await supabase.auth.api.signOut(access_token);
 						await supabase.auth.signOut();
+						sessionStorage.clear();
 					}}
 				>
 					<ExitIcon />
@@ -96,7 +98,7 @@ export default function Account({
 					Update
 				</Button>
 			</div>
-		</div>
+		</Content>
 	);
 }
 

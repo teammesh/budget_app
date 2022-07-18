@@ -52,6 +52,10 @@ export default function Home({
 				})
 				.subscribe();
 		}
+
+		return () => {
+			supabase.removeAllSubscriptions();
+		};
 	}, []);
 
 	const handleCreateGroup = async () => {
