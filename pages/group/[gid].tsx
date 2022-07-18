@@ -117,8 +117,7 @@ const Group = ({
 			true,
 		);
 
-		setSharedTransactions(data);
-		setFilteredTransactions(data);
+		setGroupUsers(data);
 	};
 
 	const fetchUserPayments = async () => {
@@ -146,7 +145,8 @@ const Group = ({
 			true,
 		);
 
-		setGroupUsers(data);
+		setSharedTransactions(data);
+		setFilteredTransactions(data);
 	};
 
 	return (
