@@ -8,10 +8,10 @@ import { PrimaryBox } from "@/components/boxes";
 import { DateTime } from "luxon";
 import Link from "next/link";
 import { Separator } from "./Separator";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/utils/supabaseClient";
 import { PaymentActivity } from "./PaymentActivity";
-import { F, isEmpty, isNil } from "ramda";
+import { isNil } from "ramda";
 import { SharedTransaction } from "./SharedTransaction";
 import { Loading } from "./Loading";
 

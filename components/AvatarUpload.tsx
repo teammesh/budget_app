@@ -20,7 +20,7 @@ export const AvatarUpload = ({
 	avatarUrl: string;
 	avatarName: string;
 	avatarType: string;
-	typeId: string,
+	typeId: string;
 }) => {
 	const [avatarFile, setAvatarFile] = useState();
 	const [newAvatarURL, setNewAvatarURL] = useState(avatarUrl);
@@ -37,7 +37,6 @@ export const AvatarUpload = ({
 			setGroupAvatar(newAvatarURL);
 		}
 	}, [avatarType, newAvatarURL]);
-	
 
 	const uploadToClient = (e: any) => {
 		const newAvatarFile = e.target.files ? e.target.files[0] : null;
@@ -66,7 +65,7 @@ export const AvatarUpload = ({
 			const { data: publicAvatarURL }: any = supabase.storage
 				.from("avatars")
 				.getPublicUrl(filePath);
-			
+
 			if (avatarType === "profile") {
 				const { error } = await supabase
 					.from("profiles")
@@ -88,7 +87,6 @@ export const AvatarUpload = ({
 			}
 			setNewAvatarURL(publicAvatarURL?.publicURL);
 			setIsLoading(false);
-
 		} catch (error: any) {
 			alert(error.message);
 		}
@@ -96,7 +94,11 @@ export const AvatarUpload = ({
 
 	return (
 		<div className="place-self-center">
-			{isLoading ? <Loading /> : <Avatar avatarName={avatarName} avatarUrl={newAvatarURL} size={128} />}
+			{isLoading ? (
+				<Loading />
+			) : (
+				<Avatar avatarName={avatarName} avatarUrl={newAvatarURL} size={128} />
+			)}
 			<div className="mt-3">
 				<Dialog.Root>
 					<Dialog.Trigger asChild>

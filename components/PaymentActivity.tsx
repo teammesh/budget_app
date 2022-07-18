@@ -2,7 +2,6 @@ import theme from "@/styles/theme";
 import Image from "next/image";
 import DefaultAvatar from "boring-avatars";
 import { TextGradient } from "./text";
-import { definitions } from "types/supabase";
 import { PrimaryBox } from "@/components/boxes";
 import { styled } from "@stitches/react";
 

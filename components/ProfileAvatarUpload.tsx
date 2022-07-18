@@ -7,14 +7,14 @@ export const ProfileAvatarUpload = ({
 }: {
 	avatarUrl: string;
 	avatarName: string;
-	profileId: string | any,
+	profileId: string | any;
 }) => {
-    return (
-        <AvatarUpload 
-            avatarUrl={avatarUrl}
-            avatarName={avatarName}
-            avatarType="profile"
-            typeId={profileId}
-        />
-    );
+	return (
+		<AvatarUpload
+			avatarUrl={avatarUrl}
+			avatarName={avatarName}
+			avatarType="profile"
+			typeId={profileId}
+		/>
+	);
 };

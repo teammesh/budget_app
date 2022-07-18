@@ -7,14 +7,14 @@ export const GroupAvatarUpload = ({
 }: {
 	avatarUrl: string;
 	avatarName: string;
-	groupId: string | any,
+	groupId: string | any;
 }) => {
-    return (
-        <AvatarUpload 
-            avatarUrl={avatarUrl}
-            avatarName={avatarName}
-            avatarType="group"
-            typeId={groupId}
-        />
-    );
+	return (
+		<AvatarUpload
+			avatarUrl={avatarUrl}
+			avatarName={avatarName}
+			avatarType="group"
+			typeId={groupId}
+		/>
+	);
 };

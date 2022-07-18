@@ -6,7 +6,7 @@ import { supabase } from "@/utils/supabaseClient";
 import { Auth } from "@supabase/ui";
 import { Loading } from "@/components/Loading";
 import { uiStore } from "@/utils/store";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence } from "framer-motion";
 import { Navbar } from "@/components/Navbar";
 import { Main } from "@/components/Main";
 import { useRouter } from "next/router";

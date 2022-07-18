@@ -1,7 +1,6 @@
 import * as React from "react";
 import { keyframes, styled } from "@stitches/react";
 import * as ToastPrimitive from "@radix-ui/react-toast";
-import theme from "@/styles/theme";
 
 const VIEWPORT_PADDING = 25;
 
