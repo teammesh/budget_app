@@ -51,16 +51,25 @@ export default function Login({ user }: { user: AuthUser }) {
 	return (
 		<Content>
 			{/*<button onClick={() => setShowSessionExpired(true)}>test</button>*/}
-			<Auth supabaseClient={supabase} />
-			<Toast
-				open={showSessionExpired}
-				setOpen={setShowSessionExpired}
-				title={"Your session expired"}
-				description={"Please sign in again."}
+			<SessionExpiredToast
+				showSessionExpired={showSessionExpired}
+				setShowSessionExpired={setShowSessionExpired}
 			/>
+			<Auth supabaseClient={supabase} />
 		</Content>
 	);
 }
+
+const SessionExpiredToast = ({ showSessionExpired, setShowSessionExpired }: any) => {
+	return (
+		<Toast
+			open={showSessionExpired}
+			setOpen={setShowSessionExpired}
+			title={"Your session expired"}
+			description={"Please sign in again."}
+		/>
+	);
+};
 
 export async function getServerSideProps({ req, res }: { req: RequestData; res: any }) {
 	const { user, error: userError } = await supabase.auth.api.getUserByCookie(req, res);

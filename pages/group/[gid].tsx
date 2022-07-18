@@ -24,8 +24,6 @@ import { Content } from "@/components/Main";
 import Payments from "@/components/Payments";
 import Manage from "@/components/Manage";
 
-const mainContentRef = createRef();
-
 const Group = ({
 	user,
 	profile,
@@ -157,7 +155,7 @@ const Group = ({
 		<>
 			{!(showPayments || showManage || showAddTransactions) && (
 				<>
-					<Content ref={mainContentRef}>
+					<Content>
 						<div className={"flex justify-between"}>
 							<Button
 								size={"sm"}
@@ -177,7 +175,7 @@ const Group = ({
 							</Button>
 						</div>
 						<GroupSummary groupUsers={groupUsers} profile={profile} />
-						<GroupFeed groupUsers={groupUsers} activities={activities} />
+						<GroupFeed groupUsers={groupUsers} />
 					</Content>
 					<div className={"grid grid-cols-[108px_1fr] gap-2 px-3 pt-3"}>
 						<Button
@@ -238,7 +236,9 @@ export async function getServerSideProps({ req, params }: { req: RequestData; pa
 
 	const { data: activities } = await supabase
 		.from("activities")
-		.select("id, group_id, user:profile_id(id, username), to_user:to_profile_id(id, username), table_name, table_item_id, type, created_at")
+		.select(
+			"id, group_id, user:profile_id(id, username), to_user:to_profile_id(id, username), table_name, table_item_id, type, created_at",
+		)
 		.eq("group_id", gid)
 		.order("created_at", { ascending: false });
 
