@@ -255,6 +255,7 @@ const EditTransactionAmount = ({ transaction, groupUsers, profile }: any) => {
 				<Input
 					id="amount"
 					type="number"
+					pattern="\d*"
 					value={newTransaction.amount.toLocaleString(undefined, {
 						minimumFractionDigits: 2,
 						maximumFractionDigits: 2,
@@ -323,6 +324,7 @@ const EditTransactionAmount = ({ transaction, groupUsers, profile }: any) => {
 							<Input
 								id={`custom-amount-${user.profile_id}`}
 								type="number"
+								pattern="\d*"
 								value={amountRatios[user.profile_id].toLocaleString(undefined, {
 									minimumFractionDigits: 2,
 									maximumFractionDigits: 2,
