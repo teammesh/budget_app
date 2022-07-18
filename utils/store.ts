@@ -52,6 +52,8 @@ interface TempStoreState {
 	setWebsite: (x: string) => void;
 	avatarUrl: string;
 	setAvatarUrl: (x: string) => void;
+	groupAvatarUrl: string;
+	setGroupAvatarUrl: (x: string) => void;
 	linkToken: string;
 	setLinkToken: (x: string) => void;
 }
@@ -79,6 +81,8 @@ export const tempStore = create<TempStoreState>((set, get) => ({
 	setWebsite: (x) => set(() => ({ website: x })),
 	avatarUrl: "",
 	setAvatarUrl: (x) => set(() => ({ avatarUrl: x })),
+	groupAvatarUrl: "",
+	setGroupAvatarUrl: (x) => set(() => ({ groupAvatarUrl: x })),
 	linkToken: "",
 	setLinkToken: (x) => set(() => ({ linkToken: x })),
 }));

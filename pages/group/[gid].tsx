@@ -60,6 +60,7 @@ const Group = ({
 
 	useEffect(() => {
 		tempStore.getState().setGroupName(users[0].groups.name);
+		tempStore.getState().setGroupAvatarUrl(users[0].groups.avatar_url);
 		tempStore.getState().setGroupMembers(groupUsers.map((user: any) => user.profiles.username));
 		transactions && setSharedTransactions(transactions);
 		transactions && setFilteredTransactions(transactions);
@@ -225,7 +226,7 @@ export async function getServerSideProps({
 	const { data: users } = await supabase
 		.from("profiles_groups")
 		.select(
-			"profile_id, amount_paid_transactions, amount_paid_users, split_amount, amount_owed, profiles(username, avatar_url), groups(name)",
+			"profile_id, amount_paid_transactions, amount_paid_users, split_amount, amount_owed, profiles(username, avatar_url), groups(name, avatar_url)",
 		)
 		.eq("group_id", gid);
 

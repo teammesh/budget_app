@@ -1,15 +1,11 @@
 import { displayAmount } from "@/components/Amount";
 import { forwardRef, useEffect, useRef, useState } from "react";
 import { styled } from "@stitches/react";
-import * as Avatar from "@radix-ui/react-avatar";
-import DefaultAvatar from "boring-avatars";
-import theme from "@/styles/theme";
 import { tempStore, uiStore } from "@/utils/store";
 import { GROUP_FEED_MODE } from "@/constants/components.constants";
 import { definitions } from "../types/supabase";
 import { ArrowBetweenIcon, BarChartIcon, PieChartIcon } from "@/components/icons";
 import { Separator } from "@/components/Separator";
-import Image from "next/image";
 import { PaginatedHeader } from "@/components/text";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Activity } from "@/components/Activity";
@@ -17,6 +13,7 @@ import { isEmpty } from "ramda";
 import { PaymentActivity } from "@/components/PaymentActivity";
 import Link from "next/link";
 import { SharedTransaction } from "@/components/SharedTransaction";
+import { Avatar } from "./Avatar";
 
 const Amount = styled("div", {
 	"& > span": {
@@ -31,17 +28,7 @@ export const Group = forwardRef(({ group, ...props }: { group: any; props?: any 
 		// @ts-ignore
 		ref={ref}
 	>
-		<Avatar.Root>
-			<Avatar.Image />
-			<Avatar.Fallback>
-				<DefaultAvatar
-					size={32}
-					name={group.groups.name}
-					variant="marble"
-					colors={theme.colors.avatar}
-				/>
-			</Avatar.Fallback>
-		</Avatar.Root>
+		<Avatar avatarUrl={group.groups.avatar_url} avatarName={group.groups.name} variant={"marble"} />
 		<div className="block">
 			<div className="text-sm">{group.groups.name}</div>
 			<div className="text-sm text-gray-600">{group.groups.name}</div>
@@ -133,7 +120,7 @@ export const GroupFeed = ({ groupUsers }: { groupUsers: any }) => {
 					</div>
 				</SwiperSlide>
 				<SwiperSlide className={"w-full min-h-8"}>
-					<TransactionList groupUsers={groupUsers} />
+					<TransactionList />
 				</SwiperSlide>
 			</Swiper>
 			<DummyComponent headerContRef={headerContRef} />
@@ -141,7 +128,7 @@ export const GroupFeed = ({ groupUsers }: { groupUsers: any }) => {
 	);
 };
 
-const TransactionList = ({ groupUsers }: { groupUsers: any }) => {
+const TransactionList = () => {
 	const filteredTransactions = tempStore((state) => state.filteredTransactions);
 
 	return (
@@ -182,7 +169,8 @@ export const GroupSummary = ({
 	profile: definitions["profiles"];
 }) => {
 	const [showRunningTotal, setShowRunningTotal] = useState(false);
-	const groupName = tempStore.getState().groupName;
+	const groupName = tempStore((state) => state.groupName);
+	const groupAvatar = tempStore((state) => state.groupAvatarUrl);
 
 	useEffect(() => {
 		uiStore.getState().setGroupFilterbyUser(null);
@@ -195,16 +183,7 @@ export const GroupSummary = ({
 		>
 			<div className={"grid grid-cols-[auto_1fr_auto] gap-3 items-center"}>
 				<div>
-					<Avatar.Root>
-						<Avatar.Fallback>
-							<DefaultAvatar
-								size={32}
-								name={groupName}
-								variant="marble"
-								colors={theme.colors.avatar}
-							/>
-						</Avatar.Fallback>
-					</Avatar.Root>
+					<Avatar avatarUrl={groupAvatar} avatarName={groupName} />
 				</div>
 				<div className="block">
 					<div className="text-sm font-medium">{groupName}</div>
@@ -263,22 +242,7 @@ const GroupUser = ({ user, profile, showRunningTotal }: any) => {
 			onClick={() => filterTransactionsByUser(user.profile_id)}
 		>
 			<div className={"flex items-center justify-center"}>
-				{user.profiles.avatar_url ? (
-					<Image
-						src={user.profiles.avatar_url}
-						className={"w-6 h-6 rounded-full"}
-						height={24}
-						width={24}
-						alt={"user avatar"}
-					/>
-				) : (
-					<DefaultAvatar
-						size={24}
-						name={user.profiles.username}
-						variant="beam"
-						colors={theme.colors.avatar}
-					/>
-				)}
+				<Avatar avatarUrl={user.profiles.avatar_url} avatarName={user.profiles.username} />
 			</div>
 			<div className={"text-ellipsis overflow-hidden whitespace-nowrap"}>
 				{user.profiles.username} {user.profile_id === profile.id && <span>(you)</span>}

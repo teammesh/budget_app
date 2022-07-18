@@ -1,16 +1,19 @@
 import theme from "@/styles/theme";
 import { supabase } from "@/utils/supabaseClient";
 import { ArrowLeftIcon } from "@radix-ui/react-icons";
-import { styled } from "@stitches/react";
 import { useEffect } from "react";
 import { Button } from "./Button";
-import { tempStore, uiStore } from "@/utils/store";
+import { tempStore } from "@/utils/store";
 import { Input } from "@/components/Input";
 import { useRouter } from "next/router";
 import { Content } from "@/components/Main";
+import { Field } from "./Field";
+import { Label } from "./Label";
+import { GroupAvatarUpload } from "./GroupAvatarUpload";
 
 export default function Manage({ gid, setShowManage }: { gid: string; setShowManage: any }) {
 	const router = useRouter();
+	const groupAvatar = tempStore((state) => state.groupAvatarUrl);
 	const groupName = tempStore.getState().groupName;
 	const groupMembers = tempStore.getState().groupMembers;
 
@@ -85,7 +88,7 @@ export default function Manage({ gid, setShowManage }: { gid: string; setShowMan
 
 	return (
 		<>
-			<Content>
+			<Content className={"grid grid-cols-1 gap-8"}>
 				<div className={"flex justify-between"}>
 					<Button
 						size={"sm"}
@@ -98,7 +101,8 @@ export default function Manage({ gid, setShowManage }: { gid: string; setShowMan
 						Cancel
 					</Button>
 				</div>
-				<div className="form-widget">
+				<div className="grid grid-cols-1 gap-4 pt-4">
+					<GroupAvatarUpload avatarUrl={groupAvatar} avatarName={groupName} groupId={gid} />
 					<NameInput />
 					<MembersInput />
 				</div>
@@ -112,15 +116,15 @@ const NameInput = () => {
 	const field = tempStore((state) => state.groupName);
 
 	return (
-		<div>
-			<label htmlFor="groupName">Group name</label>
+		<Field>
+			<Label htmlFor="groupName">Group name</Label>
 			<Input
 				id="groupName"
 				type="text"
 				value={field || ""}
 				onChange={(e) => tempStore.getState().setGroupName(e.target.value)}
 			/>
-		</div>
+		</Field>
 	);
 };
 
@@ -128,14 +132,14 @@ const MembersInput = () => {
 	const field = tempStore((state) => state.groupMembers);
 
 	return (
-		<div>
-			<label htmlFor="groupMembers">Group members</label>
+		<Field>
+			<Label htmlFor="groupMembers">Group members</Label>
 			<Input
 				id="groupMembers"
 				type="text"
 				value={field || ""}
 				onChange={(e) => tempStore.getState().setGroupMembers(e.target.value)}
 			/>
-		</div>
+		</Field>
 	);
 };
