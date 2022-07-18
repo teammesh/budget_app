@@ -1,12 +1,9 @@
 import { useEffect } from "react";
 import { supabase } from "@/utils/supabaseClient";
 import { useRouter } from "next/router";
-import { styled } from "@stitches/react";
-import { uiStore } from "@/utils/store";
 import { motion } from "framer-motion";
 
 export const Main = ({ children }: { children: any }) => {
-	const isToolbarShown = uiStore((state) => state.isToolbarShown);
 	const router = useRouter();
 
 	const variants = {
@@ -14,16 +11,6 @@ export const Main = ({ children }: { children: any }) => {
 		enter: { opacity: 1, x: 0, y: 0 },
 		exit: { opacity: 0, x: 0, y: -100 },
 	};
-
-	const Container = styled("div", {
-		// "& > main:first-of-type": {
-		// 	overflow: "auto",
-		// 	height: isToolbarShown ? "calc(100% - 124px)" : "calc(100% - 68px)",
-		// 	alignContent: "start",
-		// 	padding: "0.75rem",
-		// 	paddingBottom: "2rem",
-		// },
-	});
 
 	useEffect(() => {
 		const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {

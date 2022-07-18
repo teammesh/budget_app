@@ -103,10 +103,6 @@ const Group = ({
 		};
 	}, []);
 
-	useEffect(() => {
-		console.log(supabase.getSubscriptions());
-	}, [showAddTransactions, showManage, showPayments]);
-
 	const fetchGroupUsers = async () => {
 		const { data } = await supabaseQuery(
 			() =>

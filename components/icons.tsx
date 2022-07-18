@@ -179,3 +179,39 @@ export const ActivitySharedIcon = () => (
 		</defs>
 	</svg>
 );
+
+export const ActivityRemovedIcon = () => (
+	<svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+		<rect width="40" height="40" rx="8" fill="url(#paint0_linear_656_2592)" />
+		<path
+			fillRule="evenodd"
+			clipRule="evenodd"
+			d="M17.3333 11.3333C16.9651 11.3333 16.6667 11.6318 16.6667 12C16.6667 12.3682 16.9651 12.6667 17.3333 12.6667H22.6667C23.0349 12.6667 23.3333 12.3682 23.3333 12C23.3333 11.6318 23.0349 11.3333 22.6667 11.3333H17.3333ZM14 14.6667C14 14.2985 14.2985 14 14.6667 14H16.6667H23.3333H25.3333C25.7015 14 26 14.2985 26 14.6667C26 15.0348 25.7015 15.3333 25.3333 15.3333H24.6667V26C24.6667 26.7364 24.0697 27.3333 23.3333 27.3333H16.6667C15.9303 27.3333 15.3333 26.7364 15.3333 26V15.3333H14.6667C14.2985 15.3333 14 15.0348 14 14.6667ZM16.6667 15.3333H23.3333V26H16.6667V15.3333Z"
+			fill="url(#paint1_linear_656_2592)"
+		/>
+		<defs>
+			<linearGradient
+				id="paint0_linear_656_2592"
+				x1="0"
+				y1="20"
+				x2="40"
+				y2="20"
+				gradientUnits="userSpaceOnUse"
+			>
+				<stop stopColor="#F2709C" stopOpacity="0.16" />
+				<stop offset="1" stopColor="#FF9472" stopOpacity="0.16" />
+			</linearGradient>
+			<linearGradient
+				id="paint1_linear_656_2592"
+				x1="14"
+				y1="19.3333"
+				x2="26"
+				y2="19.3333"
+				gradientUnits="userSpaceOnUse"
+			>
+				<stop stopColor="#F2709C" />
+				<stop offset="1" stopColor="#FF9472" />
+			</linearGradient>
+		</defs>
+	</svg>
+);

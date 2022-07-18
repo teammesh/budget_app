@@ -72,11 +72,11 @@ export default function Account({
 					size={"sm"}
 					style={{ background: theme.colors.gradient.a }}
 					onClick={async () => {
+						// sessionStorage and localStorage are also cleared via authlistener in Main
 						const access_token = supabase.auth.session()?.access_token;
 						if (!access_token) return;
 						await supabase.auth.api.signOut(access_token);
 						await supabase.auth.signOut();
-						sessionStorage.clear();
 					}}
 				>
 					<ExitIcon />

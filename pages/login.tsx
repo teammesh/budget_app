@@ -14,7 +14,6 @@ export default function Login({ user }: { user: AuthUser }) {
 	const [showSessionExpired, setShowSessionExpired] = useState(false);
 
 	useEffect(() => {
-		uiStore.getState().setIsToolbarShown(null);
 		uiStore.getState().setShowNavbar(false);
 
 		const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {

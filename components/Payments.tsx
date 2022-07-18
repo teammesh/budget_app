@@ -32,7 +32,7 @@ export default function Payments({
 	);
 
 	useEffect(() => {
-		supabase
+		const balancesSub = supabase
 			.from(`balances:group_id=eq.${gid}`)
 			.on("*", (payload) => {
 				console.log("Change received!", payload);
@@ -42,10 +42,7 @@ export default function Payments({
 		setIsLoading(false);
 
 		return () => {
-			supabase.removeSubscription(
-				// @ts-ignore
-				supabase.getSubscriptions().at(supabase.getSubscriptions().length - 1),
-			);
+			supabase.removeSubscription(balancesSub);
 		};
 	}, []);
 

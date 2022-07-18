@@ -4,13 +4,11 @@ import theme from "@/styles/theme";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { uiStore } from "@/utils/store";
-import { Toolbar } from "./Toolbar";
 import { useRouter } from "next/router";
 
 export const Navbar = () => {
 	const router = useRouter();
 	const [activeRoute, setActiveRoute] = useState("");
-	const isToolbarShown = uiStore((state) => state.isToolbarShown);
 	const showNavbar = uiStore((state) => state.showNavbar);
 
 	useEffect(() => {
