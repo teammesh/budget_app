@@ -89,6 +89,11 @@ export const Activity = ({ activity }: { activity: any }) => {
 
 	const MoreInfoComponent = () => {
 		if (data) {
+			if (activity.type === activityType.delete) {
+				return (
+					<div className="p-3">TODO add this back</div>
+				);
+			}
 			if (activity.table_name === tableNames.payments) {
 				return (
 					<div className="pt-4">
