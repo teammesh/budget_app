@@ -33,6 +33,7 @@ const Group = ({
 	users,
 	balances,
 	payments,
+	activities,
 }: {
 	user: AuthUser;
 	profile: definitions["profiles"];
@@ -40,6 +41,7 @@ const Group = ({
 	users: definitions["profiles_groups"][] | any;
 	balances: definitions["balances"];
 	payments: [] | any;
+	activities: [] | any;
 }) => {
 	const router = useRouter();
 
@@ -55,6 +57,7 @@ const Group = ({
 	const setSharedTransactions = tempStore.getState().setSharedTransactions;
 	const setFilteredTransactions = tempStore.getState().setFilteredTransactions;
 	const setUserPayments = tempStore.getState().setUserPayments;
+	const setGroupActivities = tempStore.getState().setGroupActivities;
 
 	useEffect(() => {
 		tempStore.getState().setGroupName(users[0].groups.name);
@@ -62,6 +65,7 @@ const Group = ({
 		transactions && setSharedTransactions(transactions);
 		transactions && setFilteredTransactions(transactions);
 		payments && setUserPayments(payments);
+		activities && setGroupActivities(activities);
 
 		// subscribe to shared_transactions table based on group_id
 		supabase
@@ -173,7 +177,7 @@ const Group = ({
 							</Button>
 						</div>
 						<GroupSummary groupUsers={groupUsers} profile={profile} />
-						<GroupFeed groupUsers={groupUsers} />
+						<GroupFeed groupUsers={groupUsers} activities={activities} />
 					</Content>
 					<div className={"grid grid-cols-[108px_1fr] gap-2 px-3 pt-3"}>
 						<Button
@@ -232,11 +236,17 @@ export async function getServerSideProps({ req, params }: { req: RequestData; pa
 		)
 		.eq("group_id", gid);
 
+	const { data: activities } = await supabase
+		.from("activities")
+		.select("id, group_id, user:profile_id(id, username), to_user:to_profile_id(id, username), table_name, table_item_id, type, created_at")
+		.eq("group_id", gid)
+		.order("created_at", { ascending: false });
+
 	const sortedTransactions =
 		transactions && transactions.length > 0 && R.reverse(sortByDate(transactions));
 
 	return {
-		props: { ...props, transactions: sortedTransactions, users, balances, payments },
+		props: { ...props, transactions: sortedTransactions, users, balances, payments, activities },
 		redirect,
 	};
 }

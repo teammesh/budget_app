@@ -57,6 +57,7 @@ export const GroupFeed = ({ groupUsers }: { groupUsers: any }) => {
 	const headerContRef = useRef<any>();
 	const setGroupFeedMode = uiStore.getState().setGroupFeedMode;
 	const userPayments = tempStore((state) => state.userPayments);
+	const activities = tempStore((state) => state.groupActivities);
 
 	const PaginatedHeaderCont = styled("div", {
 		"-ms-overflow-style": "none",
@@ -117,7 +118,8 @@ export const GroupFeed = ({ groupUsers }: { groupUsers: any }) => {
 			>
 				<SwiperSlide className={"w-full min-h-8"}>
 					<div className={"grid grid-cols-1 gap-2"}>
-						<Activity />
+						{!isEmpty(activities) && 
+							activities.map((activity) => <Activity activity={activity} key={activity.id} /> )}
 					</div>
 				</SwiperSlide>
 				<SwiperSlide className={"w-full min-h-8"}>

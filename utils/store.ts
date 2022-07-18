@@ -46,6 +46,8 @@ interface TempStoreState {
 	setUserPayments: (x: any[]) => void;
 	addTransactions: any[];
 	setAddTransactions: (x: any[]) => void;
+	groupActivities: any[];
+	setGroupActivities: (x: any[]) => void;
 	groups: any[];
 	setGroups: (x: any[]) => void;
 	groupName: string;
@@ -71,6 +73,8 @@ export const tempStore = create<TempStoreState>((set, get) => ({
 	setFilteredTransactions: (x) => set(() => ({ filteredTransactions: x })),
 	userPayments: [],
 	setUserPayments: (x) => set(() => ({ userPayments: x })),
+	groupActivities: [],
+	setGroupActivities: (x) => set(() => ({ groupActivities: x })),
 	groups: [],
 	setGroups: (x) => set(() => ({ groups: x })),
 	groupName: "",
