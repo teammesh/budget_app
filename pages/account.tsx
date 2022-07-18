@@ -90,7 +90,7 @@ export default function Account({
 					<Input id="email" type="text" value={user.email} disabled />
 				</Field>
 				<UsernameInput />
-				<AvatarUrlInput />
+				{/* <AvatarUrlInput /> */}
 				{/*<WebsiteInput />*/}
 			</div>
 			<div className={"grid grid-cols-1 gap-4"}>
