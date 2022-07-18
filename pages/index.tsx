@@ -12,7 +12,6 @@ import { Button } from "@/components/Button";
 import { ArrowLeftIcon, LightningBoltIcon, PlusIcon } from "@radix-ui/react-icons";
 import theme from "@/styles/theme";
 import { verifyUser } from "@/utils/ssr";
-import { tempStore, uiStore } from "@/utils/store";
 import { AuthUser } from "@supabase/supabase-js";
 import { definitions } from "../types/supabase";
 import { RequestData } from "next/dist/server/web/types";
@@ -28,8 +27,6 @@ export default function Home({
 	groups: definitions["profiles_groups"][];
 }) {
 	const profile_id = supabase.auth.session()?.user?.id;
-	const setGroupName = tempStore.getState().setGroupName;
-	const setGroupMembers = tempStore.getState().setGroupMembers;
 	const [userGroups, setUserGroups] = useState(groups);
 	const totalOwed = userGroups.reduce((prev, curr) => {
 		if (!curr.amount_owed) return prev;
@@ -58,10 +55,7 @@ export default function Home({
 		};
 	}, []);
 
-	const handleCreateGroup = async () => {
-		const groupName = tempStore.getState().groupName;
-		const groupMembers = tempStore.getState().groupMembers;
-
+	const handleCreateGroup = async (groupName: string, groupMembers: Array<string>) => {
 		// Create group
 		const { data: groupsData, error } = await supabase.from("groups").insert([{ name: groupName }]);
 		if (!groupsData || groupsData.length === 0) return;
@@ -99,7 +93,11 @@ export default function Home({
 		}
 	};
 
-	const Toolbar = () => (
+	const Toolbar = () => {
+		const [groupName, setGroupName] = useState<string>();
+		const [groupMembers, setGroupMembers] = useState<string[]>([]);
+
+		return (
 		<div className={"flex justify-end pt-3 px-3"}>
 			<Dialog.Root>
 				<Dialog.Trigger asChild>
@@ -115,8 +113,12 @@ export default function Home({
 						</Dialog.Description>
 					</div>
 					<div className={"grid grid-cols-1 gap-2"}>
-						<Input placeholder="Group name" onChange={(e) => setGroupName(e.target.value)} />
+						<Input 
+							key="group_name" 
+							placeholder="Group name" 
+							onChange={(e) => setGroupName(e.target.value)} />
 						<Input
+							key="group_members"
 							placeholder="Members"
 							onChange={(e) => setGroupMembers(e.target.value.split(","))}
 						/>
@@ -132,7 +134,7 @@ export default function Home({
 							<Button
 								size={"sm"}
 								background={theme.colors.gradient.a}
-								onClick={() => handleCreateGroup()}
+								onClick={() => handleCreateGroup(groupName, groupMembers)}
 							>
 								<LightningBoltIcon />
 								Create
@@ -142,7 +144,8 @@ export default function Home({
 				</ModalContent>
 			</Dialog.Root>
 		</div>
-	);
+		);
+	};
 
 	return (
 		<>
