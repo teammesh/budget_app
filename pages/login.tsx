@@ -6,6 +6,7 @@ import { useRouter } from "next/router";
 import { RequestData } from "next/dist/server/web/types";
 import { AuthUser } from "@supabase/supabase-js";
 import Toast from "@/components/Toast";
+import { Content } from "@/components/Main";
 
 export default function Login({ user }: { user: AuthUser }) {
 	const router = useRouter();
@@ -48,7 +49,7 @@ export default function Login({ user }: { user: AuthUser }) {
 	};
 
 	return (
-		<>
+		<Content>
 			{/*<button onClick={() => setShowSessionExpired(true)}>test</button>*/}
 			<Auth supabaseClient={supabase} />
 			<Toast
@@ -57,7 +58,7 @@ export default function Login({ user }: { user: AuthUser }) {
 				title={"Your session expired"}
 				description={"Please sign in again."}
 			/>
-		</>
+		</Content>
 	);
 }
 

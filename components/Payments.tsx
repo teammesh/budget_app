@@ -85,7 +85,7 @@ export default function Payments({
 	};
 
 	const Toolbar = () => (
-		<div className={"grid grid-cols-[auto_1fr] justify-center gap-8"}>
+		<div className={"grid grid-cols-[auto_1fr] justify-center gap-8 pt-3 px-3"}>
 			<div className={"grid grid-cols-1 gap-1"}>
 				<div className={"font-mono tracking-tighter text-sm"}>Your total payment:</div>
 				<div className={"text-xl tracking-tight leading-none"}>

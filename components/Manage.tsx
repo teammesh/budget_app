@@ -69,7 +69,7 @@ export default function Manage({ gid, setShowManage }: { gid: string; setShowMan
 	}
 
 	const Toolbar = () => (
-		<div className={"grid grid-cols-2 gap-2"}>
+		<div className={"grid grid-cols-2 gap-2 pt-3 px-3"}>
 			<Button
 				size={"sm"}
 				style={{ background: theme.colors.gradient.a }}
