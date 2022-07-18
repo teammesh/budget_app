@@ -71,7 +71,7 @@ const StyledChildren = styled("div", {
 	background: "rgba(0,0,0,0.7)",
 });
 
-export function Content({ children, ...props }: { children: any }) {
+export function ModalContent({ children, ...props }: { children: any }) {
 	return (
 		<Dialog.Portal>
 			<StyledOverlay />

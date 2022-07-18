@@ -1,17 +1,16 @@
 import theme from "@/styles/theme";
 import { supabase } from "@/utils/supabaseClient";
 import { ArrowLeftIcon, CheckCircledIcon } from "@radix-ui/react-icons";
-import { styled } from "@stitches/react";
 import { useEffect, useState } from "react";
 import { Button } from "./Button";
 import { definitions } from "../types/supabase";
 import { Loading } from "@/components/Loading";
 import { PaymentsContainer } from "./PaymentsContainer";
 import * as Dialog from "@radix-ui/react-dialog";
-import { Content } from "@/components/Modal";
-import { uiStore } from "@/utils/store";
+import { ModalContent } from "@/components/Modal";
 import { isEmpty } from "ramda";
 import { displayAmount } from "./Amount";
+import { Content } from "@/components/Main";
 
 export default function Payments({
 	gid,
@@ -32,11 +31,7 @@ export default function Payments({
 		balances.filter((x: definitions["balances"]) => x.from_profile_id !== profile_id),
 	);
 
-	console.log(balances);
-
 	useEffect(() => {
-		uiStore.getState().setToolbar(toolbar);
-
 		supabase
 			.from(`balances:group_id=eq.${gid}`)
 			.on("*", (payload) => {
@@ -44,7 +39,6 @@ export default function Payments({
 				fetchBalances();
 			})
 			.subscribe();
-		console.log(supabase.getSubscriptions());
 		setIsLoading(false);
 
 		return () => {
@@ -90,7 +84,7 @@ export default function Payments({
 		}
 	};
 
-	const toolbar = () => (
+	const Toolbar = () => (
 		<div className={"grid grid-cols-[auto_1fr] justify-center gap-8"}>
 			<div className={"grid grid-cols-1 gap-1"}>
 				<div className={"font-mono tracking-tighter text-sm"}>Your total payment:</div>
@@ -111,7 +105,7 @@ export default function Payments({
 						<CheckCircledIcon /> Mark as paid
 					</Button>
 				</Dialog.Trigger>
-				<Content>
+				<ModalContent>
 					<div className={"grid grid-cols-1 gap-2 text-center"}>
 						<Dialog.Title className={"font-medium text-md"}>
 							Are you sure you want to pay?
@@ -135,49 +129,43 @@ export default function Payments({
 							</Button>
 						</Dialog.Close>
 					</div>
-				</Content>
+				</ModalContent>
 			</Dialog.Root>
 		</div>
 	);
 
-	const Container = styled("div", {
-		position: "fixed",
-		top: 0,
-		bottom: "124px",
-		left: 0,
-		right: 0,
-		zIndex: 10,
-	});
-
 	return (
-		<Container className={"bg-black p-3 grid grid-cols-1 gap-4 content-start overflow-auto"}>
-			<div className={"flex justify-between"}>
-				<Button
-					size={"sm"}
-					style={{ background: theme.colors.gradient.a }}
-					onClick={() => {
-						setShowPayments(false);
-					}}
-				>
-					<ArrowLeftIcon />
-					Cancel
-				</Button>
-			</div>
-			<PaymentsContainer
-				title={"Your payments"}
-				description={"Send these amounts to the designated person(s)"}
-				balances={userBalances}
-				emptyText={"You do not have any open balances"}
-				profileId={profile_id}
-			/>
-			<PaymentsContainer
-				title={"Group payments"}
-				description={"Payments that others in your group need to make"}
-				balances={groupBalances}
-				emptyText={"The group currently does not have any open balances"}
-				profileId={profile_id}
-			/>
-			{isLoading && <Loading />}
-		</Container>
+		<>
+			<Content className={"bg-black p-3 grid grid-cols-1 gap-4 content-start overflow-auto"}>
+				<div className={"flex justify-between"}>
+					<Button
+						size={"sm"}
+						style={{ background: theme.colors.gradient.a }}
+						onClick={() => {
+							setShowPayments(false);
+						}}
+					>
+						<ArrowLeftIcon />
+						Cancel
+					</Button>
+				</div>
+				<PaymentsContainer
+					title={"Your payments"}
+					description={"Send these amounts to the designated person(s)"}
+					balances={userBalances}
+					emptyText={"You do not have any open balances"}
+					profileId={profile_id}
+				/>
+				<PaymentsContainer
+					title={"Group payments"}
+					description={"Payments that others in your group need to make"}
+					balances={groupBalances}
+					emptyText={"The group currently does not have any open balances"}
+					profileId={profile_id}
+				/>
+				{isLoading && <Loading />}
+			</Content>
+			<Toolbar />
+		</>
 	);
 }

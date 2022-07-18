@@ -4,9 +4,9 @@ import { verifyUser } from "@/utils/ssr";
 import { AuthUser } from "@supabase/supabase-js";
 import { definitions } from "../types/supabase";
 import { RequestData } from "next/dist/server/web/types";
-import { tempStore, uiStore } from "@/utils/store";
+import { tempStore } from "@/utils/store";
 import { Button } from "@/components/Button";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import theme from "@/styles/theme";
 import { ArrowLeftIcon, ExitIcon } from "@radix-ui/react-icons";
 import { useRouter } from "next/router";
@@ -15,7 +15,7 @@ import { Label } from "@/components/Label";
 import Image from "next/image";
 import DefaultAvatar from "boring-avatars";
 import * as Dialog from "@radix-ui/react-dialog";
-import { Content } from "@/components/Modal";
+import { ModalContent } from "@/components/Modal";
 import { v4 } from "uuid";
 
 export default function Account({
@@ -29,10 +29,6 @@ export default function Account({
 	tempStore.getState().setUsername(profile.username ? profile.username : "");
 	tempStore.getState().setWebsite(profile.website ? profile.website : "");
 	tempStore.getState().setAvatarUrl(profile.avatar_url ? profile.avatar_url : "");
-
-	useEffect(() => {
-		uiStore.getState().setToolbar(null);
-	}, []);
 
 	async function updateProfile() {
 		const username = tempStore.getState().username;
@@ -112,7 +108,7 @@ const Avatar = () => {
 	const [userAvatar, setUserAvatar] = useState(avatar_url);
 	const [userAvatarURL, setUserAvatarURL] = useState(avatar_url);
 
-	const uploadToClient = (e) => {
+	const uploadToClient = (e: any) => {
 		setUserAvatar("");
 		setUserAvatarURL("");
 		const avatar = e.target.files ? e.target.files[0] : null;
@@ -124,7 +120,7 @@ const Avatar = () => {
 		}
 	};
 
-	const uploadToServer = async (e) => {
+	const uploadToServer = async (e: any) => {
 		try {
 			const filePath = `public/${profile_id}/${v4()}.jpg`;
 			const { data, error } = await supabase.storage.from("avatars").upload(filePath, userAvatar, {
@@ -134,7 +130,9 @@ const Avatar = () => {
 				throw error;
 			}
 
-			const { data: publicAvatarURL } = supabase.storage.from("avatars").getPublicUrl(filePath);
+			const { data: publicAvatarURL }: any = supabase.storage
+				.from("avatars")
+				.getPublicUrl(filePath);
 
 			const { error: profileUpdateError } = await supabase
 				.from("profiles")
@@ -144,7 +142,6 @@ const Avatar = () => {
 				throw profileUpdateError;
 			}
 			set_avatar_url(publicAvatarURL?.publicURL);
-
 		} catch (error: any) {
 			alert(error.message);
 		}
@@ -170,7 +167,7 @@ const Avatar = () => {
 							Upload avatar
 						</Button>
 					</Dialog.Trigger>
-					<Content>
+					<ModalContent>
 						<div className={"grid grid-cols-1 gap-2 text-center"}>
 							<Dialog.Title className={"font-medium text-md"}>Upload avatar</Dialog.Title>
 						</div>
@@ -206,7 +203,7 @@ const Avatar = () => {
 								</Button>
 							</Dialog.Close>
 						</div>
-					</Content>
+					</ModalContent>
 				</Dialog.Root>
 			</div>
 		</div>

@@ -7,9 +7,6 @@ import { Transaction as TransactionType } from "plaid";
 import { ItemPublicTokenExchangeResponse } from "plaid/api";
 import { plaidLink, plaidLinkUpdate } from "@/components/plaidLink";
 import { sortByDate } from "@/utils/helper";
-import { styled } from "@stitches/react";
-import { useAtom } from "jotai";
-import { isToolbarShownAtom } from "@/components/Main";
 import { Button } from "@/components/Button";
 import theme from "@/styles/theme";
 import { ArrowLeftIcon, ExclamationTriangleIcon, ExitIcon, PlusIcon } from "@radix-ui/react-icons";
@@ -19,8 +16,9 @@ import { Header, TextGradient } from "@/components/text";
 import { Loading } from "@/components/Loading";
 import Script from "next/script";
 import * as Dialog from "@radix-ui/react-dialog";
-import { Content } from "./Modal";
+import { ModalContent } from "./Modal";
 import { displayAmount } from "./Amount";
+import { Content } from "@/components/Main";
 
 export default function AddTransactions({
 	gid,
@@ -34,16 +32,12 @@ export default function AddTransactions({
 	const [transactions, setTransactions] = useState<any>([]);
 	const [isLoading, setIsLoading] = useState<any>(true);
 	const accounts = sessionStore((state) => state.accounts);
-	const [isToolbarShown] = useAtom(isToolbarShownAtom);
 	const setAccounts = sessionStore.getState().setAccounts;
 	const transactionCursor = sessionStore.getState().transactionCursor;
 	const setTransactionCursor = sessionStore.getState().setTransactionCursor;
-	const addTransactions = tempStore((state) => state.addTransactions);
 	const setAddTransactions = tempStore.getState().setAddTransactions;
 
 	useEffect(() => {
-		uiStore.getState().setToolbar(toolbar);
-		
 		supabase
 			.from("plaid_items")
 			.select()
@@ -93,10 +87,6 @@ export default function AddTransactions({
 
 		return () => setAddTransactions([]);
 	}, []);
-
-	useEffect(() => {
-		uiStore.getState().setToolbar(toolbar);	
-	}, [addTransactions]);
 
 	const getTransactions = async (
 		access_token: ItemPublicTokenExchangeResponse["access_token"],
@@ -155,47 +145,6 @@ export default function AddTransactions({
 		console.log(data);
 		return setIsLoading(false);
 	};
-	
-	const onAddTransactions = async () => {
-		if (addTransactions.length === 0) return;
-
-		const { data } = await supabaseQuery(
-			() => supabase.from("shared_transactions").upsert(tempStore.getState().addTransactions),
-			true,
-		);
-		setShowAddTransactions(false);
-		setAddTransactions([]);
-	};
-
-	const toolbar = () => (
-		<div className={"grid grid-cols-[auto_1fr] justify-center gap-8"}>
-			<div className={"grid grid-cols-1 gap-1"}>
-				<div className={"font-mono tracking-tighter text-sm"}>Total transaction:</div>
-				<div className={"text-xl tracking-tight leading-none"}>
-					{addTransactions.length === 0
-						? "--"
-						: displayAmount(
-							addTransactions.reduce((prev, curr) => {
-								if (!curr.amount) return prev;
-								return curr.amount + prev;
-							}, 0),
-					)}
-				</div>
-			</div>
-			<Button size={"sm"} background={theme.colors.gradient.a} onClick={onAddTransactions}>
-				<PlusIcon /> Add {addTransactions.length} transactions
-			</Button>
-		</div>
-	);
-
-	const Container = styled("div", {
-		position: "fixed",
-		top: 0,
-		bottom: isToolbarShown ? "124px" : "68px",
-		left: 0,
-		right: 0,
-		zIndex: 10,
-	});
 
 	const reauthenticatePlaid = (access_token: ItemPublicTokenExchangeResponse["access_token"]) => {
 		setIsLoading(true);
@@ -242,7 +191,7 @@ export default function AddTransactions({
 								</span>
 							</div>
 						</Dialog.Trigger>
-						<Content>
+						<ModalContent>
 							<div className={"grid grid-cols-1 gap-2 text-center"}>
 								<Dialog.Title className={"font-medium text-md"}>
 									Lost connection to payment method
@@ -268,7 +217,7 @@ export default function AddTransactions({
 									Proceed
 								</Button>
 							</div>
-						</Content>
+						</ModalContent>
 					</Dialog.Root>,
 				);
 			} else
@@ -293,42 +242,85 @@ export default function AddTransactions({
 	};
 
 	return (
-		<Container className={"bg-black p-3 grid grid-cols-1 gap-4 content-start overflow-auto"}>
-			<Script src="https://cdn.plaid.com/link/v2/stable/link-initialize.js" />
-			<div className={"flex justify-between"}>
-				<Button
-					size={"sm"}
-					style={{ background: theme.colors.gradient.a }}
-					onClick={() => {
-						setShowAddTransactions(false);
-						tempStore.getState().setAddTransactions([]);
-					}}
-				>
-					<ArrowLeftIcon />
-					Cancel
-				</Button>
-				<Button
-					size={"sm"}
-					style={{ background: theme.colors.gradient.a }}
-					onClick={() => window.Plaid.create(plaidLink({ setIsLoading })).open()}
-				>
-					<PlusIcon />
-					Add payment account
-				</Button>
-			</div>
-			<div className={"p-3 rounded-md bg-gray-900 grid grid-cols-1 gap-2 text-sm"}>{Account()}</div>
-			<div className={"mt-6"}>
-				<Header>
-					Your <TextGradient gradient={theme.colors.gradient.a}>transactions</TextGradient>
-				</Header>
-				<div className={"grid grid-cols-1 gap-2"}>
-					{!R.isEmpty(transactions) &&
-						transactions.map((x: TransactionType) => (
-							<Transaction gid={gid} transaction={x} key={x.transaction_id} />
-						))}
+		<>
+			<Content>
+				<Script src="https://cdn.plaid.com/link/v2/stable/link-initialize.js" />
+				<div className={"flex justify-between"}>
+					<Button
+						size={"sm"}
+						style={{ background: theme.colors.gradient.a }}
+						onClick={() => {
+							setShowAddTransactions(false);
+							tempStore.getState().setAddTransactions([]);
+						}}
+					>
+						<ArrowLeftIcon />
+						Cancel
+					</Button>
+					<Button
+						size={"sm"}
+						style={{ background: theme.colors.gradient.a }}
+						onClick={() => window.Plaid.create(plaidLink({ setIsLoading })).open()}
+					>
+						<PlusIcon />
+						Add payment account
+					</Button>
 				</div>
-			</div>
-			{isLoading && <Loading />}
-		</Container>
+				<div className={"p-3 rounded-md bg-gray-900 grid grid-cols-1 gap-2 text-sm"}>
+					{Account()}
+				</div>
+				<div className={"mt-6"}>
+					<Header>
+						Your <TextGradient gradient={theme.colors.gradient.a}>transactions</TextGradient>
+					</Header>
+					<div className={"grid grid-cols-1 gap-2"}>
+						{!R.isEmpty(transactions) &&
+							transactions.map((x: TransactionType) => (
+								<Transaction gid={gid} transaction={x} key={x.transaction_id} />
+							))}
+					</div>
+				</div>
+				{isLoading && <Loading />}
+			</Content>
+			<Toolbar />
+		</>
 	);
 }
+
+const Toolbar = () => {
+	const addTransactions = tempStore((state) => state.addTransactions);
+
+	const onAddTransactions = async () => {
+		const addTransactions = tempStore.getState().addTransactions;
+
+		if (addTransactions.length === 0) return;
+
+		const { data } = await supabaseQuery(
+			() => supabase.from("shared_transactions").upsert(tempStore.getState().addTransactions),
+			true,
+		);
+		uiStore.getState().setShowAddTransactions(false);
+		tempStore.getState().setAddTransactions([]);
+	};
+
+	return (
+		<div className={"grid grid-cols-[auto_1fr] justify-center gap-8"}>
+			<div className={"grid grid-cols-1 gap-1"}>
+				<div className={"font-mono tracking-tighter text-sm"}>Total transaction:</div>
+				<div className={"text-xl tracking-tight leading-none"}>
+					{addTransactions.length === 0
+						? "--"
+						: displayAmount(
+								addTransactions.reduce((prev, curr) => {
+									if (!curr.amount) return prev;
+									return curr.amount + prev;
+								}, 0),
+						  )}
+				</div>
+			</div>
+			<Button size={"sm"} background={theme.colors.gradient.a} onClick={onAddTransactions}>
+				<PlusIcon /> Add {addTransactions.length} transactions
+			</Button>
+		</div>
+	);
+};

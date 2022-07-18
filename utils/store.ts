@@ -98,8 +98,8 @@ interface UIStoreState {
 	setShowPayments: (x: boolean) => void;
 	showManage: boolean;
 	setShowManage: (x: boolean) => void;
-	toolbar: any;
-	setToolbar: (x: any) => void;
+	isToolbarShown: any;
+	setIsToolbarShown: (x: any) => void;
 	groupFeedMode: any;
 	setGroupFeedMode: (x: any) => void;
 	groupFilterbyUser: any;
@@ -111,8 +111,8 @@ export const uiStore = create<UIStoreState>((set, get) => ({
 	setShowNavbar: (x) => set(() => ({ showNavbar: x })),
 	globalLoading: false,
 	setGlobalLoading: (x) => set(() => ({ globalLoading: x })),
-	toolbar: null,
-	setToolbar: (x) => set(() => ({ toolbar: x })),
+	isToolbarShown: null,
+	setIsToolbarShown: (x) => set(() => ({ isToolbarShown: x })),
 	showAddTransactions: false,
 	setShowAddTransactions: (x) => set(() => ({ showAddTransactions: x })),
 	showPayments: false,

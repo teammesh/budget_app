@@ -16,30 +16,15 @@ function MyApp({ Component, pageProps }: AppProps) {
 	return (
 		<Auth.UserContextProvider supabaseClient={supabase}>
 			<Main>
-				<motion.main
-					variants={variants} // Pass the variant object into Framer Motion
-					initial="hidden" // Set the initial state to variants.hidden
-					animate="enter" // Animated state to variants.enter
-					exit="exit" // Exit state (used later) to variants.exit
-					transition={{ type: "just" }} // Set the transition to linear
-					className=""
-				>
-					<AnimatePresence>
-						<Component {...pageProps} />
-					</AnimatePresence>
-				</motion.main>
+				<AnimatePresence>
+					<Component {...pageProps} />
+				</AnimatePresence>
 				<Navbar />
 			</Main>
 			<GlobalLoading />
 		</Auth.UserContextProvider>
 	);
 }
-
-const variants = {
-	hidden: { opacity: 0, x: 0, y: 10 },
-	enter: { opacity: 1, x: 0, y: 0 },
-	exit: { opacity: 0, x: 0, y: -100 },
-};
 
 const GlobalLoading = () => {
 	const router = useRouter();

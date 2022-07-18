@@ -7,6 +7,7 @@ import { Button } from "./Button";
 import { tempStore, uiStore } from "@/utils/store";
 import { Input } from "@/components/Input";
 import { useRouter } from "next/router";
+import { Content } from "@/components/Main";
 
 export default function Manage({ gid, setShowManage }: { gid: string; setShowManage: any }) {
 	const router = useRouter();
@@ -14,8 +15,6 @@ export default function Manage({ gid, setShowManage }: { gid: string; setShowMan
 	const groupMembers = tempStore.getState().groupMembers;
 
 	useEffect(() => {
-		uiStore.getState().setToolbar(toolbar);
-
 		supabase
 			.from("groups")
 			.select()
@@ -69,7 +68,7 @@ export default function Manage({ gid, setShowManage }: { gid: string; setShowMan
 		}
 	}
 
-	const toolbar = () => (
+	const Toolbar = () => (
 		<div className={"grid grid-cols-2 gap-2"}>
 			<Button
 				size={"sm"}
@@ -84,34 +83,28 @@ export default function Manage({ gid, setShowManage }: { gid: string; setShowMan
 		</div>
 	);
 
-	const Container = styled("div", {
-		position: "fixed",
-		top: 0,
-		bottom: "124px",
-		left: 0,
-		right: 0,
-		zIndex: 99,
-	});
-
 	return (
-		<Container className={"bg-black p-3 grid grid-cols-1 gap-4 content-start overflow-auto"}>
-			<div className={"flex justify-between"}>
-				<Button
-					size={"sm"}
-					style={{ background: theme.colors.gradient.a }}
-					onClick={() => {
-						setShowManage(false);
-					}}
-				>
-					<ArrowLeftIcon />
-					Cancel
-				</Button>
-			</div>
-			<div className="form-widget">
-				<NameInput />
-				<MembersInput />
-			</div>
-		</Container>
+		<>
+			<Content>
+				<div className={"flex justify-between"}>
+					<Button
+						size={"sm"}
+						style={{ background: theme.colors.gradient.a }}
+						onClick={() => {
+							setShowManage(false);
+						}}
+					>
+						<ArrowLeftIcon />
+						Cancel
+					</Button>
+				</div>
+				<div className="form-widget">
+					<NameInput />
+					<MembersInput />
+				</div>
+			</Content>
+			<Toolbar />
+		</>
 	);
 }
 

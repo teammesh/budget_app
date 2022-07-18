@@ -4,7 +4,7 @@ import { Widget } from "@/components/Widget";
 import Link from "next/link";
 import { Group } from "@/components/Group";
 import * as Dialog from "@radix-ui/react-dialog";
-import { Content } from "@/components/Modal";
+import { ModalContent } from "@/components/Modal";
 import { Input } from "@/components/Input";
 import React, { useEffect, useState } from "react";
 import { isNil } from "ramda";
@@ -16,6 +16,7 @@ import { tempStore, uiStore } from "@/utils/store";
 import { AuthUser } from "@supabase/supabase-js";
 import { definitions } from "../types/supabase";
 import { RequestData } from "next/dist/server/web/types";
+import { Content } from "@/components/Main";
 
 export default function Home({
 	user,
@@ -42,7 +43,6 @@ export default function Home({
 	}, 0);
 
 	useEffect(() => {
-		uiStore.getState().setToolbar(toolbar);
 		if (profile_id) {
 			supabase
 				.from(`profiles_groups:profile_id=eq.${supabase.auth.session()?.user?.id}`)
@@ -95,15 +95,15 @@ export default function Home({
 		}
 	};
 
-	const toolbar = () => (
-		<div className={"flex justify-end"}>
+	const Toolbar = () => (
+		<div className={"flex justify-end pt-3 px-3"}>
 			<Dialog.Root>
 				<Dialog.Trigger asChild>
 					<Button size={"sm"} background={theme.colors.gradient.a}>
 						<PlusIcon /> Create Group
 					</Button>
 				</Dialog.Trigger>
-				<Content>
+				<ModalContent>
 					<div className={"grid grid-cols-1 gap-2 text-center"}>
 						<Dialog.Title className={"font-medium text-md"}>Create a group</Dialog.Title>
 						<Dialog.Description className={"text-sm text-gray-600"}>
@@ -135,40 +135,43 @@ export default function Home({
 							</Button>
 						</Dialog.Close>
 					</div>
-				</Content>
+				</ModalContent>
 			</Dialog.Root>
 		</div>
 	);
 
 	return (
-		<div className="grid grid-cols-1 gap-16">
-			<div className={"justify-self-start mt-6"}>
-				<Header>
-					Welcome <TextGradient gradient={theme.colors.gradient.a}>{profile.username}</TextGradient>
-					,
-				</Header>
-				<div className={"self-start grid grid-cols-[auto_auto] gap-2"}>
-					<Widget amount={totalOwed} label={"Total owed"} />
-					<Widget amount={totalRefund} label={"Total refund"} />
+		<>
+			<Content>
+				<div className={"justify-self-start mt-6"}>
+					<Header>
+						Welcome{" "}
+						<TextGradient gradient={theme.colors.gradient.a}>{profile.username}</TextGradient>,
+					</Header>
+					<div className={"self-start grid grid-cols-[auto_auto] gap-2"}>
+						<Widget amount={totalOwed} label={"Total owed"} />
+						<Widget amount={totalRefund} label={"Total refund"} />
+					</div>
 				</div>
-			</div>
-			<div>
-				<Header>
-					Your <TextGradient gradient={theme.colors.gradient.a}>groups</TextGradient>
-				</Header>
-				<div className="grid grid-cols-1 gap-2">
-					{userGroups.length > 0 ? (
-						userGroups.map((group: any) => (
-							<Link href={`/group/${group.group_id}`} key={group.groups.name} passHref>
-								<Group group={group} />
-							</Link>
-						))
-					) : (
-						<div>You are currently not in any groups</div>
-					)}
+				<div>
+					<Header>
+						Your <TextGradient gradient={theme.colors.gradient.a}>groups</TextGradient>
+					</Header>
+					<div className="grid grid-cols-1 gap-2">
+						{userGroups.length > 0 ? (
+							userGroups.map((group: any) => (
+								<Link href={`/group/${group.group_id}`} key={group.groups.name} passHref>
+									<Group group={group} />
+								</Link>
+							))
+						) : (
+							<div>You are currently not in any groups</div>
+						)}
+					</div>
 				</div>
-			</div>
-		</div>
+			</Content>
+			<Toolbar />
+		</>
 	);
 }
 

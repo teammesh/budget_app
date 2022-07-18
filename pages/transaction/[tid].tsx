@@ -18,7 +18,6 @@ import { Params } from "next/dist/shared/lib/router/utils/route-matcher";
 import * as Avatar from "@radix-ui/react-avatar";
 import DefaultAvatar from "boring-avatars";
 import { useEffect, useState } from "react";
-import { uiStore } from "@/utils/store";
 import { Field } from "@/components/Field";
 import { Label } from "@/components/Label";
 import { Input } from "@/components/Input";
@@ -32,6 +31,7 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import { defaultAnimations } from "@/utils/animation";
 import { EDIT_TRANSACTION_AMOUNT_MODE } from "@/constants/components.constants";
+import { Content } from "@/components/Main";
 
 const Transaction = ({
 	user,
@@ -56,14 +56,115 @@ const Transaction = ({
 		router.push(`/group/${transaction.groups.id}`);
 	};
 
-	useEffect(() => {
-		uiStore.getState().setToolbar(null);
-	}, []);
-
-	useEffect(() => {
-		const toolbarProps = () => {
-			return isEditing ? (
-				<div className={"grid grid-cols-[auto_1fr] gap-2"}>
+	return (
+		<>
+			<Content>
+				<div className={"flex justify-between"}>
+					<Button
+						size={"sm"}
+						style={{ background: theme.colors.gradient.a }}
+						onClick={() => router.back()}
+					>
+						<ArrowLeftIcon />
+						Return
+					</Button>
+					<Button
+						size={"sm"}
+						style={{ background: theme.colors.gradient.a }}
+						onClick={deleteTransaction}
+					>
+						<TrashIcon />
+						Delete
+					</Button>
+				</div>
+				<SharedTransaction transaction={transaction} groupUsers={groupUsers} />
+				{isEditing && (
+					<FormBox>
+						<Field>
+							<Label>Transaction name</Label>
+							<Input id="transaction-name" type="text" value={transaction.name} />
+						</Field>
+						<Field>
+							<Label>Merchant name</Label>
+							<Input id="merchant-name" type="text" value={transaction.merchant_name} />
+						</Field>
+						<Field>
+							<Label>Transaction date</Label>
+							<Input id="date" type="date" value={transaction.date} />
+						</Field>
+					</FormBox>
+				)}
+				{isEditing && (
+					<EditTransactionAmount
+						groupUsers={groupUsers}
+						transaction={transaction}
+						profile={profile}
+						amountDivisor={amountDivisor}
+						newTransaction={newTransaction}
+						setNewTransaction={setNewTransaction}
+					/>
+				)}
+				{!isEditing && (
+					<PrimaryBox>
+						<div className="flex justify-between">
+							<div className="font-medium text-sm">{transaction.location?.city || "City"}</div>
+							<div className="font-medium text-sm capitalize">
+								{transaction.payment_channel || "N/A"}
+							</div>
+						</div>
+						<div></div>
+						<div className="font-mono font-medium text-sm tracking-tight text-gray-600">
+							{transaction?.category.map((c: any) => (
+								<span key={c} className="mr-4">
+									{c}
+								</span>
+							))}
+						</div>
+					</PrimaryBox>
+				)}
+				{!isEditing && (
+					<PrimaryBox>
+						<div className={"grid grid-cols-1 gap-3"}>
+							{groupUsers.map((user: any) => (
+								<div
+									key={user.profile_id}
+									className={"grid grid-cols-[auto_1fr_auto] items-center text-sm gap-3"}
+								>
+									<Avatar.Root>
+										{user.profiles.avatar_url ? (
+											<Image
+												src={user.profiles.avatar_url}
+												className={"w-6 h-6 rounded-full"}
+												height={24}
+												width={24}
+											/>
+										) : (
+											<DefaultAvatar
+												size={24}
+												name={user.profiles.username}
+												variant="beam"
+												colors={theme.colors.avatar}
+											/>
+										)}
+									</Avatar.Root>
+									<div>
+										{user.profiles.username} {user.profile_id === profile.id && " (you)"}
+									</div>
+									<div className={"font-mono font-medium tracking-tighter"}>
+										$
+										{(transaction.amount * amountDivisor).toLocaleString(undefined, {
+											minimumFractionDigits: 2,
+											maximumFractionDigits: 2,
+										})}
+									</div>
+								</div>
+							))}
+						</div>
+					</PrimaryBox>
+				)}
+			</Content>
+			{isEditing ? (
+				<div className={"grid grid-cols-[auto_1fr] gap-2 pt-3 px-3"}>
 					<Button size={"sm"} border={theme.colors.gradient.a} onClick={() => setIsEditing(false)}>
 						<Cross2Icon /> Cancel
 					</Button>
@@ -76,7 +177,7 @@ const Transaction = ({
 					</Button>
 				</div>
 			) : (
-				<div className={"grid grid-cols-1"}>
+				<div className={"grid grid-cols-1 pt-3 px-3"}>
 					<Button
 						size={"sm"}
 						background={theme.colors.gradient.a}
@@ -85,118 +186,8 @@ const Transaction = ({
 						<Pencil1Icon /> Edit transaction
 					</Button>
 				</div>
-			);
-		};
-
-		uiStore.getState().setToolbar(toolbarProps);
-	}, [isEditing]);
-
-	return (
-		<div className={"grid grid-cols-1 gap-4"}>
-			<div className={"flex justify-between"}>
-				<Button
-					size={"sm"}
-					style={{ background: theme.colors.gradient.a }}
-					onClick={() => router.back()}
-				>
-					<ArrowLeftIcon />
-					Return
-				</Button>
-				<Button
-					size={"sm"}
-					style={{ background: theme.colors.gradient.a }}
-					onClick={deleteTransaction}
-				>
-					<TrashIcon />
-					Delete
-				</Button>
-			</div>
-			<SharedTransaction transaction={transaction} groupUsers={groupUsers} />
-			{isEditing && (
-				<FormBox>
-					<Field>
-						<Label>Transaction name</Label>
-						<Input id="transaction-name" type="text" value={transaction.name} />
-					</Field>
-					<Field>
-						<Label>Merchant name</Label>
-						<Input id="merchant-name" type="text" value={transaction.merchant_name} />
-					</Field>
-					<Field>
-						<Label>Transaction date</Label>
-						<Input id="date" type="date" value={transaction.date} />
-					</Field>
-				</FormBox>
 			)}
-			{isEditing && (
-				<EditTransactionAmount
-					groupUsers={groupUsers}
-					transaction={transaction}
-					profile={profile}
-					amountDivisor={amountDivisor}
-					newTransaction={newTransaction}
-					setNewTransaction={setNewTransaction}
-				/>
-			)}
-			{!isEditing && (
-				<PrimaryBox>
-					<div className="flex justify-between">
-						<div className="font-medium text-sm">{transaction.location?.city || "City"}</div>
-						<div className="font-medium text-sm capitalize">
-							{transaction.payment_channel || "N/A"}
-						</div>
-					</div>
-					<div></div>
-					<div className="font-mono font-medium text-sm tracking-tight text-gray-600">
-						{transaction?.category.map((c: any) => (
-							<span key={c} className="mr-4">
-								{c}
-							</span>
-						))}
-					</div>
-				</PrimaryBox>
-			)}
-			{!isEditing && (
-				<PrimaryBox>
-					<div className={"grid grid-cols-1 gap-3"}>
-						{groupUsers.map((user: any) => (
-							<div
-								key={user.profile_id}
-								className={"grid grid-cols-[auto_1fr_auto] items-center text-sm gap-3"}
-							>
-								<Avatar.Root>
-									{user.profiles.avatar_url ? (
-										<Image
-											src={user.profiles.avatar_url}
-											className={"w-6 h-6 rounded-full"}
-											height={24}
-											width={24}
-										/>
-									) : (
-										<DefaultAvatar
-											size={24}
-											name={user.profiles.username}
-											variant="beam"
-											colors={theme.colors.avatar}
-										/>
-									)}
-								</Avatar.Root>
-								<div>
-									{user.profiles.username} {user.profile_id === profile.id && " (you)"}
-								</div>
-								<div className={"font-mono font-medium tracking-tighter"}>
-									$
-									{(transaction.amount * amountDivisor).toLocaleString(undefined, {
-										minimumFractionDigits: 2,
-										maximumFractionDigits: 2,
-									})}
-								</div>
-							</div>
-						))}
-					</div>
-				</PrimaryBox>
-			)}
-		</div>
+		</>
 	);
 };
 

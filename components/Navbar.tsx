@@ -3,21 +3,19 @@ import { HomeIcon, PersonIcon } from "@radix-ui/react-icons";
 import theme from "@/styles/theme";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { useAtom } from "jotai";
-import { isToolbarShownAtom } from "./Main";
 import { uiStore } from "@/utils/store";
 import { Toolbar } from "./Toolbar";
+import { useRouter } from "next/router";
 
 export const Navbar = () => {
+	const router = useRouter();
 	const [activeRoute, setActiveRoute] = useState("");
-	const [isToolbarShown, setIsToolbarShown] = useAtom(isToolbarShownAtom);
-	const toolbar = uiStore((state) => state.toolbar);
+	const isToolbarShown = uiStore((state) => state.isToolbarShown);
 	const showNavbar = uiStore((state) => state.showNavbar);
 
 	useEffect(() => {
 		isActive();
-		toolbar && setIsToolbarShown(true);
-	}, [toolbar]);
+	}, [router]);
 
 	const isActive = () => {
 		if (!window) return;
@@ -28,12 +26,7 @@ export const Navbar = () => {
 	if (!showNavbar) return null;
 
 	return (
-		<div
-			className={
-				"fixed bottom-0 left-0 right-0 bg-black grid grid-cols-1 grid-rows-[auto_auto] overflow-hidden"
-			}
-		>
-			{toolbar && <Toolbar>{toolbar()}</Toolbar>}
+		<div className={"bg-black grid grid-cols-1 overflow-hidden"}>
 			<div className={"grid grid-cols-[auto_auto] gap-2 py-3 justify-center "}>
 				<Link href={"/"} passHref>
 					<Button

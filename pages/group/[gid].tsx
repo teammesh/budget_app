@@ -1,5 +1,5 @@
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { createRef, useEffect, useState } from "react";
 import { supabase, supabaseQuery } from "@/utils/supabaseClient";
 import AddTransactions from "@/components/AddTransactions";
 import * as R from "ramda";
@@ -16,12 +16,15 @@ import theme from "@/styles/theme";
 import { definitions } from "../../types/supabase";
 import { AuthUser } from "@supabase/supabase-js";
 import { RequestData } from "next/dist/server/web/types";
-import Payments from "@/components/Payments";
-import Manage from "@/components/Manage";
 import { sortByDate } from "@/utils/helper";
 import { Params } from "next/dist/shared/lib/router/utils/route-matcher";
 import "swiper/css";
 import { GroupFeed, GroupSummary } from "@/components/Group";
+import { Content } from "@/components/Main";
+import Payments from "@/components/Payments";
+import Manage from "@/components/Manage";
+
+const mainContentRef = createRef();
 
 const Group = ({
 	user,
@@ -42,14 +45,13 @@ const Group = ({
 
 	// @ts-ignore
 	const { gid }: { gid: string } = router.query;
-	const showAddTransactions = uiStore((state) => state.showAddTransactions);
-	const setShowAddTransactions = uiStore.getState().setShowAddTransactions;
-	const showPayments = uiStore((state) => state.showPayments);
-	const setShowPayments = uiStore.getState().setShowPayments;
-	const showManage = uiStore((state) => state.showManage);
-	const setShowManage = uiStore.getState().setShowManage;
-
 	const [groupUsers, setGroupUsers] = useState(users);
+	const showAddTransactions = uiStore((state) => state.showAddTransactions);
+	const showManage = uiStore((state) => state.showManage);
+	const showPayments = uiStore((state) => state.showPayments);
+	const setShowAddTransactions = uiStore.getState().setShowAddTransactions;
+	const setShowPayments = uiStore.getState().setShowPayments;
+	const setShowManage = uiStore.getState().setShowManage;
 	const setSharedTransactions = tempStore.getState().setSharedTransactions;
 	const setFilteredTransactions = tempStore.getState().setFilteredTransactions;
 	const setUserPayments = tempStore.getState().setUserPayments;
@@ -60,20 +62,6 @@ const Group = ({
 		transactions && setSharedTransactions(transactions);
 		transactions && setFilteredTransactions(transactions);
 		payments && setUserPayments(payments);
-		return () => {
-			setSharedTransactions([]);
-			setFilteredTransactions([]);
-			setUserPayments([]);
-			supabase.removeAllSubscriptions();
-		};
-	}, []);
-
-	useEffect(() => {
-		uiStore.getState().setToolbar(toolbar);
-	}, [showPayments, showManage, showAddTransactions]);
-
-	useEffect(() => {
-		if (!gid) return;
 
 		// subscribe to shared_transactions table based on group_id
 		supabase
@@ -101,7 +89,20 @@ const Group = ({
 				fetchGroupUsers();
 			})
 			.subscribe();
-	}, [gid]);
+
+		return () => {
+			setSharedTransactions([]);
+			setFilteredTransactions([]);
+			setUserPayments([]);
+			setShowManage(false);
+			setShowPayments(false);
+			setShowAddTransactions(false);
+		};
+	}, []);
+
+	useEffect(() => {
+		console.log(supabase.getSubscriptions());
+	}, [showAddTransactions, showManage, showPayments]);
 
 	const fetchGroupUsers = async () => {
 		const { data } = await supabaseQuery(
@@ -147,53 +148,56 @@ const Group = ({
 		setGroupUsers(data);
 	};
 
-	const toolbar = () => (
-		<div className={"grid grid-cols-[108px_1fr] gap-2"}>
-			<Button
-				size={"sm"}
-				style={{ background: theme.colors.gradient.a }}
-				onClick={() => setShowPayments(true)}
-			>
-				<CheckCircledIcon /> Pay
-			</Button>
-			<Button
-				size={"sm"}
-				background={theme.colors.gradient.a}
-				onClick={() => setShowAddTransactions(true)}
-			>
-				<PlusIcon /> Add transactions
-			</Button>
-		</div>
-	);
-
 	return (
-		<div className={"grid grid-cols-1 gap-4 overflow-x-hidden"}>
-			<div className={"flex justify-between"}>
-				<Button
-					size={"sm"}
-					style={{ background: theme.colors.gradient.a }}
-					onClick={() => router.back()}
-				>
-					<ArrowLeftIcon />
-					Return
-				</Button>
-				<Button
-					size={"sm"}
-					style={{ background: theme.colors.gradient.a }}
-					onClick={() => setShowManage(true)}
-				>
-					<MixerHorizontalIcon />
-					Manage
-				</Button>
-			</div>
-			<GroupSummary groupUsers={groupUsers} profile={profile} />
-			<GroupFeed groupUsers={groupUsers} />
-			{showAddTransactions && (
-				<AddTransactions gid={gid} setShowAddTransactions={setShowAddTransactions} />
+		<>
+			{!(showPayments || showManage || showAddTransactions) && (
+				<>
+					<Content ref={mainContentRef}>
+						<div className={"flex justify-between"}>
+							<Button
+								size={"sm"}
+								style={{ background: theme.colors.gradient.a }}
+								onClick={() => router.back()}
+							>
+								<ArrowLeftIcon />
+								Return
+							</Button>
+							<Button
+								size={"sm"}
+								style={{ background: theme.colors.gradient.a }}
+								onClick={() => setShowManage(true)}
+							>
+								<MixerHorizontalIcon />
+								Manage
+							</Button>
+						</div>
+						<GroupSummary groupUsers={groupUsers} profile={profile} />
+						<GroupFeed groupUsers={groupUsers} />
+					</Content>
+					<div className={"grid grid-cols-[108px_1fr] gap-2 px-3 pt-3"}>
+						<Button
+							size={"sm"}
+							style={{ background: theme.colors.gradient.a }}
+							onClick={() => setShowPayments(true)}
+						>
+							<CheckCircledIcon /> Pay
+						</Button>
+						<Button
+							size={"sm"}
+							background={theme.colors.gradient.a}
+							onClick={() => setShowAddTransactions(true)}
+						>
+							<PlusIcon /> Add transactions
+						</Button>
+					</div>
+				</>
 			)}
 			{showPayments && <Payments gid={gid} setShowPayments={setShowPayments} balances={balances} />}
 			{showManage && <Manage gid={gid} setShowManage={setShowManage} />}
-		</div>
+			{showAddTransactions && (
+				<AddTransactions gid={gid} setShowAddTransactions={setShowAddTransactions} />
+			)}
+		</>
 	);
 };
 
