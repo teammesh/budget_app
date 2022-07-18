@@ -37,7 +37,7 @@ export const PaginatedHeader = ({
 
 	return (
 		<HeaderStyle
-			className={"text-2xl font-semibold tracking-tight relative transition-all"}
+			className={"text-2xl font-semibold tracking-tight relative transition-all cursor-pointer"}
 			onClick={onClick}
 		>
 			{children}

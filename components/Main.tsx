@@ -45,7 +45,7 @@ export const Main = ({ children }: { children: any }) => {
 			exit="exit" // Exit state (used later) to variants.exit
 			transition={{ type: "just" }} // Set the transition to linear
 			className={
-				"h-full bg-black text-white grid grid-cols-1 grid-rows-[1fr_auto_auto] items-start"
+				"h-full bg-black text-white grid grid-cols-1 grid-rows-[1fr_auto_auto] items-start max-w-2xl mx-auto"
 			}
 		>
 			{children}

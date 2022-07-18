@@ -63,7 +63,9 @@ export const GroupFeed = ({ groupUsers }: { groupUsers: any }) => {
 		<>
 			<div className={"mt-6"}>
 				<PaginatedHeaderCont
-					className={"grid grid-cols-[auto_auto_auto] gap-2 overflow-x-auto pl-3 pr-40 pb-1"}
+					className={
+						"grid grid-cols-[auto_auto_auto] gap-2 overflow-x-auto pl-3 pr-40 pb-1 justify-start"
+					}
 					ref={headerContRef}
 				>
 					<PaginatedHeader
