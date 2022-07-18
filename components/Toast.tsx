@@ -100,7 +100,7 @@ const ToastDemo = ({
 	open: boolean;
 	setOpen: any;
 	title: string;
-	description: string;
+	description?: string;
 }) => {
 	const eventDateRef = React.useRef(new Date());
 	const timerRef = React.useRef(0);
@@ -113,7 +113,9 @@ const ToastDemo = ({
 		<ToastProvider swipeDirection="right">
 			<Toast open={open} onOpenChange={setOpen} className={"p-4 rounded-md bg-gray-900"}>
 				<ToastTitle className={"text-white"}>{title}</ToastTitle>
-				<ToastDescription className={"text-gray-600"}>{description}</ToastDescription>
+				{description && (
+					<ToastDescription className={"text-gray-600"}>{description}</ToastDescription>
+				)}
 			</Toast>
 			<ToastViewport />
 		</ToastProvider>

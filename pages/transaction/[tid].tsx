@@ -1,5 +1,5 @@
 import { useRouter } from "next/router";
-import { supabase } from "@/utils/supabaseClient";
+import { supabase, supabaseQuery } from "@/utils/supabaseClient";
 import { Button } from "@/components/Button";
 import theme from "@/styles/theme";
 import {
@@ -33,21 +33,41 @@ import { defaultAnimations } from "@/utils/animation";
 import { EDIT_TRANSACTION_AMOUNT_MODE } from "@/constants/components.constants";
 import { Content } from "@/components/Main";
 import { NextApiResponse } from "next";
+import { tempStore } from "@/utils/store";
+import create from "zustand";
+import Toast from "@/components/Toast";
+
+interface UIStoreState {
+	showToast: boolean;
+	setShowToast: (x: boolean) => void;
+}
+
+const uiStore = create<UIStoreState>((set, get) => ({
+	showToast: false,
+	setShowToast: (x) => set(() => ({ showToast: x })),
+}));
 
 const Transaction = ({
 	user,
 	profile,
-	transaction,
+	transaction: oldTransaction,
 }: {
 	user: AuthUser;
 	profile: definitions["profiles"];
 	transaction: definitions["shared_transactions"] | any;
 }) => {
 	const router = useRouter();
-	const groupUsers = transaction.groups.profiles_groups;
 	const [isEditing, setIsEditing] = useState(false);
-	const [newTransaction, setNewTransaction] = useState(transaction);
-	const amountDivisor = 1 / groupUsers.length;
+	const [transaction, setTransaction] = useState(oldTransaction);
+	const groupUsers = transaction.groups.profiles_groups;
+
+	useEffect(() => {
+		tempStore.getState().setNewTransaction(transaction);
+
+		return () => {
+			tempStore.getState().setNewTransaction({});
+		};
+	}, []);
 
 	const deleteTransaction = async () => {
 		await supabase
@@ -55,6 +75,32 @@ const Transaction = ({
 			.delete()
 			.eq("transaction_id", transaction.transaction_id);
 		router.push(`/group/${transaction.groups.id}`);
+	};
+
+	const saveTransaction = async () => {
+		const req = R.omit(
+			["profiles_groups", "groups", "profiles"],
+			tempStore.getState().newTransaction,
+		);
+
+		const { data, error } = await supabaseQuery(
+			() =>
+				supabase
+					.from("shared_transactions")
+					.upsert(req)
+					.eq("transaction_id", transaction.transaction_id),
+			true,
+		);
+
+		if (error) return;
+		setTransaction(R.mergeDeepLeft(data[0], transaction));
+		setIsEditing(false);
+		uiStore.getState().setShowToast(true);
+	};
+
+	const cancelChanges = async () => {
+		tempStore.getState().setNewTransaction(transaction);
+		setIsEditing(false);
 	};
 
 	return (
@@ -98,11 +144,8 @@ const Transaction = ({
 				{isEditing && (
 					<EditTransactionAmount
 						groupUsers={groupUsers}
-						transaction={transaction}
 						profile={profile}
-						amountDivisor={amountDivisor}
-						newTransaction={newTransaction}
-						setNewTransaction={setNewTransaction}
+						transaction={transaction}
 					/>
 				)}
 				{!isEditing && (
@@ -153,7 +196,7 @@ const Transaction = ({
 									</div>
 									<div className={"font-mono font-medium tracking-tighter"}>
 										$
-										{(transaction.amount * amountDivisor).toLocaleString(undefined, {
+										{Number(transaction.split_amounts[user.profile_id]).toLocaleString(undefined, {
 											minimumFractionDigits: 2,
 											maximumFractionDigits: 2,
 										})}
@@ -166,14 +209,10 @@ const Transaction = ({
 			</Content>
 			{isEditing ? (
 				<div className={"grid grid-cols-[auto_1fr] gap-2 pt-3 px-3"}>
-					<Button size={"sm"} border={theme.colors.gradient.a} onClick={() => setIsEditing(false)}>
+					<Button size={"sm"} border={theme.colors.gradient.a} onClick={cancelChanges}>
 						<Cross2Icon /> Cancel
 					</Button>
-					<Button
-						size={"sm"}
-						background={theme.colors.gradient.a}
-						onClick={() => setIsEditing(false)}
-					>
+					<Button size={"sm"} background={theme.colors.gradient.a} onClick={saveTransaction}>
 						<CheckIcon /> Save changes
 					</Button>
 				</div>
@@ -188,38 +227,25 @@ const Transaction = ({
 					</Button>
 				</div>
 			)}
+			<SavedSuccessfulToast />
 		</>
 	);
 };
 
-const EditTransactionAmount = ({
-	newTransaction,
-	setNewTransaction,
-	groupUsers,
-	profile,
-	amountDivisor,
-}: any) => {
+const EditTransactionAmount = ({ transaction, groupUsers, profile }: any) => {
+	const newTransaction = tempStore((state) => state.newTransaction);
+	const setNewTransaction = tempStore.getState().setNewTransaction;
 	const [mode, setMode] = useState<any>(EDIT_TRANSACTION_AMOUNT_MODE.custom);
-	const [amountRatios, setAmountRatios] = useState<any>(
-		R.indexBy(
-			// @ts-ignore
-			R.prop("profile_id"),
-			R.map((x) => {
-				return {
-					amount: (newTransaction.amount * amountDivisor).toFixed(2),
-					profile_id: x.profile_id,
-				};
-			}, groupUsers),
-		),
-	);
+	const [amountRatios, setAmountRatios] = useState<any>(newTransaction.split_amounts);
 
 	useEffect(() => {
-		console.log(R.values(amountRatios));
 		const totalTransaction = R.values(amountRatios).reduce((prev, curr) => {
-			return Number(curr.amount) + prev;
+			return Number(curr) + prev;
 		}, 0);
 
-		setNewTransaction(R.assoc("amount", totalTransaction, newTransaction));
+		setNewTransaction(
+			R.assoc("split_amounts", amountRatios, R.assoc("amount", totalTransaction, newTransaction)),
+		);
 	}, [amountRatios]);
 
 	return (
@@ -297,15 +323,13 @@ const EditTransactionAmount = ({
 							<Input
 								id={`custom-amount-${user.profile_id}`}
 								type="number"
-								value={amountRatios[user.profile_id].amount.toLocaleString(undefined, {
+								value={amountRatios[user.profile_id].toLocaleString(undefined, {
 									minimumFractionDigits: 2,
 									maximumFractionDigits: 2,
 								})}
 								onChange={(e) => {
 									// @ts-ignore
-									setAmountRatios(
-										R.assocPath([user.profile_id, "amount"], e.target.value, amountRatios),
-									);
+									setAmountRatios(R.assocPath([user.profile_id], e.target.value, amountRatios));
 								}}
 							/>
 						</div>
@@ -340,42 +364,32 @@ const EditTransactionAmount = ({
 								<div className={"grid grid-cols-[auto_auto_auto] gap-1"}>
 									<div className={"font-mono font-medium tracking-tight"}>
 										$
-										{amountRatios[user.profile_id].amount.toLocaleString(undefined, {
+										{amountRatios[user.profile_id].toLocaleString(undefined, {
 											minimumFractionDigits: 2,
 											maximumFractionDigits: 2,
 										})}
 									</div>
 									<div className={"font-mono font-medium tracking-tight"}>/</div>
 									<div className={"font-mono font-medium tracking-tight text-gray-600"}>
-										%
-										{Math.round(
-											(amountRatios[user.profile_id].amount / newTransaction.amount) * 100,
-										)}
+										%{Math.round((amountRatios[user.profile_id] / newTransaction.amount) * 100)}
 									</div>
 								</div>
 							</div>
 							<Slider
 								onValueChange={(e: number[]) => {
 									// @ts-ignore
-									const amtRatios = R.map(
-										(x: any) =>
-											x.profile_id === user.profile_id
-												? { amount: newTransaction.amount * e[0] * 0.01, profile_id: x.profile_id }
-												: {
-														amount:
-															(newTransaction.amount * (100 - e[0]) * 0.01) /
-															(groupUsers.length - 1),
-														profile_id: x.profile_id,
-												  },
-										amountRatios,
-									);
+									const amtRatios = R.clone(amountRatios);
+									R.forEachObjIndexed((x, key, obj: any) => {
+										if (key === user.profile_id) obj[key] = newTransaction.amount * e[0] * 0.01;
+										else
+											obj[key] =
+												(newTransaction.amount * (100 - e[0]) * 0.01) / (groupUsers.length - 1);
+									}, amtRatios);
 
 									// @ts-ignore
 									setAmountRatios(amtRatios);
 								}}
-								value={[
-									Math.round((amountRatios[user.profile_id].amount / newTransaction.amount) * 100),
-								]}
+								value={[Math.round((amountRatios[user.profile_id] / newTransaction.amount) * 100)]}
 							/>
 						</div>
 					))}
@@ -383,6 +397,13 @@ const EditTransactionAmount = ({
 			)}
 		</FormBox>
 	);
+};
+
+const SavedSuccessfulToast = () => {
+	const showToast = uiStore((state) => state.showToast);
+	const setShowToast = uiStore.getState().setShowToast;
+
+	return <Toast open={showToast} setOpen={setShowToast} title={"Transaction saved"} />;
 };
 
 export async function getServerSideProps({
