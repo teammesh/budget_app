@@ -102,12 +102,12 @@ interface UIStoreState {
 	setShowPayments: (x: boolean) => void;
 	showManage: boolean;
 	setShowManage: (x: boolean) => void;
-	isToolbarShown: any;
-	setIsToolbarShown: (x: any) => void;
 	groupFeedMode: any;
 	setGroupFeedMode: (x: any) => void;
 	groupFilterbyUser: any;
 	setGroupFilterbyUser: (x: any) => void;
+	showSessionExpired: boolean;
+	setShowSessionExpired: (x: boolean) => void;
 }
 
 export const uiStore = create<UIStoreState>((set, get) => ({
@@ -115,8 +115,6 @@ export const uiStore = create<UIStoreState>((set, get) => ({
 	setShowNavbar: (x) => set(() => ({ showNavbar: x })),
 	globalLoading: false,
 	setGlobalLoading: (x) => set(() => ({ globalLoading: x })),
-	isToolbarShown: null,
-	setIsToolbarShown: (x) => set(() => ({ isToolbarShown: x })),
 	showAddTransactions: false,
 	setShowAddTransactions: (x) => set(() => ({ showAddTransactions: x })),
 	showPayments: false,
@@ -127,4 +125,6 @@ export const uiStore = create<UIStoreState>((set, get) => ({
 	setGroupFeedMode: (x) => set(() => ({ groupFeedMode: x })),
 	groupFilterbyUser: null,
 	setGroupFilterbyUser: (x) => set(() => ({ groupFilterbyUser: x })),
+	showSessionExpired: false,
+	setShowSessionExpired: (x) => set(() => ({ showSessionExpired: x })),
 }));

@@ -11,7 +11,6 @@ import { Content } from "@/components/Main";
 export default function Login({ user }: { user: AuthUser }) {
 	const router = useRouter();
 	const setSession = sessionStore.getState().setSession;
-	const [showSessionExpired, setShowSessionExpired] = useState(false);
 
 	useEffect(() => {
 		uiStore.getState().setShowNavbar(false);
@@ -42,7 +41,7 @@ export default function Login({ user }: { user: AuthUser }) {
 
 	const signOut = async () => {
 		if (!sessionStore.getState().session) return;
-		setShowSessionExpired(true);
+		uiStore.getState().setShowSessionExpired(true);
 		await supabase.auth.api.signOut(sessionStore.getState().session.access_token);
 		await supabase.auth.signOut();
 	};
@@ -50,16 +49,16 @@ export default function Login({ user }: { user: AuthUser }) {
 	return (
 		<Content>
 			{/*<button onClick={() => setShowSessionExpired(true)}>test</button>*/}
-			<SessionExpiredToast
-				showSessionExpired={showSessionExpired}
-				setShowSessionExpired={setShowSessionExpired}
-			/>
+			<SessionExpiredToast />
 			<Auth supabaseClient={supabase} />
 		</Content>
 	);
 }
 
-const SessionExpiredToast = ({ showSessionExpired, setShowSessionExpired }: any) => {
+const SessionExpiredToast = () => {
+	const showSessionExpired = uiStore((state) => state.showSessionExpired);
+	const setShowSessionExpired = uiStore.getState().setShowSessionExpired;
+
 	return (
 		<Toast
 			open={showSessionExpired}
