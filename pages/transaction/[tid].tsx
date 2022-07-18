@@ -25,7 +25,6 @@ import { AuthUser } from "@supabase/supabase-js";
 import { FormBox, PrimaryBox } from "@/components/boxes";
 import { Separator } from "@/components/Separator";
 import * as R from "ramda";
-import Image from "next/image";
 import { motion } from "framer-motion";
 import { defaultAnimations } from "@/utils/animation";
 import { EDIT_TRANSACTION_AMOUNT_MODE } from "@/constants/components.constants";

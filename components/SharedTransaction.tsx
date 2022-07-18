@@ -1,7 +1,7 @@
 import { forwardRef } from "react";
 import { definitions } from "../types/supabase";
 import { PrimaryBox } from "@/components/boxes";
-import { Avatar } from "./Avatar";
+import { Avatar } from "@/components/Avatar";
 
 export const SharedTransaction = forwardRef(
 	(

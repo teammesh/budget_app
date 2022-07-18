@@ -7,7 +7,7 @@ import { v4 } from "uuid";
 import { Button } from "./Button";
 import { ModalContent } from "./Modal";
 import * as Dialog from "@radix-ui/react-dialog";
-import { Avatar } from "./Avatar";
+import { Avatar } from "@/components/Avatar";
 import { isNil } from "ramda";
 import { Loading } from "./Loading";
 

@@ -1,7 +1,7 @@
 import { PrimaryBox } from "@/components/boxes";
 import { styled } from "@stitches/react";
 import { displayAmount } from "@/components/Amount";
-import { Avatar } from "./Avatar";
+import { Avatar } from "@/components/Avatar";
 
 const ProfilePictureCont = styled("div", {
 	height: "100%",

@@ -1,6 +1,6 @@
 import { definitions } from "types/supabase";
 import { displayAmount } from "./Amount";
-import Avatar from "boring-avatars";
+import { Avatar } from "@/components/Avatar";
 
 export const PaymentDetail = ({
 	profile_id,
