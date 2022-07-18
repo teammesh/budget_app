@@ -23,6 +23,7 @@
     "boring-avatars": "^1.7.0",
     "framer-motion": "^6.5.1",
     "jotai": "^1.7.3",
+    "luxon": "^3.0.1",
     "next": "12.2.0",
     "plaid": "^10.7.0",
     "postcss": "^8.4.14",
@@ -37,6 +38,7 @@
     "zustand": "^4.0.0-rc.1"
   },
   "devDependencies": {
+    "@types/luxon": "^2.3.2",
     "@types/node": "18.0.1",
     "@types/ramda": "^0.28.14",
     "@types/react": "18.0.14",

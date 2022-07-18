@@ -5,6 +5,7 @@ import {
 	ActivitySharedIcon,
 } from "@/components/icons";
 import { PrimaryBox } from "@/components/boxes";
+import { DateTime } from "luxon";
 
 export const Activity = ({ activity }: { activity: any }) => {
 	const username = activity.user.username;
@@ -71,13 +72,22 @@ export const Activity = ({ activity }: { activity: any }) => {
 		},
 	};
 
+	const calculateAgo = ( timeAgo: string) => {
+		const now = DateTime.now();
+		const duration = now.diff(DateTime.fromISO(timeAgo), ["years", "months", "days", "hours", "seconds"]);
+
+		return now.minus(duration).toRelative();
+	};
+
 	return (
 		<PrimaryBox key={activity.id}>
 			<div className={"grid grid-cols-[auto_1fr_auto] gap-4"}>
 				{iconMap[activity.table_name][activity.type]}
 				<div className={"grid grid-cols-1"}>
 					<p className={"text-sm"}>{descriptionMap[activity.table_name][activity.type]}</p>
-					<p className={"text-sm text-gray-600 font-mono tracking-tighter"}>4 hours ago</p>
+					<p className={"text-sm text-gray-600 font-mono tracking-tighter"}>
+						{calculateAgo(activity.created_at)}
+					</p>
 				</div>
 			</div>
 		</PrimaryBox>
