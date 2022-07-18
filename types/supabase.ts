@@ -661,6 +661,7 @@ export interface paths {
           account_id?: parameters["rowFilter.shared_transactions.account_id"];
           location?: parameters["rowFilter.shared_transactions.location"];
           id?: parameters["rowFilter.shared_transactions.id"];
+          split_amounts?: parameters["rowFilter.shared_transactions.split_amounts"];
           /** Filtering Columns */
           select?: parameters["select"];
           /** Ordering */
@@ -729,6 +730,7 @@ export interface paths {
           account_id?: parameters["rowFilter.shared_transactions.account_id"];
           location?: parameters["rowFilter.shared_transactions.location"];
           id?: parameters["rowFilter.shared_transactions.id"];
+          split_amounts?: parameters["rowFilter.shared_transactions.split_amounts"];
         };
         header: {
           /** Preference */
@@ -761,6 +763,7 @@ export interface paths {
           account_id?: parameters["rowFilter.shared_transactions.account_id"];
           location?: parameters["rowFilter.shared_transactions.location"];
           id?: parameters["rowFilter.shared_transactions.id"];
+          split_amounts?: parameters["rowFilter.shared_transactions.split_amounts"];
         };
         body: {
           /** shared_transactions */
@@ -1224,6 +1227,8 @@ export interface definitions {
      * @default extensions.uuid_generate_v4()
      */
     id: string;
+    /** Format: jsonb */
+    split_amounts?: unknown;
   };
   profiles: {
     /**
@@ -1408,6 +1413,8 @@ export interface parameters {
   "rowFilter.shared_transactions.location": string;
   /** Format: uuid */
   "rowFilter.shared_transactions.id": string;
+  /** Format: jsonb */
+  "rowFilter.shared_transactions.split_amounts": string;
   /** @description profiles */
   "body.profiles": definitions["profiles"];
   /** Format: uuid */
