@@ -1193,7 +1193,7 @@ export interface definitions {
      */
     charged_to?: string;
     /** Format: double precision */
-    amount?: number;
+    amount: number;
     /** Format: character varying */
     authorized_date?: string;
     /** Format: ARRAY */

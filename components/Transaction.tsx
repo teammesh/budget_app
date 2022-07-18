@@ -1,10 +1,10 @@
 import { CheckCircle } from "./CheckCircle";
 import * as Avatar from "@radix-ui/react-avatar";
-import { Transaction as TransactionType } from "plaid";
 import { tempStore } from "@/utils/store";
 import { pick } from "ramda";
 import { supabase } from "@/utils/supabaseClient";
 import { displayAmount } from "./Amount";
+import { definitions } from "../types/supabase";
 
 const TRANSACTION_METADATA = [
 	"account_id",
@@ -23,7 +23,15 @@ const TRANSACTION_METADATA = [
 	"transaction_type",
 ];
 
-export const Transaction = ({ transaction, gid }: { transaction: TransactionType; gid: any }) => {
+export const Transaction = ({
+	transaction,
+	gid,
+	groupUsers,
+}: {
+	transaction: definitions["shared_transactions"];
+	gid: any;
+	groupUsers: any;
+}) => {
 	const sharedTransactions = tempStore((state) => state.sharedTransactions);
 	const addTransactions = tempStore((state) => state.addTransactions);
 
@@ -32,7 +40,7 @@ export const Transaction = ({ transaction, gid }: { transaction: TransactionType
 	const profile_id = supabase.auth.session()?.user?.id;
 
 	const shareTransaction = async (
-		transaction: TransactionType,
+		transaction: definitions["shared_transactions"],
 		isShared: boolean,
 		isAdded: boolean,
 	) => {
@@ -47,9 +55,18 @@ export const Transaction = ({ transaction, gid }: { transaction: TransactionType
 			);
 
 		const metadata = pick(TRANSACTION_METADATA, transaction);
-		const req = { ...metadata, group_id: gid, charged_to: profile_id };
+		const splitAmountDivisor = 1 / groupUsers.length;
+		const split_amounts = groupUsers.map((x: any) => {
+			return { [x.profile_id]: transaction.amount * splitAmountDivisor };
+		});
+		const newTransaction: definitions["shared_transactions"] = {
+			...metadata,
+			group_id: gid,
+			charged_to: profile_id,
+			split_amounts,
+		};
 
-		return setAddTransactions([...addTransactions, req]);
+		return setAddTransactions([...addTransactions, newTransaction]);
 	};
 
 	return (

@@ -6,9 +6,10 @@ export const formatter = new Intl.NumberFormat("en-US", {
 	currency: "USD",
 });
 
-export const displayAmount = (amount: number | bigint) => (
-	<TextGradient gradient={amount >= 0 ? theme.colors.gradient.f : theme.colors.gradient.b}>
-		{amount > 0 ? "+" : null}
-		{formatter.format(amount)}
-	</TextGradient>
-);
+export const displayAmount = (amount: number | bigint | undefined) =>
+	amount ? (
+		<TextGradient gradient={amount >= 0 ? theme.colors.gradient.f : theme.colors.gradient.b}>
+			{amount > 0 ? "+" : null}
+			{formatter.format(amount)}
+		</TextGradient>
+	) : null;

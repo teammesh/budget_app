@@ -1,5 +1,5 @@
 import { useRouter } from "next/router";
-import { createRef, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { supabase, supabaseQuery } from "@/utils/supabaseClient";
 import AddTransactions from "@/components/AddTransactions";
 import * as R from "ramda";
@@ -195,7 +195,11 @@ const Group = ({
 			{showPayments && <Payments gid={gid} setShowPayments={setShowPayments} balances={balances} />}
 			{showManage && <Manage gid={gid} setShowManage={setShowManage} />}
 			{showAddTransactions && (
-				<AddTransactions gid={gid} setShowAddTransactions={setShowAddTransactions} />
+				<AddTransactions
+					gid={gid}
+					setShowAddTransactions={setShowAddTransactions}
+					groupUsers={groupUsers}
+				/>
 			)}
 		</>
 	);

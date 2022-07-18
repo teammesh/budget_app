@@ -19,13 +19,16 @@ import * as Dialog from "@radix-ui/react-dialog";
 import { ModalContent } from "./Modal";
 import { displayAmount } from "./Amount";
 import { Content } from "@/components/Main";
+import { definitions } from "../types/supabase";
 
 export default function AddTransactions({
 	gid,
 	setShowAddTransactions,
+	groupUsers,
 }: {
 	gid: string;
 	setShowAddTransactions: any;
+	groupUsers: any;
 }) {
 	const profile_id = supabase.auth.session()?.user?.id;
 	const [showAccounts, setShowAccounts] = useState<any>([]);
@@ -278,8 +281,13 @@ export default function AddTransactions({
 					</Header>
 					<div className={"grid grid-cols-1 gap-2"}>
 						{!R.isEmpty(transactions) &&
-							transactions.map((x: TransactionType) => (
-								<Transaction gid={gid} transaction={x} key={x.transaction_id} />
+							transactions.map((x: definitions["shared_transactions"]) => (
+								<Transaction
+									gid={gid}
+									transaction={x}
+									key={x.transaction_id}
+									groupUsers={groupUsers}
+								/>
 							))}
 					</div>
 				</div>
