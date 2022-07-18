@@ -15,8 +15,6 @@ import { SharedTransaction } from "@/components/SharedTransaction";
 import { verifyUser } from "@/utils/ssr";
 import { RequestData } from "next/dist/server/web/types";
 import { Params } from "next/dist/shared/lib/router/utils/route-matcher";
-import * as Avatar from "@radix-ui/react-avatar";
-import DefaultAvatar from "boring-avatars";
 import { useEffect, useState } from "react";
 import { Field } from "@/components/Field";
 import { Label } from "@/components/Label";
@@ -36,6 +34,7 @@ import { NextApiResponse } from "next";
 import { tempStore } from "@/utils/store";
 import create from "zustand";
 import Toast from "@/components/Toast";
+import { Avatar } from "@/components/Avatar";
 
 interface UIStoreState {
 	showToast: boolean;
@@ -174,23 +173,7 @@ const Transaction = ({
 									key={user.profile_id}
 									className={"grid grid-cols-[auto_1fr_auto] items-center text-sm gap-3"}
 								>
-									<Avatar.Root>
-										{user.profiles.avatar_url ? (
-											<Image
-												src={user.profiles.avatar_url}
-												className={"w-6 h-6 rounded-full"}
-												height={24}
-												width={24}
-											/>
-										) : (
-											<DefaultAvatar
-												size={24}
-												name={user.profiles.username}
-												variant="beam"
-												colors={theme.colors.avatar}
-											/>
-										)}
-									</Avatar.Root>
+									<Avatar avatarUrl={user.profiles.avatar_url} avatarName={user.profiles.username} size={24} />
 									<div>
 										{user.profiles.username} {user.profile_id === profile.id && " (you)"}
 									</div>
@@ -301,23 +284,7 @@ const EditTransactionAmount = ({ transaction, groupUsers, profile }: any) => {
 							key={user.profile_id}
 							className={"grid grid-cols-[auto_1fr_80px] items-center text-sm gap-3"}
 						>
-							<Avatar.Root>
-								{user.profiles.avatar_url ? (
-									<Image
-										src={user.profiles.avatar_url}
-										className={"w-6 h-6 rounded-full"}
-										height={24}
-										width={24}
-									/>
-								) : (
-									<DefaultAvatar
-										size={24}
-										name={user.profiles.username}
-										variant="beam"
-										colors={theme.colors.avatar}
-									/>
-								)}
-							</Avatar.Root>
+							<Avatar avatarUrl={user.profiles.avatar_url} avatarName={user.profiles.username} size={24} />
 							<div>
 								{user.profiles.username} {user.profile_id === profile.id && " (you)"}
 							</div>
@@ -343,23 +310,7 @@ const EditTransactionAmount = ({ transaction, groupUsers, profile }: any) => {
 					{groupUsers.map((user: any) => (
 						<div className={"grid grid-cols-1 gap-2"} key={user.profile_id}>
 							<div className={"grid grid-cols-[auto_1fr_auto] items-center text-sm gap-3"}>
-								<Avatar.Root>
-									{user.profiles.avatar_url ? (
-										<Image
-											src={user.profiles.avatar_url}
-											className={"w-6 h-6 rounded-full"}
-											height={24}
-											width={24}
-										/>
-									) : (
-										<DefaultAvatar
-											size={24}
-											name={user.profiles.username}
-											variant="beam"
-											colors={theme.colors.avatar}
-										/>
-									)}
-								</Avatar.Root>
+								<Avatar avatarUrl={user.profiles.avatar_url} avatarName={user.profiles.username} size={24} />
 								<div>
 									{user.profiles.username} {user.profile_id === profile.id && " (you)"}
 								</div>

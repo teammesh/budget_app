@@ -1,10 +1,7 @@
-import theme from "@/styles/theme";
-import Image from "next/image";
-import DefaultAvatar from "boring-avatars";
-import { TextGradient } from "./text";
 import { PrimaryBox } from "@/components/boxes";
 import { styled } from "@stitches/react";
 import { displayAmount } from "@/components/Amount";
+import { Avatar } from "./Avatar";
 
 const ProfilePictureCont = styled("div", {
 	height: "100%",
@@ -30,39 +27,9 @@ export const PaymentActivity = ({ payment }: { payment: any }) => {
 	return (
 		<PrimaryBox>
 			<div className={"grid grid-cols-[48px_1fr] gap-4 items-center"}>
-				<ProfilePictureCont>
-					{from_user.avatar_url ? (
-						<Image
-							src={from_user.avatar_url}
-							className={"w-8 h-8 rounded-full"}
-							height={32}
-							width={32}
-							alt={"from user avatar"}
-						/>
-					) : (
-						<DefaultAvatar
-							size={32}
-							name={from_user.username}
-							variant="beam"
-							colors={theme.colors.avatar}
-						/>
-					)}
-					{to_user.avatar_url ? (
-						<Image
-							src={to_user.avatar_url}
-							className={"w-8 h-8 rounded-full"}
-							height={32}
-							width={32}
-							alt={"to user avatar"}
-						/>
-					) : (
-						<DefaultAvatar
-							size={32}
-							name={to_user.username}
-							variant="beam"
-							colors={theme.colors.avatar}
-						/>
-					)}
+				<ProfilePictureCont>	
+					<Avatar avatarUrl={from_user.avatar_url} avatarName={from_user.username} />
+					<Avatar avatarUrl={to_user.avatar_url} avatarName={to_user.username} />
 				</ProfilePictureCont>
 				<div className="text-sm leading-none grid-cols-1 grid gap-1">
 					<div>

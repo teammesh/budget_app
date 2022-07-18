@@ -1,9 +1,6 @@
-import theme from "@/styles/theme";
-import Image from "next/image";
-import DefaultAvatar from "boring-avatars";
-import { TextGradient } from "./text";
 import { definitions } from "types/supabase";
 import { displayAmount } from "./Amount";
+import Avatar from "boring-avatars";
 
 export const PaymentDetail = ({
 	profile_id,
@@ -24,22 +21,7 @@ export const PaymentDetail = ({
 	return (
 		<div className="grid grid-cols-[auto_1fr_auto] items-center">
 			<div className={"flex items-center justify-center"}>
-				{from_user.avatar_url ? (
-					<Image
-						src={from_user.avatar_url}
-						className={"w-12 h-12 rounded-full"}
-						height={48}
-						width={48}
-						alt={"from user avatar"}
-					/>
-				) : (
-					<DefaultAvatar
-						size={48}
-						name={from_user.username}
-						variant="beam"
-						colors={theme.colors.avatar}
-					/>
-				)}
+				<Avatar avatarUrl={from_user.avatar_url} avatarName={from_user.username} size={48} />
 			</div>
 			<div className="text-sm text-center">
 				{from_user.id === profile_id ? (
@@ -55,22 +37,7 @@ export const PaymentDetail = ({
 				</div>
 			</div>
 			<div className={"flex items-center justify-center"}>
-				{to_user.avatar_url ? (
-					<Image
-						src={to_user.avatar_url}
-						className={"w-12 h-12 rounded-full"}
-						height={48}
-						width={48}
-						alt={"to user avatar"}
-					/>
-				) : (
-					<DefaultAvatar
-						size={48}
-						name={to_user.username}
-						variant="beam"
-						colors={theme.colors.avatar}
-					/>
-				)}
+				<Avatar avatarUrl={to_user.avatar_url} avatarName={to_user.username} size={48} />
 			</div>
 		</div>
 	);

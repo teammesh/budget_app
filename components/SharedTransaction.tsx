@@ -1,9 +1,7 @@
-import theme from "@/styles/theme";
-import DefaultAvatar from "boring-avatars";
 import { forwardRef } from "react";
 import { definitions } from "../types/supabase";
-import Image from "next/image";
 import { PrimaryBox } from "@/components/boxes";
+import { Avatar } from "./Avatar";
 
 export const SharedTransaction = forwardRef(
 	(
@@ -23,22 +21,7 @@ export const SharedTransaction = forwardRef(
 					<div className={"grid grid-cols-[auto_auto] gap-2 items-center"}>
 						<div className={"flex items-center justify-center"}>
 							<div className={"flex items-center justify-center"}>
-								{transaction.profiles.avatar_url ? (
-									<Image
-										src={transaction.profiles.avatar_url}
-										className={"w-6 h-6 rounded-full"}
-										height={16}
-										width={16}
-										alt={"user avatar"}
-									/>
-								) : (
-									<DefaultAvatar
-										size={16}
-										name={transaction.profiles.username}
-										variant="beam"
-										colors={theme.colors.avatar}
-									/>
-								)}
+								<Avatar avatarUrl={transaction.profiles.avatar_url} avatarName={transaction.profiles.username} size={16} />
 							</div>
 						</div>
 						<div className={"font-medium"}>{transaction.merchant_name}</div>
