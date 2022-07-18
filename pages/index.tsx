@@ -17,6 +17,7 @@ import { definitions } from "../types/supabase";
 import { RequestData } from "next/dist/server/web/types";
 import { Content } from "@/components/Main";
 import { NextApiResponse } from "next";
+import { fetcher } from "@/utils/helper";
 
 export default function Home({
 	user,
@@ -41,6 +42,13 @@ export default function Home({
 	}, 0);
 
 	useEffect(() => {
+		// fetch("/api/createUser", {
+		// 	method: "POST",
+		// 	headers: new Headers({ "Content-Type": "application/json" }),
+		// 	credentials: "same-origin",
+		// 	body: JSON.stringify({ email: "test@mail.com" }),
+		// }).then((res) => res.json());
+
 		if (profile_id) {
 			supabase
 				.from(`profiles_groups:profile_id=eq.${supabase.auth.session()?.user?.id}`)

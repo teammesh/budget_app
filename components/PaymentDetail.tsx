@@ -3,6 +3,7 @@ import Image from "next/image";
 import DefaultAvatar from "boring-avatars";
 import { TextGradient } from "./text";
 import { definitions } from "types/supabase";
+import { displayAmount } from "./Amount";
 
 export const PaymentDetail = ({
 	profile_id,
@@ -50,7 +51,7 @@ export const PaymentDetail = ({
 				)}{" "}
 				{to_user.username}
 				<div className={"text-sm font-mono font-medium tracking-tight"}>
-					<TextGradient gradient={theme.colors.gradient.f}>${Math.abs(amount)}</TextGradient>
+					{displayAmount(amount)}
 				</div>
 			</div>
 			<div className={"flex items-center justify-center"}>

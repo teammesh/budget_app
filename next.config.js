@@ -8,7 +8,6 @@ const nextConfig = {
 		images: {
 			allowFutureImage: true,
 		},
-		scrollRestoration: true,
 	},
 };
 

@@ -4,6 +4,7 @@ import DefaultAvatar from "boring-avatars";
 import { TextGradient } from "./text";
 import { PrimaryBox } from "@/components/boxes";
 import { styled } from "@stitches/react";
+import { displayAmount } from "@/components/Amount";
 
 const ProfilePictureCont = styled("div", {
 	height: "100%",
@@ -68,9 +69,7 @@ export const PaymentActivity = ({ payment }: { payment: any }) => {
 						<b>{from_user.username}</b> paid <b>{to_user.username}</b>
 					</div>
 					<div className={"flex justify-between"}>
-						<div className={"font-mono font-medium tracking-tight"}>
-							<TextGradient gradient={theme.colors.gradient.f}>${Math.abs(amount)}</TextGradient>
-						</div>
+						<div className={"font-mono font-medium tracking-tight"}>{displayAmount(amount)}</div>
 						<div className={"font-mono font-medium tracking-tight text-gray-600"}>{date}</div>
 					</div>
 				</div>

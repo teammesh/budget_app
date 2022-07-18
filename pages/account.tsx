@@ -14,6 +14,7 @@ import { Label } from "@/components/Label";
 import { Content } from "@/components/Main";
 import { NextApiResponse } from "next";
 import { ProfileAvatarUpload } from "@/components/ProfileAvatarUpload";
+import { useEffect } from "react";
 
 export default function Account({
 	user,
@@ -23,13 +24,14 @@ export default function Account({
 	profile: definitions["profiles"];
 }) {
 	const router = useRouter();
-	tempStore.getState().setUsername(profile.username ? profile.username : "");
-	tempStore.getState().setWebsite(profile.website ? profile.website : "");
-	tempStore.getState().setAvatarUrl(profile.avatar_url ? profile.avatar_url : "");
-
 	const profile_id = supabase.auth.session()?.user?.id;
 	const avatar_url = tempStore((state) => state.avatarUrl);
-	const username = tempStore((state) => state.username);
+
+	useEffect(() => {
+		tempStore.getState().setUsername(profile.username ? profile.username : "");
+		tempStore.getState().setWebsite(profile.website ? profile.website : "");
+		tempStore.getState().setAvatarUrl(profile.avatar_url ? profile.avatar_url : "");
+	}, []);
 
 	async function updateProfile() {
 		const username = tempStore.getState().username;
@@ -84,7 +86,11 @@ export default function Account({
 				</Button>
 			</div>
 			<div className="grid grid-cols-1 gap-4 pt-4">
-				<ProfileAvatarUpload avatarUrl={avatar_url} avatarName={username} profileId={profile_id} />
+				<ProfileAvatarUpload
+					avatarUrl={avatar_url}
+					avatarName={tempStore.getState().username}
+					profileId={profile_id}
+				/>
 				<Field>
 					<Label htmlFor="email">Email</Label>
 					<Input id="email" type="text" value={user.email} disabled />

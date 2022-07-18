@@ -8,7 +8,7 @@ export const Avatar = ({
 	size = 32,
 	variant = "beam",
 }: {
-	avatarUrl: string;
+	avatarUrl: string | undefined;
 	avatarName: string;
 	size?: number;
 	variant?: AvatarProps["variant"];
