@@ -1,17 +1,17 @@
 import Image from "next/image";
-import DefaultAvatar from "boring-avatars";
+import DefaultAvatar, { AvatarProps } from "boring-avatars";
 import theme from "@/styles/theme";
 
 export const Avatar = ({
 	avatarUrl,
 	avatarName,
-    size = 32,
+	size = 32,
 	variant = "beam",
 }: {
 	avatarUrl: string;
 	avatarName: string;
-    size?: number;
-	variant?: string;
+	size?: number;
+	variant?: AvatarProps["variant"];
 }) => (
 	<>
 		{avatarUrl ? (

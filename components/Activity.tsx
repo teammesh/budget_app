@@ -19,7 +19,7 @@ export const Activity = ({ activity }: { activity: any }) => {
 	const username = activity.user.username;
 	const toUsername = activity.to_user?.username;
 	const [showMore, setShowMore] = useState(false);
-	const [data, setData] = useState();
+	const [data, setData] = useState<any>();
 
 	const tableNames = {
 		transactions: "shared_transactions",
@@ -90,9 +90,7 @@ export const Activity = ({ activity }: { activity: any }) => {
 	const MoreInfoComponent = () => {
 		if (data) {
 			if (activity.type === activityType.delete) {
-				return (
-					<div className="p-3">TODO add this back</div>
-				);
+				return <div className="p-3">TODO add this back</div>;
 			}
 			if (activity.table_name === tableNames.payments) {
 				return (
@@ -108,17 +106,15 @@ export const Activity = ({ activity }: { activity: any }) => {
 					<div className="pt-4">
 						<Separator />
 						<Link href={linkMap[activity.table_name]} key={activity.table_item_id} passHref>
-						<div className="pt-2">
-							<SharedTransaction transaction={data[0]} />
-						</div>
+							<div className="pt-2">
+								<SharedTransaction transaction={data[0]} />
+							</div>
 						</Link>
-					</div>	
+					</div>
 				);
 			}
 		}
-		return (
-			<Loading />
-		);
+		return <Loading />;
 	};
 
 	useEffect(() => {
