@@ -9,9 +9,8 @@ export const SharedTransaction = forwardRef(
 	(
 		{
 			transaction,
-			groupUsers,
 			...props
-		}: { transaction: definitions["shared_transactions"] | any; groupUsers: any; props?: any },
+		}: { transaction: definitions["shared_transactions"] | any; props?: any },
 		ref,
 	) => {
 		return (

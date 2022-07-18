@@ -149,7 +149,7 @@ const TransactionList = ({ groupUsers }: { groupUsers: any }) => {
 			{!isEmpty(filteredTransactions) &&
 				filteredTransactions.map((x) => (
 					<Link href={`/transaction/${encodeURIComponent(x.id)}`} key={x.id} passHref>
-						<SharedTransaction transaction={x} groupUsers={groupUsers} />
+						<SharedTransaction transaction={x} />
 					</Link>
 				))}
 		</div>

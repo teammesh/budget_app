@@ -6,10 +6,20 @@ import {
 } from "@/components/icons";
 import { PrimaryBox } from "@/components/boxes";
 import { DateTime } from "luxon";
+import Link from "next/link";
+import { Separator } from "./Separator";
+import { useState, useEffect } from "react";
+import { supabase } from "@/utils/supabaseClient";
+import { PaymentActivity } from "./PaymentActivity";
+import { F, isEmpty, isNil } from "ramda";
+import { SharedTransaction } from "./SharedTransaction";
+import { Loading } from "./Loading";
 
 export const Activity = ({ activity }: { activity: any }) => {
 	const username = activity.user.username;
 	const toUsername = activity.to_user?.username;
+	const [showMore, setShowMore] = useState(false);
+	const [data, setData] = useState();
 
 	const tableNames = {
 		transactions: "shared_transactions",
@@ -20,6 +30,11 @@ export const Activity = ({ activity }: { activity: any }) => {
 		insert: "INSERT",
 		update: "UPDATE",
 		delete: "DELETE",
+	};
+
+	const linkMap = {
+		[tableNames.transactions]: `/transaction/${encodeURIComponent(activity.table_item_id)}`,
+		[tableNames.payments]: "",
 	};
 
 	const iconMap = {
@@ -72,16 +87,79 @@ export const Activity = ({ activity }: { activity: any }) => {
 		},
 	};
 
-	const calculateAgo = ( timeAgo: string) => {
+	const MoreInfoComponent = () => {
+		if (data) {
+			if (activity.table_name === tableNames.payments) {
+				return (
+					<div className="pt-4">
+						<Separator />
+						<div className="pt-2">
+							<PaymentActivity payment={data[0]} />
+						</div>
+					</div>
+				);
+			} else if (activity.table_name === tableNames.transactions) {
+				return (
+					<div className="pt-4">
+						<Separator />
+						<Link href={linkMap[activity.table_name]} key={activity.table_item_id} passHref>
+						<div className="pt-2">
+							<SharedTransaction transaction={data[0]} />
+						</div>
+						</Link>
+					</div>	
+				);
+			}
+		}
+		return (
+			<Loading />
+		);
+	};
+
+	useEffect(() => {
+		const moreInfo = async () => {
+			console.log(data);
+			if (showMore && isNil(data)) {
+				if (activity.table_name === tableNames.payments) {
+					const { data, error } = await supabase
+						.from("payments")
+						.select("*, from_user:from_profile_id(*), to_user:to_profile_id(*)")
+						.eq("id", activity.table_item_id);
+					console.log(data);
+					setData(data);
+				} else if (activity.table_name === tableNames.transactions) {
+					const { data, error } = await supabase
+						.from("shared_transactions")
+						.select("*, profiles(username, avatar_url)")
+						.eq("id", activity.table_item_id);
+					console.log(data);
+					console.log(error);
+					setData(data);
+				}
+			}
+		};
+		moreInfo();
+	}, [showMore]);
+
+	const calculateAgo = (timeAgo: string) => {
 		const now = DateTime.now();
-		const duration = now.diff(DateTime.fromISO(timeAgo), ["years", "months", "days", "hours", "seconds"]);
+		const duration = now.diff(DateTime.fromISO(timeAgo), [
+			"years",
+			"months",
+			"days",
+			"hours",
+			"seconds",
+		]);
 
 		return now.minus(duration).toRelative();
 	};
 
 	return (
 		<PrimaryBox key={activity.id}>
-			<div className={"grid grid-cols-[auto_1fr_auto] gap-4"}>
+			<div
+				className={"grid grid-cols-[auto_1fr_auto] gap-4"}
+				onClick={() => setShowMore(!showMore)}
+			>
 				{iconMap[activity.table_name][activity.type]}
 				<div className={"grid grid-cols-1"}>
 					<p className={"text-sm"}>{descriptionMap[activity.table_name][activity.type]}</p>
@@ -90,6 +168,7 @@ export const Activity = ({ activity }: { activity: any }) => {
 					</p>
 				</div>
 			</div>
+			{showMore && <MoreInfoComponent />}
 		</PrimaryBox>
 	);
 };

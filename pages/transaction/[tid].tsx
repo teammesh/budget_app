@@ -78,7 +78,7 @@ const Transaction = ({
 						Delete
 					</Button>
 				</div>
-				<SharedTransaction transaction={transaction} groupUsers={groupUsers} />
+				<SharedTransaction transaction={transaction} />
 				{isEditing && (
 					<FormBox>
 						<Field>
