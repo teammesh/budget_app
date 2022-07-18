@@ -1,7 +1,7 @@
 import { CheckCircle } from "./CheckCircle";
 import * as Avatar from "@radix-ui/react-avatar";
 import { tempStore } from "@/utils/store";
-import { pick } from "ramda";
+import { assocPath, pick } from "ramda";
 import { supabase } from "@/utils/supabaseClient";
 import { displayAmount } from "./Amount";
 import { definitions } from "../types/supabase";
@@ -56,9 +56,15 @@ export const Transaction = ({
 
 		const metadata = pick(TRANSACTION_METADATA, transaction);
 		const splitAmountDivisor = 1 / groupUsers.length;
-		const split_amounts = groupUsers.map((x: any) => {
-			return { [x.profile_id]: transaction.amount * splitAmountDivisor };
+		let split_amounts = {};
+		groupUsers.map((x: any) => {
+			split_amounts = assocPath(
+				[x.profile_id],
+				transaction.amount * splitAmountDivisor,
+				split_amounts,
+			);
 		});
+
 		const newTransaction: definitions["shared_transactions"] = {
 			...metadata,
 			group_id: gid,
