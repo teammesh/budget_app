@@ -56,7 +56,7 @@ export default function Home({
 		};
 	}, []);
 
-	const handleCreateGroup = async (groupName: string, groupMembers: Array<string>) => {
+	const handleCreateGroup = async (groupName: string | undefined, groupMembers: Array<string>) => {
 		// Create group
 		const { data: groupsData, error } = await supabase.from("groups").insert([{ name: groupName }]);
 		if (!groupsData || groupsData.length === 0) return;
