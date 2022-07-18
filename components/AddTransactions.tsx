@@ -140,7 +140,10 @@ export default function AddTransactions({
 		// 	);
 		// }
 
-		setTransactionCursor({ [access_token]: data.next_cursor });
+		setTransactionCursor({
+			...sessionStore.getState().transactionCursor,
+			[access_token]: data.next_cursor,
+		});
 		setShowAccounts([...showAccounts, access_token]);
 		setTransactions(
 			R.reverse(
