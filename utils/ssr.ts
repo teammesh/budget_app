@@ -1,12 +1,21 @@
 import { supabase } from "@/utils/supabaseClient";
+import { NextApiResponse } from "next";
 
-export const verifyUser = async (req: any) => {
-	const { user } = await supabase.auth.api.getUserByCookie(req);
+export const verifyUser = async (req: any, res: NextApiResponse) => {
+	const { user, error: userError } = await supabase.auth.api.getUserByCookie(req, res);
 	const { data: profiles } = await supabase.from("profiles").select().eq("id", user?.id);
 
 	// If no user, redirect to index.
 	if (!user) {
-		return { props: {}, redirect: { destination: "/login", permanent: false } };
+		if (userError?.message === "Invalid Refresh Token")
+			return {
+				props: {},
+				redirect: { destination: "/login?session_expired=true", permanent: false },
+			};
+		return {
+			props: {},
+			redirect: { destination: "/login", permanent: false },
+		};
 	}
 
 	// If no profile, redirect to create account
@@ -18,5 +27,5 @@ export const verifyUser = async (req: any) => {
 	const profile = profiles && profiles.length > 0 && profiles[0];
 
 	// If there is a user, return it.
-	return { props: { user, profile } };
+	return { props: { user, profile, userError } };
 };

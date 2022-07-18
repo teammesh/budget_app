@@ -85,7 +85,10 @@ export default function AddTransactions({
 			}),
 		);
 
-		return () => setAddTransactions([]);
+		return () => {
+			setAddTransactions([]);
+			setTransactionCursor(null);
+		};
 	}, []);
 
 	const getTransactions = async (

@@ -32,6 +32,7 @@ import { motion } from "framer-motion";
 import { defaultAnimations } from "@/utils/animation";
 import { EDIT_TRANSACTION_AMOUNT_MODE } from "@/constants/components.constants";
 import { Content } from "@/components/Main";
+import { NextApiResponse } from "next";
 
 const Transaction = ({
 	user,
@@ -384,8 +385,16 @@ const EditTransactionAmount = ({
 	);
 };
 
-export async function getServerSideProps({ req, params }: { req: RequestData; params: Params }) {
-	const { props, redirect } = await verifyUser(req);
+export async function getServerSideProps({
+	req,
+	res,
+	params,
+}: {
+	req: RequestData;
+	res: NextApiResponse;
+	params: Params;
+}) {
+	const { props, redirect } = await verifyUser(req, res);
 	const { tid } = params;
 
 	const { data } = await supabase

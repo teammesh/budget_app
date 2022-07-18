@@ -5,10 +5,6 @@ import { GROUP_FEED_MODE } from "@/constants/components.constants";
 interface SessionStoreState {
 	session: any;
 	setSession: (x: any) => void;
-	profile: any;
-	setProfile: (x: any) => void;
-	transactions: any;
-	setTransactions: (x: any) => void;
 	transactionCursor: Record<string, unknown>;
 	setTransactionCursor: (x: any) => void;
 	accounts: Record<any, any>;
@@ -21,10 +17,6 @@ export const sessionStore = create<SessionStoreState>(
 		(set, get) => ({
 			session: null,
 			setSession: (x) => set(() => ({ session: x })),
-			profile: {},
-			setProfile: (x) => set(() => ({ profile: x })),
-			transactions: [],
-			setTransactions: (x) => set(() => ({ transactions: x })),
 			transactionCursor: {},
 			setTransactionCursor: (x) => set(() => ({ transactionCursor: x })),
 			accounts: {},

@@ -18,6 +18,7 @@ import * as Dialog from "@radix-ui/react-dialog";
 import { ModalContent } from "@/components/Modal";
 import { v4 } from "uuid";
 import { Content } from "@/components/Main";
+import { NextApiResponse } from "next";
 
 export default function Account({
 	user,
@@ -260,6 +261,6 @@ const WebsiteInput = () => {
 	);
 };
 
-export async function getServerSideProps({ req }: { req: RequestData }) {
-	return verifyUser(req);
+export async function getServerSideProps({ req, res }: { req: RequestData; res: NextApiResponse }) {
+	return verifyUser(req, res);
 }

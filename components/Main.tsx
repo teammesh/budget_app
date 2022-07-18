@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { supabase } from "@/utils/supabaseClient";
 import { useRouter } from "next/router";
 import { motion } from "framer-motion";
+import { sessionStore } from "@/utils/store";
 
 export const Main = ({ children }: { children: any }) => {
 	const router = useRouter();
@@ -15,6 +16,16 @@ export const Main = ({ children }: { children: any }) => {
 	useEffect(() => {
 		const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
 			if (event === "SIGNED_OUT") {
+				// remove cookies from SSR
+				fetch("/api/auth", {
+					method: "POST",
+					headers: new Headers({ "Content-Type": "application/json" }),
+					credentials: "same-origin",
+					body: JSON.stringify({ event, session }),
+				}).then((res) => res.json());
+
+				sessionStore.getState().setSession(null);
+				sessionStore.getState().setAccounts({});
 				localStorage.clear();
 				sessionStorage.clear();
 				return router.push("/login");

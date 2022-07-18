@@ -16,6 +16,7 @@ import { AuthUser } from "@supabase/supabase-js";
 import { definitions } from "../types/supabase";
 import { RequestData } from "next/dist/server/web/types";
 import { Content } from "@/components/Main";
+import { NextApiResponse } from "next";
 
 export default function Home({
 	user,
@@ -98,52 +99,53 @@ export default function Home({
 		const [groupMembers, setGroupMembers] = useState<string[]>([]);
 
 		return (
-		<div className={"flex justify-end pt-3 px-3"}>
-			<Dialog.Root>
-				<Dialog.Trigger asChild>
-					<Button size={"sm"} background={theme.colors.gradient.a}>
-						<PlusIcon /> Create Group
-					</Button>
-				</Dialog.Trigger>
-				<ModalContent>
-					<div className={"grid grid-cols-1 gap-2 text-center"}>
-						<Dialog.Title className={"font-medium text-md"}>Create a group</Dialog.Title>
-						<Dialog.Description className={"text-sm text-gray-600"}>
-							Enter the name of your group and the usernames of those you'd like to invite.
-						</Dialog.Description>
-					</div>
-					<div className={"grid grid-cols-1 gap-2"}>
-						<Input 
-							key="group_name" 
-							placeholder="Group name" 
-							onChange={(e) => setGroupName(e.target.value)} />
-						<Input
-							key="group_members"
-							placeholder="Members"
-							onChange={(e) => setGroupMembers(e.target.value.split(","))}
-						/>
-					</div>
-					<div className={"grid grid-cols-1 gap-2"}>
-						<Dialog.Close asChild>
-							<Button size={"sm"} border={theme.colors.gradient.a}>
-								<ArrowLeftIcon />
-								Cancel
-							</Button>
-						</Dialog.Close>
-						<Dialog.Close asChild>
-							<Button
-								size={"sm"}
-								background={theme.colors.gradient.a}
-								onClick={() => handleCreateGroup(groupName, groupMembers)}
-							>
-								<LightningBoltIcon />
-								Create
-							</Button>
-						</Dialog.Close>
-					</div>
-				</ModalContent>
-			</Dialog.Root>
-		</div>
+			<div className={"flex justify-end pt-3 px-3"}>
+				<Dialog.Root>
+					<Dialog.Trigger asChild>
+						<Button size={"sm"} background={theme.colors.gradient.a}>
+							<PlusIcon /> Create Group
+						</Button>
+					</Dialog.Trigger>
+					<ModalContent>
+						<div className={"grid grid-cols-1 gap-2 text-center"}>
+							<Dialog.Title className={"font-medium text-md"}>Create a group</Dialog.Title>
+							<Dialog.Description className={"text-sm text-gray-600"}>
+								Enter the name of your group and the usernames of those you'd like to invite.
+							</Dialog.Description>
+						</div>
+						<div className={"grid grid-cols-1 gap-2"}>
+							<Input
+								key="group_name"
+								placeholder="Group name"
+								onChange={(e) => setGroupName(e.target.value)}
+							/>
+							<Input
+								key="group_members"
+								placeholder="Members"
+								onChange={(e) => setGroupMembers(e.target.value.split(","))}
+							/>
+						</div>
+						<div className={"grid grid-cols-1 gap-2"}>
+							<Dialog.Close asChild>
+								<Button size={"sm"} border={theme.colors.gradient.a}>
+									<ArrowLeftIcon />
+									Cancel
+								</Button>
+							</Dialog.Close>
+							<Dialog.Close asChild>
+								<Button
+									size={"sm"}
+									background={theme.colors.gradient.a}
+									onClick={() => handleCreateGroup(groupName, groupMembers)}
+								>
+									<LightningBoltIcon />
+									Create
+								</Button>
+							</Dialog.Close>
+						</div>
+					</ModalContent>
+				</Dialog.Root>
+			</div>
 		);
 	};
 
@@ -182,15 +184,15 @@ export default function Home({
 	);
 }
 
-export async function getServerSideProps({ req }: { req: RequestData }) {
-	const { props, redirect } = await verifyUser(req);
+export async function getServerSideProps({ req, res }: { req: RequestData; res: NextApiResponse }) {
+	const { props, redirect } = await verifyUser(req, res);
 	const groups = await findGroups(props.user?.id);
 
 	return { props: { ...props, groups }, redirect };
 }
 
 const findGroups = async (profile_id?: string) => {
-	if (!profile_id) return;
+	if (!profile_id) return null;
 
 	const { data } = await supabaseQuery(
 		() =>

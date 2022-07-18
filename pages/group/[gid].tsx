@@ -23,6 +23,7 @@ import { GroupFeed, GroupSummary } from "@/components/Group";
 import { Content } from "@/components/Main";
 import Payments from "@/components/Payments";
 import Manage from "@/components/Manage";
+import { NextApiResponse } from "next";
 
 const Group = ({
 	user,
@@ -200,8 +201,16 @@ const Group = ({
 	);
 };
 
-export async function getServerSideProps({ req, params }: { req: RequestData; params: Params }) {
-	const { props, redirect } = await verifyUser(req);
+export async function getServerSideProps({
+	req,
+	res,
+	params,
+}: {
+	req: RequestData;
+	res: NextApiResponse;
+	params: Params;
+}) {
+	const { props, redirect } = await verifyUser(req, res);
 	const { gid } = params;
 
 	const { data: transactions } = await supabase
