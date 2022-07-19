@@ -17,10 +17,10 @@ export const AvatarUpload = ({
 	avatarType,
 	typeId,
 }: {
-	avatarUrl: string;
-	avatarName: string;
-	avatarType: string;
-	typeId: string;
+	avatarUrl: string | any;
+	avatarName: string | any;
+	avatarType: string | any;
+	typeId: string | any;
 }) => {
 	const [avatarFile, setAvatarFile] = useState();
 	const [newAvatarURL, setNewAvatarURL] = useState(avatarUrl);

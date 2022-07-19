@@ -5,8 +5,8 @@ export const ProfileAvatarUpload = ({
 	avatarName,
 	profileId,
 }: {
-	avatarUrl: string;
-	avatarName: string;
+	avatarUrl: string | any;
+	avatarName: string | any;
 	profileId: string | any;
 }) => {
 	return (

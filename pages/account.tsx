@@ -24,8 +24,6 @@ export default function Account({
 	profile: definitions["profiles"];
 }) {
 	const router = useRouter();
-	const profile_id = supabase.auth.session()?.user?.id;
-	const avatar_url = tempStore((state) => state.avatarUrl);
 
 	useEffect(() => {
 		tempStore.getState().setUsername(profile.username ? profile.username : "");
@@ -87,9 +85,9 @@ export default function Account({
 			</div>
 			<div className="grid grid-cols-1 gap-4 pt-4">
 				<ProfileAvatarUpload
-					avatarUrl={avatar_url}
-					avatarName={tempStore.getState().username}
-					profileId={profile_id}
+					avatarUrl={profile.avatar_url}
+					avatarName={profile.username}
+					profileId={profile.id}
 				/>
 				<Field>
 					<Label htmlFor="email">Email</Label>
