@@ -110,7 +110,9 @@ export const GroupFeed = ({ groupUsers }: { groupUsers: any }) => {
 						{!isEmpty(activities) ? (
 							activities.map((activity) => <Activity activity={activity} key={activity.id} />)
 						) : (
-							<div className="grid grid-cols-[auto_1fr_auto] p-3">No activities</div>
+							<div className="flex justify-center py-20 font-mono text-gray-600">
+								No activity yet ☹️
+							</div>
 						)}
 					</div>
 				</SwiperSlide>
@@ -119,7 +121,9 @@ export const GroupFeed = ({ groupUsers }: { groupUsers: any }) => {
 						{!isEmpty(userPayments) ? (
 							userPayments.map((x) => <PaymentActivity payment={x} key={x.id} />)
 						) : (
-							<div className="grid grid-cols-[auto_1fr_auto] p-3">No payments</div>
+							<div className="flex justify-center py-20 font-mono text-gray-600">
+								No payments posted 😢
+							</div>
 						)}
 					</div>
 				</SwiperSlide>
@@ -144,7 +148,9 @@ const TransactionList = () => {
 					</Link>
 				))
 			) : (
-				<div className="grid grid-cols-[auto_1fr_auto] p-3">No transactions</div>
+				<div className="flex justify-center py-20 font-mono text-gray-600">
+					No transactions posted 😭
+				</div>
 			)}
 		</div>
 	);
