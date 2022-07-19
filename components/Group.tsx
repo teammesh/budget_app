@@ -107,18 +107,20 @@ export const GroupFeed = ({ groupUsers }: { groupUsers: any }) => {
 			>
 				<SwiperSlide className={"w-full min-h-8"}>
 					<div className={"grid grid-cols-1 gap-2"}>
-						{!isEmpty(activities) ?
-							activities.map((activity) => <Activity activity={activity} key={activity.id} /> )
-							: <div className="grid grid-cols-[auto_1fr_auto] p-3">No activities</div>
-						}
+						{!isEmpty(activities) ? (
+							activities.map((activity) => <Activity activity={activity} key={activity.id} />)
+						) : (
+							<div className="grid grid-cols-[auto_1fr_auto] p-3">No activities</div>
+						)}
 					</div>
 				</SwiperSlide>
 				<SwiperSlide className={"w-full min-h-8"}>
 					<div className={"grid grid-cols-1 gap-2"}>
-						{!isEmpty(userPayments) ?
+						{!isEmpty(userPayments) ? (
 							userPayments.map((x) => <PaymentActivity payment={x} key={x.id} />)
-							: <div className="grid grid-cols-[auto_1fr_auto] p-3">No payments</div>
-						}
+						) : (
+							<div className="grid grid-cols-[auto_1fr_auto] p-3">No payments</div>
+						)}
 					</div>
 				</SwiperSlide>
 				<SwiperSlide className={"w-full min-h-8"}>
@@ -185,7 +187,7 @@ export const GroupSummary = ({
 		>
 			<div className={"grid grid-cols-[auto_1fr_auto] gap-3 items-center"}>
 				<div>
-					<Avatar avatarUrl={groupAvatar} avatarName={groupName} />
+					<Avatar avatarUrl={groupAvatar} avatarName={groupName} variant={"marble"} />
 				</div>
 				<div className="block">
 					<div className="text-sm font-medium">{groupName}</div>
