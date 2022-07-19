@@ -31,7 +31,7 @@ export const PaymentDetail = ({
 						{from_user.username} {wordPlural}{" "}
 					</>
 				)}{" "}
-				{to_user.username}
+				{to_user.id === profile_id ? "you" : to_user.username}
 				<div className={"text-sm font-mono font-medium tracking-tight"}>
 					{displayAmount(amount)}
 				</div>
