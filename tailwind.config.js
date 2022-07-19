@@ -9,6 +9,9 @@ module.exports = {
 			minHeight: {
 				8: "24rem",
 			},
+			width: {
+				mobile: "100%",
+			},
 			colors: {
 				gray: {
 					600: "rgba(115, 115, 126, 1)",

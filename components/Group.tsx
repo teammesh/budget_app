@@ -105,7 +105,7 @@ export const GroupFeed = ({ groupUsers }: { groupUsers: any }) => {
 				}}
 				onSwiper={(swiper) => (swiperRef.current = swiper)}
 			>
-				<SwiperSlide className={"w-full min-h-8"}>
+				<SwiperSlide className={"w-full min-h-screen"}>
 					<div className={"grid grid-cols-1 gap-2"}>
 						{!isEmpty(activities) ? (
 							activities.map((activity) => <Activity activity={activity} key={activity.id} />)
@@ -114,7 +114,7 @@ export const GroupFeed = ({ groupUsers }: { groupUsers: any }) => {
 						)}
 					</div>
 				</SwiperSlide>
-				<SwiperSlide className={"w-full min-h-8"}>
+				<SwiperSlide className={"w-full min-h-screen"}>
 					<div className={"grid grid-cols-1 gap-2"}>
 						{!isEmpty(userPayments) ? (
 							userPayments.map((x) => <PaymentActivity payment={x} key={x.id} />)
@@ -123,7 +123,7 @@ export const GroupFeed = ({ groupUsers }: { groupUsers: any }) => {
 						)}
 					</div>
 				</SwiperSlide>
-				<SwiperSlide className={"w-full min-h-8"}>
+				<SwiperSlide className={"w-full min-h-screen"}>
 					<TransactionList />
 				</SwiperSlide>
 			</Swiper>
@@ -137,13 +137,15 @@ const TransactionList = () => {
 
 	return (
 		<div className={"grid grid-cols-1 gap-2"}>
-			{!isEmpty(filteredTransactions) ?
+			{!isEmpty(filteredTransactions) ? (
 				filteredTransactions.map((x) => (
 					<Link href={`/transaction/${encodeURIComponent(x.id)}`} key={x.id} passHref>
 						<SharedTransaction transaction={x} />
 					</Link>
 				))
-			: <div className="grid grid-cols-[auto_1fr_auto] p-3">No transactions</div>}
+			) : (
+				<div className="grid grid-cols-[auto_1fr_auto] p-3">No transactions</div>
+			)}
 		</div>
 	);
 };
