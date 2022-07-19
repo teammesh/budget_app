@@ -34,8 +34,16 @@ export function plaidLink({ setIsLoading }: { setIsLoading: any }) {
 						}),
 					})
 						.then((res) => res.json())
-						.then(({ data, error }) => {
+						.then(async ({ data, error }) => {
 							if (error) return alert(error.message);
+							await fetch("/api/plaidCreateLinkToken", {
+								method: "post",
+								body: JSON.stringify({
+									profile_id: supabase.auth.session()?.user?.id,
+								}),
+							}).then((res) =>
+								res.json().then((token) => tempStore.getState().setLinkToken(token)),
+							);
 							return setAccounts(assocPath([access_token], data[0], accounts));
 						});
 				})
@@ -67,6 +75,12 @@ export function plaidLinkUpdate({
 		onSuccess: async (public_token, metadata) => {
 			setIsLoading(false);
 			setAccounts(dissocPath([access_token, "invalid"], accounts));
+			return await fetch("/api/plaidCreateLinkToken", {
+				method: "post",
+				body: JSON.stringify({
+					profile_id: supabase.auth.session()?.user?.id,
+				}),
+			}).then((res) => res.json().then((token) => tempStore.getState().setLinkToken(token)));
 		},
 		token: linkToken,
 	};
