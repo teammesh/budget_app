@@ -137,12 +137,13 @@ const TransactionList = () => {
 
 	return (
 		<div className={"grid grid-cols-1 gap-2"}>
-			{!isEmpty(filteredTransactions) &&
+			{!isEmpty(filteredTransactions) ?
 				filteredTransactions.map((x) => (
 					<Link href={`/transaction/${encodeURIComponent(x.id)}`} key={x.id} passHref>
 						<SharedTransaction transaction={x} />
 					</Link>
-				))}
+				))
+			: <div className="grid grid-cols-[auto_1fr_auto] p-3">No transactions</div>}
 		</div>
 	);
 };
