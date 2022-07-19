@@ -1,7 +1,6 @@
 import theme from "@/styles/theme";
 import { supabase } from "@/utils/supabaseClient";
 import { ArrowLeftIcon } from "@radix-ui/react-icons";
-import { useEffect } from "react";
 import { Button } from "./Button";
 import { tempStore } from "@/utils/store";
 import { Input } from "@/components/Input";
@@ -14,31 +13,18 @@ import { GroupAvatarUpload } from "./GroupAvatarUpload";
 export default function Manage({ gid, setShowManage }: { gid: string; setShowManage: any }) {
 	const router = useRouter();
 	const groupAvatar = tempStore((state) => state.groupAvatarUrl);
-	const groupName = tempStore.getState().groupName;
-	const groupMembers = tempStore.getState().groupMembers;
-
-	useEffect(() => {
-		supabase
-			.from("groups")
-			.select()
-			.eq("id", gid)
-			.then(({ data }) => {
-				tempStore.getState().setGroupName(data ? data[0].name : "");
-			});
-	}, [gid]);
+	const groupName = tempStore((state) => state.groupName);
 
 	async function updateGroup() {
 		// TODO need to account for removing members from the group?
-
 		try {
 			const updates = {
 				id: gid,
 				name: groupName,
-				// updated_at: new Date(),
 			};
 
 			const { error } = await supabase.from("groups").upsert(updates, {
-				returning: "minimal", // Don't return the value after inserting
+				returning: "minimal",
 			});
 
 			if (error) {
@@ -53,12 +39,9 @@ export default function Manage({ gid, setShowManage }: { gid: string; setShowMan
 
 	async function deleteGroup() {
 		try {
-			const { error } = await supabase.from("groups").upsert(
-				{ id: gid, is_deleted: true },
-				{
-					returning: "minimal", // Don't return the value after inserting
-				},
-			);
+			const { error } = await supabase
+				.from("groups")
+				.upsert({ id: gid, is_deleted: true }, { returning: "minimal" });
 
 			if (error) {
 				throw error;
@@ -113,7 +96,7 @@ export default function Manage({ gid, setShowManage }: { gid: string; setShowMan
 }
 
 const NameInput = () => {
-	const field = tempStore((state) => state.groupName);
+	const groupName = tempStore((state) => state.groupName);
 
 	return (
 		<Field>
@@ -121,7 +104,7 @@ const NameInput = () => {
 			<Input
 				id="groupName"
 				type="text"
-				value={field || ""}
+				value={groupName || ""}
 				onChange={(e) => tempStore.getState().setGroupName(e.target.value)}
 			/>
 		</Field>
@@ -129,7 +112,7 @@ const NameInput = () => {
 };
 
 const MembersInput = () => {
-	const field = tempStore((state) => state.groupMembers);
+	const groupMembers = tempStore((state) => state.groupMembers);
 
 	return (
 		<Field>
@@ -137,7 +120,7 @@ const MembersInput = () => {
 			<Input
 				id="groupMembers"
 				type="text"
-				value={field || ""}
+				value={groupMembers || ""}
 				onChange={(e) => tempStore.getState().setGroupMembers(e.target.value)}
 			/>
 		</Field>
