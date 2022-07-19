@@ -1,5 +1,5 @@
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { supabase, supabaseQuery } from "@/utils/supabaseClient";
 import AddTransactions from "@/components/AddTransactions";
 import * as R from "ramda";
@@ -9,7 +9,9 @@ import { Button } from "@/components/Button";
 import {
 	ArrowLeftIcon,
 	CheckCircledIcon,
+	IdCardIcon,
 	MixerHorizontalIcon,
+	Pencil2Icon,
 	PlusIcon,
 } from "@radix-ui/react-icons";
 import theme from "@/styles/theme";
@@ -24,6 +26,8 @@ import { Content } from "@/components/Main";
 import Payments from "@/components/Payments";
 import Manage from "@/components/Manage";
 import { NextApiResponse } from "next";
+import * as Dialog from "@radix-ui/react-dialog";
+import { ModalContent } from "@/components/Modal";
 
 const Group = ({
 	user,
@@ -183,13 +187,39 @@ const Group = ({
 						>
 							<CheckCircledIcon /> Pay
 						</Button>
-						<Button
-							size={"sm"}
-							background={theme.colors.gradient.a}
-							onClick={() => setShowAddTransactions(true)}
-						>
-							<PlusIcon /> Add transactions
-						</Button>
+						<Dialog.Root>
+							<Dialog.Trigger asChild>
+								<Button size={"sm"} background={theme.colors.gradient.a}>
+									<PlusIcon /> Add transactions
+								</Button>
+							</Dialog.Trigger>
+							<ModalContent>
+								<div className={"grid grid-cols-1 gap-2 text-center"}>
+									<Dialog.Title className={"font-medium text-md"}>Add transactions</Dialog.Title>
+									<Dialog.Description className={"text-sm text-gray-600"}>
+										How would you like to enter your transactions?
+									</Dialog.Description>
+								</div>
+								<div className={"grid grid-cols-1 gap-2"}>
+									<Dialog.Close asChild>
+										<Button size={"sm"} border={theme.colors.gradient.a}>
+											<Pencil2Icon />
+											Add transactions manually
+										</Button>
+									</Dialog.Close>
+									<Dialog.Close asChild>
+										<Button
+											size={"sm"}
+											background={theme.colors.gradient.a}
+											onClick={() => setShowAddTransactions(true)}
+										>
+											<IdCardIcon />
+											Import bank/card transactions
+										</Button>
+									</Dialog.Close>
+								</div>
+							</ModalContent>
+						</Dialog.Root>
 					</div>
 				</>
 			)}
