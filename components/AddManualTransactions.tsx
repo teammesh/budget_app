@@ -307,12 +307,9 @@ const TransactionAmount = ({ groupUsers, profile }: any) => {
 };
 
 const Toolbar = () => {
+	const newTransaction = tempStore((state) => state.newTransaction);
+
 	const submit = async () => {
-		const newTransaction = tempStore.getState().newTransaction;
-
-		console.log(newTransaction);
-
-		if (newTransaction && newTransaction.amount === 0) return;
 		uiStore.getState().setGlobalLoading(true);
 		const { data, error } = await supabaseQuery(
 			() => supabase.from("shared_transactions").insert(newTransaction),
@@ -325,8 +322,21 @@ const Toolbar = () => {
 	};
 
 	return (
-		<div className={"grid grid-cols-[auto_1fr] justify-center gap-8 pt-3 px-3"}>
-			<Button size={"sm"} background={theme.colors.gradient.a} onClick={() => submit()}>
+		<div className={"grid grid-cols-[1fr] justify-center gap-8 pt-3 px-3"}>
+			<Button
+				size={"sm"}
+				background={theme.colors.gradient.a}
+				disabled={
+					!(
+						newTransaction.amount &&
+						newTransaction.charged_to &&
+						newTransaction.name &&
+						newTransaction.date &&
+						newTransaction.merchant_name
+					)
+				}
+				onClick={submit}
+			>
 				<PlusIcon /> Submit transaction
 			</Button>
 		</div>

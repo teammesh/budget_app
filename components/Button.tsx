@@ -8,8 +8,8 @@ export const Button = forwardRef(
 			style,
 			background,
 			border,
-			onClick,
-			disabled,
+			onClick = () => {},
+			disabled = false,
 			...props
 		}: {
 			children: any;
@@ -36,9 +36,9 @@ export const Button = forwardRef(
 			}
 			// @ts-ignore
 			ref={ref}
-			onClick={() => {
-				if (disabled) return;
-				onClick();
+			onClick={(e) => {
+				if (disabled) return e;
+				onClick(e);
 			}}
 			{...props}
 		>
