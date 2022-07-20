@@ -203,7 +203,7 @@ const Group = ({
 							<ModalContent>
 								<div className={"grid grid-cols-1 gap-2 text-center"}>
 									<Dialog.Title className={"font-medium text-md"}>Add transactions</Dialog.Title>
-									<Dialog.Description className={"text-sm text-gray-600"}>
+									<Dialog.Description className={"text-sm text-gray-500"}>
 										How would you like to enter your transactions?
 									</Dialog.Description>
 								</div>

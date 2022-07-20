@@ -116,7 +116,7 @@ export default function Home({
 					<ModalContent>
 						<div className={"grid grid-cols-1 gap-2 text-center"}>
 							<Dialog.Title className={"font-medium text-md"}>Create a group</Dialog.Title>
-							<Dialog.Description className={"text-sm text-gray-600"}>
+							<Dialog.Description className={"text-sm text-gray-500"}>
 								Enter the name of your group and the usernames of those you'd like to invite.
 							</Dialog.Description>
 						</div>

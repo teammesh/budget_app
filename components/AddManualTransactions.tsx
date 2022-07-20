@@ -171,7 +171,11 @@ const TransactionAmount = ({ groupUsers, profile }: any) => {
 		}, 0);
 
 		setNewTransaction(
-			R.assoc("split_amounts", amountRatios, R.assoc("amount", totalTransaction, newTransaction)),
+			R.assoc(
+				"split_amounts",
+				amountRatios,
+				R.assoc("amount", totalTransaction.toFixed(2), newTransaction),
+			),
 		);
 	}, [amountRatios]);
 
@@ -183,10 +187,23 @@ const TransactionAmount = ({ groupUsers, profile }: any) => {
 					id="amount"
 					type="number"
 					pattern="\d*"
-					value={newTransaction.amount.toLocaleString(undefined, {
-						minimumFractionDigits: 2,
-						maximumFractionDigits: 2,
-					})}
+					disabled={mode === EDIT_TRANSACTION_AMOUNT_MODE.custom}
+					value={newTransaction.amount}
+					onChange={(e) => {
+						const tmp = amountRatios;
+						groupUsers.map((x: any) => {
+							tmp[x.profile_id] =
+								Number(e.target.value) * (amountRatios[x.profile_id] / newTransaction.amount);
+						});
+
+						setNewTransaction(
+							R.assoc(
+								"split_amounts",
+								tmp,
+								R.assoc("amount", Number(e.target.value), newTransaction),
+							),
+						);
+					}}
 				/>
 			</Field>
 			<Separator />
@@ -277,7 +294,7 @@ const TransactionAmount = ({ groupUsers, profile }: any) => {
 										})}
 									</div>
 									<div className={"font-mono font-medium tracking-tight"}>/</div>
-									<div className={"font-mono font-medium tracking-tight text-gray-600"}>
+									<div className={"font-mono font-medium tracking-tight text-gray-500"}>
 										%{Math.round((amountRatios[user.profile_id] / newTransaction.amount) * 100)}
 									</div>
 								</div>

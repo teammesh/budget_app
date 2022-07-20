@@ -44,7 +44,7 @@ export const Button = forwardRef(
 		>
 			<div
 				className={`grid grid-cols-[auto_auto] gap-2 items-center justify-center font-medium h-10 px-4 leading-none rounded-full 
-				${!background && " bg-black"} ${disabled && "bg-gray-700 text-gray-800 cursor-not-allowed"}`}
+				${!background && " bg-black"} ${disabled && "bg-gray-600 text-gray-700 cursor-not-allowed"}`}
 			>
 				{children}
 			</div>

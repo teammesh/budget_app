@@ -195,7 +195,7 @@ export default function AddTransactions({
 									{<ExclamationTriangleIcon color={theme.colors.avatar[0]} />}
 									{account.name}
 								</div>
-								<span className={"font-mono font-medium tracking-tight text-gray-600"}>
+								<span className={"font-mono font-medium tracking-tight text-gray-500"}>
 									•••• {account.last_four_digits}
 								</span>
 							</div>
@@ -205,7 +205,7 @@ export default function AddTransactions({
 								<Dialog.Title className={"font-medium text-md"}>
 									Lost connection to payment method
 								</Dialog.Title>
-								<Dialog.Description className={"text-sm text-gray-600"}>
+								<Dialog.Description className={"text-sm text-gray-500"}>
 									To reconnect your payment method, you will need to login to your bank institution
 									via Plaid.
 								</Dialog.Description>
@@ -240,7 +240,7 @@ export default function AddTransactions({
 					>
 						<Toggle checked={showAccounts.includes(account.access_token)} />
 						<div className={"text-ellipsis overflow-hidden whitespace-nowrap"}>{account.name}</div>
-						<span className={"font-mono font-medium tracking-tight text-gray-600"}>
+						<span className={"font-mono font-medium tracking-tight text-gray-500"}>
 							•••• {account.last_four_digits}
 						</span>
 					</div>,

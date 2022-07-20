@@ -113,7 +113,7 @@ const ToastDemo = ({
 			<Toast open={open} onOpenChange={setOpen} className={"p-4 rounded-md bg-gray-900"}>
 				<ToastTitle className={"text-white"}>{title}</ToastTitle>
 				{description && (
-					<ToastDescription className={"text-gray-600"}>{description}</ToastDescription>
+					<ToastDescription className={"text-gray-500"}>{description}</ToastDescription>
 				)}
 			</Toast>
 			<ToastViewport />

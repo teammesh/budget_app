@@ -164,7 +164,7 @@ export const Activity = ({ activity }: { activity: any }) => {
 				{iconMap[activity.table_name][activity.type]}
 				<div className={"grid grid-cols-1"}>
 					<p className={"text-sm"}>{descriptionMap[activity.table_name][activity.type]}</p>
-					<p className={"text-sm text-gray-600 font-mono tracking-tighter"}>
+					<p className={"text-sm text-gray-500 font-mono tracking-tighter"}>
 						{calculateAgo(activity.created_at)}
 					</p>
 				</div>

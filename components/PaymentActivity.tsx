@@ -37,7 +37,7 @@ export const PaymentActivity = ({ payment }: { payment: any }) => {
 					</div>
 					<div className={"flex justify-between"}>
 						<div className={"font-mono font-medium tracking-tight"}>{displayAmount(amount)}</div>
-						<div className={"font-mono font-medium tracking-tight text-gray-600"}>{date}</div>
+						<div className={"font-mono font-medium tracking-tight text-gray-500"}>{date}</div>
 					</div>
 				</div>
 			</div>

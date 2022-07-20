@@ -102,10 +102,10 @@ export const Transaction = ({
 					</div>
 				</div>
 				<div className={"flex justify-between"}>
-					<div className={"text-gray-600 text-ellipsis overflow-hidden whitespace-nowrap"}>
+					<div className={"text-gray-500 text-ellipsis overflow-hidden whitespace-nowrap"}>
 						{transaction.name}
 					</div>
-					<div className={"font-mono font-medium tracking-tight text-gray-600 shrink-0"}>
+					<div className={"font-mono font-medium tracking-tight text-gray-500 shrink-0"}>
 						{transaction.date}
 					</div>
 				</div>

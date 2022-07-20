@@ -16,9 +16,10 @@ export interface ThemeColors {
 
 const colors: ThemeColors = {
 	gray: {
-		600: "rgba(115, 115, 126, 1)",
-		700: "rgba(73, 73, 80, 1)",
-		800: "rgba(23, 23, 30, 1)",
+		500: "rgba(115, 115, 126, 1)",
+		600: "#41414D",
+		700: "#24262B",
+		800: "rgba(23, 23, 26, 1)",
 		900: "rgba(15, 16, 20, 1)",
 	},
 	white: "rgba(255, 255, 255, 1)",

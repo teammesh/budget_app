@@ -17,7 +17,7 @@ export const PaymentsContainer = ({
 		<div className={"p-3 rounded-md bg-gray-900 grid grid-cols-1 gap-6"}>
 			<div className={"grid grid-cols-1 gap-1"}>
 				<div className="text-sm">{title}</div>
-				<div className="text-xs text-gray-600">{description}</div>
+				<div className="text-xs text-gray-500">{description}</div>
 			</div>
 			<div className="grid grid-cols-1 gap-4">
 				{balances.length > 0 ? (
@@ -32,7 +32,7 @@ export const PaymentsContainer = ({
 						</div>
 					))
 				) : (
-					<div className="text-xs p-3 flex justify-center text-gray-600">{emptyText}</div>
+					<div className="text-xs p-3 flex justify-center text-gray-500">{emptyText}</div>
 				)}
 			</div>
 		</div>

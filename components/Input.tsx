@@ -18,4 +18,9 @@ export const Input = styled("input", {
 	"::placeholder": {
 		color: theme.colors.gray["800"],
 	},
+
+	"&:disabled": {
+		background: theme.colors.gray["600"],
+		color: theme.colors.gray["700"],
+	},
 });

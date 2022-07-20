@@ -31,7 +31,7 @@ export const Group = forwardRef(({ group, ...props }: { group: any; props?: any 
 		<Avatar avatarUrl={group.groups.avatar_url} avatarName={group.groups.name} variant={"marble"} />
 		<div className="block">
 			<div className="text-sm">{group.groups.name}</div>
-			<div className="text-sm text-gray-600">{group.groups.name}</div>
+			<div className="text-sm text-gray-500">{group.groups.name}</div>
 		</div>
 		<Amount className="text-sm font-medium font-mono tracking-tight">
 			{displayAmount(group.amount_owed)}
@@ -110,7 +110,7 @@ export const GroupFeed = ({ groupUsers }: { groupUsers: any }) => {
 						{!isEmpty(activities) ? (
 							activities.map((activity) => <Activity activity={activity} key={activity.id} />)
 						) : (
-							<div className="flex justify-center py-20 font-mono text-gray-600">
+							<div className="flex justify-center py-20 font-mono text-gray-500">
 								No activity yet ☹️
 							</div>
 						)}
@@ -121,7 +121,7 @@ export const GroupFeed = ({ groupUsers }: { groupUsers: any }) => {
 						{!isEmpty(userPayments) ? (
 							userPayments.map((x) => <PaymentActivity payment={x} key={x.id} />)
 						) : (
-							<div className="flex justify-center py-20 font-mono text-gray-600">
+							<div className="flex justify-center py-20 font-mono text-gray-500">
 								No payments posted 😢
 							</div>
 						)}
@@ -148,7 +148,7 @@ const TransactionList = () => {
 					</Link>
 				))
 			) : (
-				<div className="flex justify-center py-20 font-mono text-gray-600">
+				<div className="flex justify-center py-20 font-mono text-gray-500">
 					No transactions posted 😭
 				</div>
 			)}
@@ -200,7 +200,7 @@ export const GroupSummary = ({
 				</div>
 				<div className="block">
 					<div className="text-sm font-medium">{groupName}</div>
-					<div className="text-xs text-gray-600">{groupUsers.length} users</div>
+					<div className="text-xs text-gray-500">{groupUsers.length} users</div>
 				</div>
 				<div
 					className={"grid grid-cols-3 gap-1"}
@@ -271,7 +271,7 @@ const GroupUser = ({ user, profile, showRunningTotal }: any) => {
 							maximumFractionDigits: 2,
 						})}{" "}
 						/{" "}
-						<span className={"font-mono font-medium text-gray-600"}>
+						<span className={"font-mono font-medium text-gray-500"}>
 							$
 							{user.split_amount.toLocaleString(undefined, {
 								minimumFractionDigits: 2,

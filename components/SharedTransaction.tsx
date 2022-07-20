@@ -35,8 +35,8 @@ export const SharedTransaction = forwardRef(
 					</div>
 				</div>
 				<div className={"flex justify-between"}>
-					<div className={"text-gray-600"}>{transaction.name}</div>
-					<div className={"font-mono font-medium tracking-tight text-gray-600"}>
+					<div className={"text-gray-500"}>{transaction.name}</div>
+					<div className={"font-mono font-medium tracking-tight text-gray-500"}>
 						{transaction.date}
 					</div>
 				</div>
