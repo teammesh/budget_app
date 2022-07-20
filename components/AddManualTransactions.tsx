@@ -31,7 +31,7 @@ import {
 	DropdownMenuRadioItem,
 	DropdownMenuTrigger,
 } from "@/components/Dropdown";
-import { defaultTransaction } from "@/pages/group/[gid]";
+import { defaultNewTransaction } from "@/pages/group/[gid]";
 
 export default function AddManualTransactions({
 	gid,
@@ -47,7 +47,7 @@ export default function AddManualTransactions({
 
 	useEffect(() => {
 		return () => {
-			defaultTransaction({ gid });
+			defaultNewTransaction({ gid, groupUsers });
 		};
 	}, []);
 

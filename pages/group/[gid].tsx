@@ -103,14 +103,7 @@ const Group = ({
 			.subscribe();
 
 		// create a blank transaction to use in AddManualTransaction
-		const setNewTransaction = tempStore.getState().setNewTransaction;
-		defaultTransaction({ gid });
-
-		groupUsers.map((x: any) =>
-			setNewTransaction(
-				R.assocPath(["split_amounts", x.profile_id], 0, tempStore.getState().newTransaction),
-			),
-		);
+		defaultNewTransaction({ gid, groupUsers });
 
 		return () => {
 			setSharedTransactions([]);
@@ -272,8 +265,10 @@ const AddTransactionSuccessfulToast = () => {
 	);
 };
 
-export const defaultTransaction = ({ gid }: any) =>
-	tempStore.getState().setNewTransaction({
+export const defaultNewTransaction = ({ gid, groupUsers }: any) => {
+	const setNewTransaction = tempStore.getState().setNewTransaction;
+
+	setNewTransaction({
 		name: "",
 		merchant_name: "",
 		date: "",
@@ -282,6 +277,13 @@ export const defaultTransaction = ({ gid }: any) =>
 		group_id: gid,
 		// id: "",
 	});
+
+	groupUsers.map((x: any) =>
+		setNewTransaction(
+			R.assocPath(["split_amounts", x.profile_id], 0, tempStore.getState().newTransaction),
+		),
+	);
+};
 
 export async function getServerSideProps({
 	req,
