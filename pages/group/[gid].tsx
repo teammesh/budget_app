@@ -28,6 +28,8 @@ import Manage from "@/components/Manage";
 import { NextApiResponse } from "next";
 import * as Dialog from "@radix-ui/react-dialog";
 import { ModalContent } from "@/components/Modal";
+import AddManualTransactions from "@/components/AddManualTransactions";
+import Toast from "@/components/Toast";
 
 const Group = ({
 	user,
@@ -52,9 +54,11 @@ const Group = ({
 	const { gid }: { gid: string } = router.query;
 	const [groupUsers, setGroupUsers] = useState(users);
 	const showAddTransactions = uiStore((state) => state.showAddTransactions);
+	const showAddManualTransactions = uiStore((state) => state.showAddManualTransactions);
 	const showManage = uiStore((state) => state.showManage);
 	const showPayments = uiStore((state) => state.showPayments);
 	const setShowAddTransactions = uiStore.getState().setShowAddTransactions;
+	const setShowAddManualTransactions = uiStore.getState().setShowAddManualTransactions;
 	const setShowPayments = uiStore.getState().setShowPayments;
 	const setShowManage = uiStore.getState().setShowManage;
 	const setSharedTransactions = tempStore.getState().setSharedTransactions;
@@ -97,6 +101,16 @@ const Group = ({
 				fetchGroupUsers();
 			})
 			.subscribe();
+
+		// create a blank transaction to use in AddManualTransaction
+		const setNewTransaction = tempStore.getState().setNewTransaction;
+		defaultTransaction({ gid });
+
+		groupUsers.map((x: any) =>
+			setNewTransaction(
+				R.assocPath(["split_amounts", x.profile_id], 0, tempStore.getState().newTransaction),
+			),
+		);
 
 		return () => {
 			setSharedTransactions([]);
@@ -155,7 +169,7 @@ const Group = ({
 
 	return (
 		<>
-			{!(showPayments || showManage || showAddTransactions) && (
+			{!(showPayments || showManage || showAddTransactions || showAddManualTransactions) && (
 				<>
 					<Content>
 						<div className={"flex justify-between"}>
@@ -202,7 +216,11 @@ const Group = ({
 								</div>
 								<div className={"grid grid-cols-1 gap-2"}>
 									<Dialog.Close asChild>
-										<Button size={"sm"} border={theme.colors.gradient.a}>
+										<Button
+											size={"sm"}
+											border={theme.colors.gradient.a}
+											onClick={() => setShowAddManualTransactions(true)}
+										>
 											<Pencil2Icon />
 											Add transactions manually
 										</Button>
@@ -232,9 +250,38 @@ const Group = ({
 					groupUsers={groupUsers}
 				/>
 			)}
+			{showAddManualTransactions && (
+				<AddManualTransactions
+					gid={gid}
+					setShowAddTransactions={setShowAddTransactions}
+					groupUsers={groupUsers}
+					profile={profile}
+				/>
+			)}
+			<AddTransactionSuccessfulToast />
 		</>
 	);
 };
+
+const AddTransactionSuccessfulToast = () => {
+	const showToast = uiStore((state) => state.showAddTransactionSuccess);
+	const setShowToast = uiStore.getState().setShowAddTransactionSuccess;
+
+	return (
+		<Toast open={showToast} setOpen={setShowToast} title={"Transaction added successfully!"} />
+	);
+};
+
+export const defaultTransaction = ({ gid }: any) =>
+	tempStore.getState().setNewTransaction({
+		name: "",
+		merchant_name: "",
+		date: "",
+		amount: 0,
+		charged_to: "",
+		group_id: gid,
+		// id: "",
+	});
 
 export async function getServerSideProps({
 	req,

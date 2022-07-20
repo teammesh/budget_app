@@ -1,6 +1,7 @@
 import create from "zustand";
 import { persist } from "zustand/middleware";
 import { GROUP_FEED_MODE } from "@/constants/components.constants";
+import { definitions } from "../types/supabase";
 
 interface SessionStoreState {
 	session: any;
@@ -32,8 +33,8 @@ export const sessionStore = create<SessionStoreState>(
 interface TempStoreState {
 	sharedTransactions: any[];
 	setSharedTransactions: (x: any[]) => void;
-	newTransaction: any;
-	setNewTransaction: (x: any) => void;
+	newTransaction: definitions["shared_transactions"];
+	setNewTransaction: (x: definitions["shared_transactions"]) => void;
 	filteredTransactions: any[];
 	setFilteredTransactions: (x: any[]) => void;
 	userPayments: any[];
@@ -63,7 +64,7 @@ interface TempStoreState {
 export const tempStore = create<TempStoreState>((set, get) => ({
 	addTransactions: [],
 	setAddTransactions: (x) => set(() => ({ addTransactions: x })),
-	newTransaction: {},
+	newTransaction: null,
 	setNewTransaction: (x) => set(() => ({ newTransaction: x })),
 	sharedTransactions: [],
 	setSharedTransactions: (x) => set(() => ({ sharedTransactions: x })),
@@ -98,6 +99,8 @@ interface UIStoreState {
 	setGlobalLoading: (x: boolean) => void;
 	showAddTransactions: boolean;
 	setShowAddTransactions: (x: boolean) => void;
+	showAddManualTransactions: boolean;
+	setShowAddManualTransactions: (x: boolean) => void;
 	showPayments: boolean;
 	setShowPayments: (x: boolean) => void;
 	showManage: boolean;
@@ -108,6 +111,8 @@ interface UIStoreState {
 	setGroupFilterbyUser: (x: any) => void;
 	showSessionExpired: boolean;
 	setShowSessionExpired: (x: boolean) => void;
+	showAddTransactionSuccess: boolean;
+	setShowAddTransactionSuccess: (x: boolean) => void;
 }
 
 export const uiStore = create<UIStoreState>((set, get) => ({
@@ -117,6 +122,8 @@ export const uiStore = create<UIStoreState>((set, get) => ({
 	setGlobalLoading: (x) => set(() => ({ globalLoading: x })),
 	showAddTransactions: false,
 	setShowAddTransactions: (x) => set(() => ({ showAddTransactions: x })),
+	showAddManualTransactions: false,
+	setShowAddManualTransactions: (x) => set(() => ({ showAddManualTransactions: x })),
 	showPayments: false,
 	setShowPayments: (x) => set(() => ({ showPayments: x })),
 	showManage: false,
@@ -127,4 +134,6 @@ export const uiStore = create<UIStoreState>((set, get) => ({
 	setGroupFilterbyUser: (x) => set(() => ({ groupFilterbyUser: x })),
 	showSessionExpired: false,
 	setShowSessionExpired: (x) => set(() => ({ showSessionExpired: x })),
+	showAddTransactionSuccess: false,
+	setShowAddTransactionSuccess: (x) => set(() => ({ showAddTransactionSuccess: x })),
 }));

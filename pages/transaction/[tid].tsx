@@ -139,13 +139,7 @@ const Transaction = ({
 						</Field>
 					</FormBox>
 				)}
-				{isEditing && (
-					<EditTransactionAmount
-						groupUsers={groupUsers}
-						profile={profile}
-						transaction={transaction}
-					/>
-				)}
+				{isEditing && <EditTransactionAmount groupUsers={groupUsers} profile={profile} />}
 				{!isEditing && (
 					<PrimaryBox>
 						<div className="flex justify-between">
@@ -172,7 +166,11 @@ const Transaction = ({
 									key={user.profile_id}
 									className={"grid grid-cols-[auto_1fr_auto] items-center text-sm gap-3"}
 								>
-									<Avatar avatarUrl={user.profiles.avatar_url} avatarName={user.profiles.username} size={24} />
+									<Avatar
+										avatarUrl={user.profiles.avatar_url}
+										avatarName={user.profiles.username}
+										size={24}
+									/>
 									<div>
 										{user.profiles.username} {user.profile_id === profile.id && " (you)"}
 									</div>
@@ -214,7 +212,7 @@ const Transaction = ({
 	);
 };
 
-const EditTransactionAmount = ({ transaction, groupUsers, profile }: any) => {
+const EditTransactionAmount = ({ groupUsers, profile }: any) => {
 	const newTransaction = tempStore((state) => state.newTransaction);
 	const setNewTransaction = tempStore.getState().setNewTransaction;
 	const [mode, setMode] = useState<any>(EDIT_TRANSACTION_AMOUNT_MODE.custom);
@@ -283,7 +281,11 @@ const EditTransactionAmount = ({ transaction, groupUsers, profile }: any) => {
 							key={user.profile_id}
 							className={"grid grid-cols-[auto_1fr_80px] items-center text-sm gap-3"}
 						>
-							<Avatar avatarUrl={user.profiles.avatar_url} avatarName={user.profiles.username} size={24} />
+							<Avatar
+								avatarUrl={user.profiles.avatar_url}
+								avatarName={user.profiles.username}
+								size={24}
+							/>
 							<div>
 								{user.profiles.username} {user.profile_id === profile.id && " (you)"}
 							</div>
@@ -309,7 +311,11 @@ const EditTransactionAmount = ({ transaction, groupUsers, profile }: any) => {
 					{groupUsers.map((user: any) => (
 						<div className={"grid grid-cols-1 gap-2"} key={user.profile_id}>
 							<div className={"grid grid-cols-[auto_1fr_auto] items-center text-sm gap-3"}>
-								<Avatar avatarUrl={user.profiles.avatar_url} avatarName={user.profiles.username} size={24} />
+								<Avatar
+									avatarUrl={user.profiles.avatar_url}
+									avatarName={user.profiles.username}
+									size={24}
+								/>
 								<div>
 									{user.profiles.username} {user.profile_id === profile.id && " (you)"}
 								</div>
