@@ -1,6 +1,5 @@
 import React from "react";
 import { keyframes, styled } from "@stitches/react";
-import { DotFilledIcon } from "@radix-ui/react-icons";
 import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
 import theme from "@/styles/theme";
 

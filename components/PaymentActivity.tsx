@@ -27,7 +27,7 @@ export const PaymentActivity = ({ payment }: { payment: any }) => {
 	return (
 		<PrimaryBox>
 			<div className={"grid grid-cols-[48px_1fr] gap-4 items-center"}>
-				<ProfilePictureCont>	
+				<ProfilePictureCont>
 					<Avatar avatarUrl={from_user.avatar_url} avatarName={from_user.username} />
 					<Avatar avatarUrl={to_user.avatar_url} avatarName={to_user.username} />
 				</ProfilePictureCont>

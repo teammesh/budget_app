@@ -21,7 +21,11 @@ export const SharedTransaction = forwardRef(
 					<div className={"grid grid-cols-[auto_auto] gap-2 items-center"}>
 						<div className={"flex items-center justify-center"}>
 							<div className={"flex items-center justify-center"}>
-								<Avatar avatarUrl={transaction.profiles.avatar_url} avatarName={transaction.profiles.username} size={16} />
+								<Avatar
+									avatarUrl={transaction.profiles.avatar_url}
+									avatarName={transaction.profiles.username}
+									size={16}
+								/>
 							</div>
 						</div>
 						<div className={"font-medium"}>{transaction.merchant_name}</div>

@@ -6,8 +6,6 @@ import {
 	ArrowLeftIcon,
 	CheckIcon,
 	Cross2Icon,
-	MixerHorizontalIcon,
-	MixIcon,
 	Pencil1Icon,
 	TrashIcon,
 } from "@radix-ui/react-icons";
@@ -16,18 +14,10 @@ import { verifyUser } from "@/utils/ssr";
 import { RequestData } from "next/dist/server/web/types";
 import { Params } from "next/dist/shared/lib/router/utils/route-matcher";
 import { useEffect, useState } from "react";
-import { Field } from "@/components/Field";
-import { Label } from "@/components/Label";
-import { Input } from "@/components/Input";
 import { definitions } from "../../types/supabase";
-import { Slider } from "@/components/Slider";
 import { AuthUser } from "@supabase/supabase-js";
-import { FormBox, PrimaryBox } from "@/components/boxes";
-import { Separator } from "@/components/Separator";
+import { PrimaryBox } from "@/components/boxes";
 import * as R from "ramda";
-import { motion } from "framer-motion";
-import { defaultAnimations } from "@/utils/animation";
-import { EDIT_TRANSACTION_AMOUNT_MODE } from "@/constants/components.constants";
 import { Content } from "@/components/Main";
 import { NextApiResponse } from "next";
 import { tempStore } from "@/utils/store";

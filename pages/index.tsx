@@ -17,7 +17,6 @@ import { definitions } from "../types/supabase";
 import { RequestData } from "next/dist/server/web/types";
 import { Content } from "@/components/Main";
 import { NextApiResponse } from "next";
-import { fetcher } from "@/utils/helper";
 
 export default function Home({
 	user,

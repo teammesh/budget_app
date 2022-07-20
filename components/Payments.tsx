@@ -93,7 +93,7 @@ export default function Payments({
 									if (!curr.amount) return prev;
 									return curr.amount + prev;
 								}, 0),
-					)}
+						  )}
 				</div>
 			</div>
 			<Dialog.Root>
