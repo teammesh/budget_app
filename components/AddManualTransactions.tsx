@@ -164,20 +164,55 @@ const TransactionAmount = ({ groupUsers, profile }: any) => {
 	const setNewTransaction = tempStore.getState().setNewTransaction;
 	const [mode, setMode] = useState<any>(EDIT_TRANSACTION_AMOUNT_MODE.custom);
 	const [amountRatios, setAmountRatios] = useState<any>(newTransaction.split_amounts);
+	const [amountPercentages, setAmountPercentages] = useState<any>(newTransaction.split_amounts);
 
 	useEffect(() => {
-		const totalTransaction = R.values(amountRatios).reduce((prev, curr) => {
+		const tmp = R.clone(amountRatios);
+		groupUsers.map((x: any) => {
+			tmp[x.profile_id] = Math.round(
+				(amountRatios[x.profile_id] / Number(newTransaction.amount)) * 100,
+			);
+		});
+		setAmountPercentages(tmp);
+	}, []);
+
+	const handleCustomAmountChange = (e: any, user: any) => {
+		const amtRatios = R.assocPath([user.profile_id], Number(e.target.value), amountRatios);
+		const amtPercentages = R.clone(amountPercentages);
+		const totalTransaction = R.values(amtRatios).reduce((prev, curr) => {
 			return Number(curr) + prev;
 		}, 0);
 
+		groupUsers.map((x: any) => {
+			amtPercentages[x.profile_id] = Math.round(
+				(amtRatios[x.profile_id] / Number(totalTransaction)) * 100,
+			);
+		});
+
+		setAmountPercentages(amtPercentages);
+		setAmountRatios(amtRatios);
 		setNewTransaction(
-			R.assoc(
-				"split_amounts",
-				amountRatios,
-				R.assoc("amount", totalTransaction.toFixed(2), newTransaction),
-			),
+			R.assoc("split_amounts", amtRatios, R.assoc("amount", totalTransaction, newTransaction)),
 		);
-	}, [amountRatios]);
+	};
+
+	const handleSliderAmountChange = (value: number, user: any) => {
+		const amtPercentages = R.clone(amountPercentages);
+		const amtRatios = R.clone(amountRatios);
+		R.forEachObjIndexed((x, key, obj: any) => {
+			if (key === user.profile_id) {
+				obj[key] = value;
+				amtRatios[key] = (value / 100) * newTransaction.amount;
+			} else {
+				obj[key] = (100 - value) / (groupUsers.length - 1);
+				amtRatios[key] = ((100 - value) / (groupUsers.length - 1) / 100) * newTransaction.amount;
+			}
+		}, amtPercentages);
+
+		setAmountPercentages(amtPercentages);
+		setAmountRatios(amtRatios);
+		setNewTransaction(R.assoc("split_amounts", amtRatios, newTransaction));
+	};
 
 	return (
 		<FormBox>
@@ -188,20 +223,21 @@ const TransactionAmount = ({ groupUsers, profile }: any) => {
 					type="number"
 					pattern="\d*"
 					disabled={mode === EDIT_TRANSACTION_AMOUNT_MODE.custom}
-					value={newTransaction.amount}
+					value={newTransaction.amount || ""}
 					onChange={(e) => {
-						const tmp = amountRatios;
+						let amount: string | number = e.target.value;
+						if (R.isEmpty(amount)) {
+							amount = 0;
+						}
+
+						const tmp = R.clone(amountRatios);
 						groupUsers.map((x: any) => {
-							tmp[x.profile_id] =
-								Number(e.target.value) * (amountRatios[x.profile_id] / newTransaction.amount);
+							tmp[x.profile_id] = Number(amount) * (amountPercentages[x.profile_id] / 100);
 						});
 
+						setAmountRatios(tmp);
 						setNewTransaction(
-							R.assoc(
-								"split_amounts",
-								tmp,
-								R.assoc("amount", Number(e.target.value), newTransaction),
-							),
+							R.assoc("split_amounts", tmp, R.assoc("amount", amount, newTransaction)),
 						);
 					}}
 				/>
@@ -257,13 +293,8 @@ const TransactionAmount = ({ groupUsers, profile }: any) => {
 								id={`custom-amount-${user.profile_id}`}
 								type="number"
 								pattern="\d*"
-								value={amountRatios[user.profile_id]}
-								onChange={(e) => {
-									// @ts-ignore
-									setAmountRatios(
-										R.assocPath([user.profile_id.toString()], Number(e.target.value), amountRatios),
-									);
-								}}
+								value={amountRatios[user.profile_id] || ""}
+								onChange={(e) => handleCustomAmountChange(e, user)}
 							/>
 						</div>
 					))}
@@ -285,36 +316,20 @@ const TransactionAmount = ({ groupUsers, profile }: any) => {
 								<div className={"grid grid-cols-[auto_auto_auto] gap-1"}>
 									<div className={"font-mono font-medium tracking-tight"}>
 										$
-										{amountRatios[user.profile_id].toLocaleString(undefined, {
+										{Number(amountRatios[user.profile_id]).toLocaleString(undefined, {
 											minimumFractionDigits: 2,
 											maximumFractionDigits: 2,
 										})}
 									</div>
 									<div className={"font-mono font-medium tracking-tight"}>/</div>
 									<div className={"font-mono font-medium tracking-tight text-gray-500"}>
-										%{Math.round((amountRatios[user.profile_id] / newTransaction.amount) * 100)}
+										%{amountPercentages[user.profile_id]}
 									</div>
 								</div>
 							</div>
 							<Slider
-								onValueChange={(e: number[]) => {
-									// @ts-ignore
-									const amtRatios = R.clone(amountRatios);
-									R.forEachObjIndexed((x, key, obj: any) => {
-										if (key === user.profile_id) obj[key] = newTransaction.amount * e[0] * 0.01;
-										else
-											obj[key] = Number(
-												(
-													(newTransaction.amount * (100 - e[0]) * 0.01) /
-													(groupUsers.length - 1)
-												).toFixed(2),
-											);
-									}, amtRatios);
-
-									// @ts-ignore
-									setAmountRatios(amtRatios);
-								}}
-								value={[Math.round((amountRatios[user.profile_id] / newTransaction.amount) * 100)]}
+								onValueChange={(e: number[]) => handleSliderAmountChange(e[0], user)}
+								value={[amountPercentages[user.profile_id]]}
 							/>
 						</div>
 					))}
