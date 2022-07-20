@@ -257,10 +257,7 @@ const TransactionAmount = ({ groupUsers, profile }: any) => {
 								id={`custom-amount-${user.profile_id}`}
 								type="number"
 								pattern="\d*"
-								value={amountRatios[user.profile_id].toLocaleString(undefined, {
-									minimumFractionDigits: 2,
-									maximumFractionDigits: 2,
-								})}
+								value={amountRatios[user.profile_id]}
 								onChange={(e) => {
 									// @ts-ignore
 									setAmountRatios(
@@ -306,8 +303,12 @@ const TransactionAmount = ({ groupUsers, profile }: any) => {
 									R.forEachObjIndexed((x, key, obj: any) => {
 										if (key === user.profile_id) obj[key] = newTransaction.amount * e[0] * 0.01;
 										else
-											obj[key] =
-												(newTransaction.amount * (100 - e[0]) * 0.01) / (groupUsers.length - 1);
+											obj[key] = Number(
+												(
+													(newTransaction.amount * (100 - e[0]) * 0.01) /
+													(groupUsers.length - 1)
+												).toFixed(2),
+											);
 									}, amtRatios);
 
 									// @ts-ignore
