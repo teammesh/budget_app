@@ -33,8 +33,8 @@ export const sessionStore = create<SessionStoreState>(
 interface TempStoreState {
 	sharedTransactions: any[];
 	setSharedTransactions: (x: any[]) => void;
-	newTransaction: definitions["shared_transactions"];
-	setNewTransaction: (x: definitions["shared_transactions"]) => void;
+	newTransaction: definitions["shared_transactions"] | Record<any, any>;
+	setNewTransaction: (x: definitions["shared_transactions"] | Record<any, any>) => void;
 	filteredTransactions: any[];
 	setFilteredTransactions: (x: any[]) => void;
 	userPayments: any[];
@@ -64,7 +64,7 @@ interface TempStoreState {
 export const tempStore = create<TempStoreState>((set, get) => ({
 	addTransactions: [],
 	setAddTransactions: (x) => set(() => ({ addTransactions: x })),
-	newTransaction: null,
+	newTransaction: {},
 	setNewTransaction: (x) => set(() => ({ newTransaction: x })),
 	sharedTransactions: [],
 	setSharedTransactions: (x) => set(() => ({ sharedTransactions: x })),

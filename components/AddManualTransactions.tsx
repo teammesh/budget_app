@@ -78,7 +78,7 @@ export default function AddManualTransactions({
 // 	return <TransactionForm transaction={transactions[0]} index={0} />;
 // };
 
-const TransactionForm = ({ groupUsers, profile }: { groupUsers: any; profile: any }) => {
+export const TransactionForm = ({ groupUsers, profile }: { groupUsers: any; profile: any }) => {
 	const newTransaction = tempStore((state) => state.newTransaction);
 	const setNewTransaction = tempStore.getState().setNewTransaction;
 
