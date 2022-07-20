@@ -125,7 +125,7 @@ const Transaction = ({
 						</div>
 						<div></div>
 						<div className="font-mono font-medium text-sm tracking-tight text-gray-600">
-							{transaction?.category.map((c: any) => (
+							{transaction?.category?.map((c: any) => (
 								<span key={c} className="mr-4">
 									{c}
 								</span>
