@@ -48,6 +48,7 @@ export default function AddManualTransactions({
 	useEffect(() => {
 		return () => {
 			defaultNewTransaction({ gid, groupUsers });
+			uiStore.getState().setShowAddManualTransactions(false);
 		};
 	}, []);
 
