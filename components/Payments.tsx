@@ -119,7 +119,7 @@ export default function Payments({
 							<Button
 								size={"sm"}
 								background={theme.colors.gradient.a}
-								onClick={() => handleMarkAsPaid()}
+								// onClick={() => handleMarkAsPaid()}
 							>
 								<CheckCircledIcon />
 								Pay
