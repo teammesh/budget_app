@@ -48,7 +48,6 @@ export default function AddManualTransactions({
 	useEffect(() => {
 		return () => {
 			defaultNewTransaction({ gid, groupUsers });
-			uiStore.getState().setShowAddManualTransactions(false);
 		};
 	}, []);
 
@@ -59,7 +58,7 @@ export default function AddManualTransactions({
 					<Button
 						size={"sm"}
 						style={{ background: theme.colors.gradient.a }}
-						onClick={() => router.back()}
+						onClick={() => uiStore.getState().setShowAddManualTransactions(false)}
 					>
 						<ArrowLeftIcon />
 						Return

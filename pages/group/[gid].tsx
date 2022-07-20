@@ -112,6 +112,7 @@ const Group = ({
 			setShowManage(false);
 			setShowPayments(false);
 			setShowAddTransactions(false);
+			setShowAddManualTransactions(false);
 			supabase.removeAllSubscriptions();
 		};
 	}, []);
