@@ -306,7 +306,7 @@ export async function getServerSideProps({
 	const { data: users } = await supabase
 		.from("profiles_groups")
 		.select(
-			"profile_id, amount_paid_transactions, amount_paid_users, split_amount, amount_owed, profiles(username, avatar_url), groups(name, avatar_url)",
+			"profile_id, amount_paid_transactions, amount_paid_users, amount_received_users, split_amount, amount_owed, profiles(username, avatar_url), groups(name, avatar_url)",
 		)
 		.eq("group_id", gid);
 
