@@ -49,8 +49,8 @@ export default function Account({
 				returning: "minimal", // Don't return the value after inserting
 			});
 
-			if (error) {
-				throw error;
+			if (error && error.code === "23505") {
+				alert("Woops, username is already taken.");
 			}
 		} catch (error: any) {
 			alert(error.message);
