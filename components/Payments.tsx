@@ -66,19 +66,22 @@ export default function Payments({
 			return;
 		}
 
+		setIsLoading(true);
 		const userPayments = userBalances?.map((userBalance: any) => ({
 			group_id: gid,
 			from_profile_id: profile_id,
 			to_profile_id: userBalance.to_profile_id,
 			amount: Math.abs(userBalance.amount),
 		}));
+		console.log(userPayments);
 		const { error } = await supabase.from("payments").insert(userPayments);
 
 		if (error) {
-			alert(error);
+			alert(error.message);
 		} else {
 			alert("Payment successful!");
 		}
+		setIsLoading(false);
 	};
 
 	const Toolbar = () => (
@@ -92,8 +95,7 @@ export default function Payments({
 								userBalances.reduce((prev: any, curr: any) => {
 									if (!curr.amount) return prev;
 									return curr.amount + prev;
-								}, 0),
-						  )}
+								}, 0))}
 				</div>
 			</div>
 			<Dialog.Root>
@@ -119,7 +121,7 @@ export default function Payments({
 							<Button
 								size={"sm"}
 								background={theme.colors.gradient.a}
-								// onClick={() => handleMarkAsPaid()}
+								onClick={() => handleMarkAsPaid()}
 							>
 								<CheckCircledIcon />
 								Pay
