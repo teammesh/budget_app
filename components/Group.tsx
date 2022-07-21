@@ -1,5 +1,5 @@
 import { displayAmount } from "@/components/Amount";
-import { forwardRef, useEffect, useRef, useState } from "react";
+import { forwardRef, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { styled } from "@stitches/react";
 import { tempStore, uiStore } from "@/utils/store";
 import { GROUP_FEED_MODE } from "@/constants/components.constants";
@@ -55,10 +55,6 @@ export const GroupFeed = ({ groupUsers }: { groupUsers: any }) => {
 		},
 	});
 
-	useEffect(() => {
-		setGroupFeedMode(GROUP_FEED_MODE.activity);
-	}, []);
-
 	return (
 		<>
 			<div className={"mt-6"}>
@@ -73,6 +69,7 @@ export const GroupFeed = ({ groupUsers }: { groupUsers: any }) => {
 							setGroupFeedMode(GROUP_FEED_MODE.activity);
 							swiperRef.current.slideTo(0);
 						}}
+						data-active={true}
 					>
 						{GROUP_FEED_MODE.activity}
 					</PaginatedHeader>
@@ -266,7 +263,7 @@ const GroupUser = ({ user, profile, showRunningTotal }: any) => {
 				) : (
 					<>
 						$
-						{(user.amount_paid_transactions).toLocaleString(undefined, {
+						{user.amount_paid_transactions.toLocaleString(undefined, {
 							minimumFractionDigits: 2,
 							maximumFractionDigits: 2,
 						})}{" "}

@@ -8,6 +8,7 @@ export const Header = ({ children, active }: { children: any; active?: boolean }
 export const PaginatedHeader = ({
 	children,
 	onClick,
+	...props
 }: {
 	children: any;
 	active?: boolean;
@@ -39,6 +40,7 @@ export const PaginatedHeader = ({
 		<HeaderStyle
 			className={"text-2xl font-semibold tracking-tight relative transition-all cursor-pointer"}
 			onClick={onClick}
+			{...props}
 		>
 			{children}
 		</HeaderStyle>
