@@ -266,7 +266,7 @@ const GroupUser = ({ user, profile, showRunningTotal }: any) => {
 				) : (
 					<>
 						$
-						{(user.amount_paid_transactions + user.amount_paid_users).toLocaleString(undefined, {
+						{(user.amount_paid_transactions).toLocaleString(undefined, {
 							minimumFractionDigits: 2,
 							maximumFractionDigits: 2,
 						})}{" "}
