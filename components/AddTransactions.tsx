@@ -310,9 +310,19 @@ const Toolbar = () => {
 		if (addTransactions.length === 0) return;
 
 		const { data } = await supabaseQuery(
-			() => supabase.from("shared_transactions").upsert(tempStore.getState().addTransactions),
+			() =>
+				supabase
+					.from("shared_transactions")
+					.upsert(tempStore.getState().addTransactions)
+					.select("*, profiles(username, avatar_url)"),
 			true,
 		);
+
+		const indexedData: Record<string, definitions["shared_transactions"]> = R.indexBy(
+			R.prop("id"),
+			data,
+		);
+		tempStore.getState().updateSharedTransactions(indexedData);
 		uiStore.getState().setShowAddTransactions(false);
 		tempStore.getState().setAddTransactions([]);
 	};
