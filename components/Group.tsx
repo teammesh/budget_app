@@ -9,7 +9,7 @@ import { Separator } from "@/components/Separator";
 import { PaginatedHeader } from "@/components/text";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Activity } from "@/components/Activity";
-import { isEmpty } from "ramda";
+import * as R from "ramda";
 import { PaymentActivity } from "@/components/PaymentActivity";
 import Link from "next/link";
 import { SharedTransaction } from "@/components/SharedTransaction";
@@ -104,7 +104,7 @@ export const GroupFeed = ({ groupUsers }: { groupUsers: any }) => {
 			>
 				<SwiperSlide className={"w-full min-h-screen"}>
 					<div className={"grid grid-cols-1 gap-2"}>
-						{!isEmpty(activities) ? (
+						{!R.isEmpty(activities) ? (
 							activities.map((activity) => <Activity activity={activity} key={activity.id} />)
 						) : (
 							<div className="flex justify-center py-20 font-mono text-gray-500">
@@ -115,8 +115,8 @@ export const GroupFeed = ({ groupUsers }: { groupUsers: any }) => {
 				</SwiperSlide>
 				<SwiperSlide className={"w-full min-h-screen"}>
 					<div className={"grid grid-cols-1 gap-2"}>
-						{!isEmpty(userPayments) ? (
-							userPayments.map((x) => <PaymentActivity payment={x} key={x.id} />)
+						{!R.isEmpty(userPayments) ? (
+							userPayments.map((x: any) => <PaymentActivity payment={x} key={x.id} />)
 						) : (
 							<div className="flex justify-center py-20 font-mono text-gray-500">
 								No payments posted 😢
@@ -138,8 +138,8 @@ const TransactionList = () => {
 
 	return (
 		<div className={"grid grid-cols-1 gap-2"}>
-			{!isEmpty(filteredTransactions) ? (
-				filteredTransactions.map((x) => (
+			{!R.isEmpty(filteredTransactions) ? (
+				R.values(filteredTransactions).map((x: any) => (
 					<Link href={`/transaction/${encodeURIComponent(x.id)}`} key={x.id} passHref>
 						<SharedTransaction transaction={x} />
 					</Link>
@@ -184,7 +184,6 @@ export const GroupSummary = ({
 
 	useEffect(() => {
 		uiStore.getState().setGroupFilterbyUser(null);
-		tempStore.getState().setFilteredTransactions(tempStore.getState().sharedTransactions);
 	}, []);
 
 	return (
@@ -210,7 +209,7 @@ export const GroupSummary = ({
 			</div>
 			<Separator />
 			<div className={"grid grid-cols-1 gap-0"}>
-				{groupUsers.map((user: any) => (
+				{R.values(groupUsers).map((user: any) => (
 					<GroupUser
 						key={user.profile_id}
 						user={user}
@@ -226,9 +225,17 @@ export const GroupSummary = ({
 const GroupUser = ({ user, profile, showRunningTotal }: any) => {
 	const setFilteredTransactions = tempStore.getState().setFilteredTransactions;
 	const groupFilterbyUser = uiStore((state) => state.groupFilterbyUser);
+	const filteredTransactions = tempStore((state) => state.filteredTransactions);
 	const setGroupFilterbyUser = uiStore.getState().setGroupFilterbyUser;
 	const sharedTransactions = tempStore.getState().sharedTransactions;
 	const isSelected = groupFilterbyUser === user.profile_id;
+
+	useEffect(() => {
+		if (groupFilterbyUser)
+			setFilteredTransactions(
+				R.values(sharedTransactions).filter((x) => x.charged_to === groupFilterbyUser),
+			);
+	}, [filteredTransactions]);
 
 	const filterTransactionsByUser = (profileId: string) => {
 		if (isSelected && profileId === user.profile_id) {
@@ -236,7 +243,9 @@ const GroupUser = ({ user, profile, showRunningTotal }: any) => {
 			setFilteredTransactions(sharedTransactions);
 		} else {
 			setGroupFilterbyUser(profileId);
-			setFilteredTransactions(sharedTransactions.filter((x) => x.charged_to === profileId));
+			setFilteredTransactions(
+				R.values(sharedTransactions).filter((x) => x.charged_to === profileId),
+			);
 		}
 	};
 

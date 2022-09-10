@@ -1,7 +1,7 @@
 import { CheckCircle } from "./CheckCircle";
 import * as Avatar from "@radix-ui/react-avatar";
 import { tempStore } from "@/utils/store";
-import { assocPath, pick } from "ramda";
+import * as R from "ramda";
 import { supabase } from "@/utils/supabaseClient";
 import { displayAmount } from "./Amount";
 import { definitions } from "../types/supabase";
@@ -35,7 +35,10 @@ export const Transaction = ({
 	const sharedTransactions = tempStore((state) => state.sharedTransactions);
 	const addTransactions = tempStore((state) => state.addTransactions);
 
-	const isShared = sharedTransactions.find((y) => transaction.transaction_id === y.transaction_id);
+	const isShared = R.any(
+		(y) => transaction.transaction_id === y.transaction_id,
+		R.values(sharedTransactions),
+	);
 	const isAdded = addTransactions.find((y) => transaction.transaction_id === y.transaction_id);
 	const profile_id = supabase.auth.session()?.user?.id;
 
@@ -54,11 +57,11 @@ export const Transaction = ({
 				addTransactions.filter((x) => x.transaction_id !== transaction.transaction_id),
 			);
 
-		const metadata = pick(TRANSACTION_METADATA, transaction);
+		const metadata = R.pick(TRANSACTION_METADATA, transaction);
 		const splitAmountDivisor = 1 / groupUsers.length;
 		let split_amounts = {};
-		groupUsers.map((x: any) => {
-			split_amounts = assocPath(
+		R.values(groupUsers).map((x: any) => {
+			split_amounts = R.assocPath(
 				[x.profile_id],
 				transaction.amount * splitAmountDivisor,
 				split_amounts,

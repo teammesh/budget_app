@@ -52,7 +52,7 @@ const Group = ({
 
 	// @ts-ignore
 	const { gid }: { gid: string } = router.query;
-	const [groupUsers, setGroupUsers] = useState(users);
+	const [groupUsers, setGroupUsers] = useState<Record<any, any>>(users);
 	const showAddTransactions = uiStore((state) => state.showAddTransactions);
 	const showAddManualTransactions = uiStore((state) => state.showAddManualTransactions);
 	const showManage = uiStore((state) => state.showManage);
@@ -67,9 +67,11 @@ const Group = ({
 	const setGroupActivities = tempStore.getState().setGroupActivities;
 
 	useEffect(() => {
-		tempStore.getState().setGroupName(users[0].groups.name);
-		tempStore.getState().setGroupAvatarUrl(users[0].groups.avatar_url);
-		tempStore.getState().setGroupMembers(groupUsers.map((user: any) => user.profiles.username));
+		tempStore.getState().setGroupName(R.values(users)[0].groups.name);
+		tempStore.getState().setGroupAvatarUrl(R.values(users)[0].groups.avatar_url);
+		tempStore
+			.getState()
+			.setGroupMembers(R.values(groupUsers).map((user: any) => user.profiles.username));
 		transactions && setSharedTransactions(transactions);
 		transactions && setFilteredTransactions(transactions);
 		payments && setUserPayments(payments);
@@ -157,8 +159,8 @@ const Group = ({
 			true,
 		);
 
-		setSharedTransactions(data);
-		setFilteredTransactions(data);
+		setSharedTransactions(R.mergeDeepLeft(tempStore.getState().sharedTransactions, data));
+		setFilteredTransactions(R.mergeDeepLeft(tempStore.getState().sharedTransactions, data));
 	};
 
 	return (
@@ -279,7 +281,7 @@ export const defaultNewTransaction = ({ gid, groupUsers }: any) => {
 		// id: "",
 	});
 
-	groupUsers.map((x: any) =>
+	R.values(groupUsers).map((x: any) =>
 		setNewTransaction(
 			R.assocPath(["split_amounts", x.profile_id], 0, tempStore.getState().newTransaction),
 		),
@@ -333,10 +335,19 @@ export async function getServerSideProps({
 		.order("created_at", { ascending: false });
 
 	const sortedTransactions =
-		transactions && transactions.length > 0 && R.reverse(sortByDate(transactions));
+		(transactions && transactions.length > 0 && R.reverse(sortByDate(transactions))) || [];
+	const indexedTransactions = R.indexBy(R.prop("id"), sortedTransactions);
+	const indexedUsers = users && users.length > 0 && R.indexBy(R.prop("profile_id"), users);
 
 	return {
-		props: { ...props, transactions: sortedTransactions, users, balances, payments, activities },
+		props: {
+			...props,
+			transactions: indexedTransactions,
+			users: indexedUsers,
+			balances,
+			payments,
+			activities,
+		},
 		redirect,
 	};
 }

@@ -132,7 +132,7 @@ export const TransactionForm = ({ groupUsers, profile }: { groupUsers: any; prof
 								value={newTransaction.charged_to}
 								onValueChange={(x) => editProperty("charged_to", x)}
 							>
-								{groupUsers.map((x: any) => (
+								{R.values(groupUsers).map((x: any) => (
 									<DropdownMenuRadioItem key={x.profile_id} value={x.profile_id}>
 										<DropdownMenuItemIndicator>
 											<DotFilledIcon />
@@ -168,7 +168,7 @@ const TransactionAmount = ({ groupUsers, profile }: any) => {
 
 	useEffect(() => {
 		const tmp = R.clone(amountRatios);
-		groupUsers.map((x: any) => {
+		R.values(groupUsers).map((x: any) => {
 			tmp[x.profile_id] = Math.round(
 				(amountRatios[x.profile_id] / Number(newTransaction.amount)) * 100,
 			);
@@ -183,7 +183,7 @@ const TransactionAmount = ({ groupUsers, profile }: any) => {
 			return Number(curr) + prev;
 		}, 0);
 
-		groupUsers.map((x: any) => {
+		R.values(groupUsers).map((x: any) => {
 			amtPercentages[x.profile_id] = Math.round(
 				(amtRatios[x.profile_id] / Number(totalTransaction)) * 100,
 			);
@@ -231,7 +231,7 @@ const TransactionAmount = ({ groupUsers, profile }: any) => {
 						}
 
 						const tmp = R.clone(amountRatios);
-						groupUsers.map((x: any) => {
+						R.values(groupUsers).map((x: any) => {
 							tmp[x.profile_id] = Number(amount) * (amountPercentages[x.profile_id] / 100);
 						});
 
@@ -276,7 +276,7 @@ const TransactionAmount = ({ groupUsers, profile }: any) => {
 			</div>
 			{mode === EDIT_TRANSACTION_AMOUNT_MODE.custom && (
 				<motion.div className={"grid grid-cols-1 gap-3"} {...defaultAnimations}>
-					{groupUsers.map((user: any) => (
+					{R.values(groupUsers).map((user: any) => (
 						<div
 							key={user.profile_id}
 							className={"grid grid-cols-[auto_1fr_80px] items-center text-sm gap-3"}
@@ -302,7 +302,7 @@ const TransactionAmount = ({ groupUsers, profile }: any) => {
 			)}
 			{mode === EDIT_TRANSACTION_AMOUNT_MODE.slider && (
 				<motion.div className={"grid grid-cols-1 gap-3"} {...defaultAnimations}>
-					{groupUsers.map((user: any) => (
+					{R.values(groupUsers).map((user: any) => (
 						<div className={"grid grid-cols-1 gap-2"} key={user.profile_id}>
 							<div className={"grid grid-cols-[auto_1fr_auto] items-center text-sm gap-3"}>
 								<Avatar

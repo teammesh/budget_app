@@ -31,14 +31,14 @@ export const sessionStore = create<SessionStoreState>(
 );
 
 interface TempStoreState {
-	sharedTransactions: any[];
-	setSharedTransactions: (x: any[]) => void;
+	sharedTransactions: Record<string, definitions["shared_transactions"]>;
+	setSharedTransactions: (x: Record<any, any>) => void;
 	newTransaction: definitions["shared_transactions"] | Record<any, any>;
 	setNewTransaction: (x: definitions["shared_transactions"] | Record<any, any>) => void;
-	filteredTransactions: any[];
-	setFilteredTransactions: (x: any[]) => void;
-	userPayments: any[];
-	setUserPayments: (x: any[]) => void;
+	filteredTransactions: Record<string, definitions["shared_transactions"]>;
+	setFilteredTransactions: (x: Record<any, any>) => void;
+	userPayments: Record<any, any>;
+	setUserPayments: (x: Record<any, any>) => void;
 	addTransactions: any[];
 	setAddTransactions: (x: any[]) => void;
 	groupActivities: any[];
@@ -66,11 +66,11 @@ export const tempStore = create<TempStoreState>((set, get) => ({
 	setAddTransactions: (x) => set(() => ({ addTransactions: x })),
 	newTransaction: {},
 	setNewTransaction: (x) => set(() => ({ newTransaction: x })),
-	sharedTransactions: [],
+	sharedTransactions: {},
 	setSharedTransactions: (x) => set(() => ({ sharedTransactions: x })),
-	filteredTransactions: [],
+	filteredTransactions: {},
 	setFilteredTransactions: (x) => set(() => ({ filteredTransactions: x })),
-	userPayments: [],
+	userPayments: {},
 	setUserPayments: (x) => set(() => ({ userPayments: x })),
 	groupActivities: [],
 	setGroupActivities: (x) => set(() => ({ groupActivities: x })),
