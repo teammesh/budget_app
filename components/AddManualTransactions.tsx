@@ -11,7 +11,6 @@ import {
 	PlusIcon,
 } from "@radix-ui/react-icons";
 import { Content } from "@/components/Main";
-import { useRouter } from "next/router";
 import { Field } from "@/components/Field";
 import { Label } from "@/components/Label";
 import { Input } from "@/components/Input";
@@ -32,6 +31,7 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/Dropdown";
 import { defaultNewTransaction } from "@/pages/group/[gid]";
+import { definitions } from "../types/supabase";
 
 export default function AddManualTransactions({
 	gid,
@@ -43,8 +43,6 @@ export default function AddManualTransactions({
 	groupUsers: any;
 	profile: any;
 }) {
-	const router = useRouter();
-
 	useEffect(() => {
 		return () => {
 			defaultNewTransaction({ gid, groupUsers });
@@ -120,9 +118,7 @@ export const TransactionForm = ({ groupUsers, profile }: { groupUsers: any; prof
 								type="text"
 								value={
 									newTransaction.charged_to
-										? groupUsers.find((x: any) => x.profile_id === newTransaction.charged_to)[
-												"profiles"
-										  ]["username"]
+										? groupUsers[newTransaction.charged_to]["profiles"]["username"]
 										: ""
 								}
 							/>
@@ -345,10 +341,19 @@ const Toolbar = () => {
 	const submit = async () => {
 		uiStore.getState().setGlobalLoading(true);
 		const { data, error } = await supabaseQuery(
-			() => supabase.from("shared_transactions").insert(newTransaction),
+			() =>
+				supabase
+					.from("shared_transactions")
+					.insert(newTransaction)
+					.select("*, profiles(username, avatar_url)"),
 			true,
 		);
 
+		const indexedData: Record<string, definitions["shared_transactions"]> = R.indexBy(
+			R.prop("id"),
+			data,
+		);
+		tempStore.getState().updateSharedTransactions(indexedData);
 		uiStore.getState().setGlobalLoading(false);
 		if (!error) uiStore.getState().setShowAddTransactionSuccess(true);
 		uiStore.getState().setShowAddManualTransactions(false);

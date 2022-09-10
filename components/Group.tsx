@@ -237,6 +237,11 @@ const GroupUser = ({ user, profile, showRunningTotal }: any) => {
 			);
 	}, [filteredTransactions]);
 
+	// used when adding/removing/editing transactions
+	useEffect(() => {
+		if (!groupFilterbyUser) setFilteredTransactions(sharedTransactions);
+	}, [sharedTransactions]);
+
 	const filterTransactionsByUser = (profileId: string) => {
 		if (isSelected && profileId === user.profile_id) {
 			setGroupFilterbyUser(null);

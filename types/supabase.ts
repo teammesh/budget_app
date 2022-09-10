@@ -1226,7 +1226,7 @@ export interface definitions {
 		 * This is a Primary Key.<pk/>
 		 * @default extensions.uuid_generate_v4()
 		 */
-		id?: string;
+		id: string;
 		/** Format: jsonb */
 		split_amounts?: unknown;
 	};

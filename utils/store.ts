@@ -2,6 +2,7 @@ import create from "zustand";
 import { persist } from "zustand/middleware";
 import { GROUP_FEED_MODE } from "@/constants/components.constants";
 import { definitions } from "../types/supabase";
+import * as R from "ramda";
 
 interface SessionStoreState {
 	session: any;
@@ -32,7 +33,8 @@ export const sessionStore = create<SessionStoreState>(
 
 interface TempStoreState {
 	sharedTransactions: Record<string, definitions["shared_transactions"]>;
-	setSharedTransactions: (x: Record<any, any>) => void;
+	setSharedTransactions: (x: Record<string, definitions["shared_transactions"]>) => void;
+	updateSharedTransactions: (x: Record<string, definitions["shared_transactions"]>) => void;
 	newTransaction: definitions["shared_transactions"] | Record<any, any>;
 	setNewTransaction: (x: definitions["shared_transactions"] | Record<any, any>) => void;
 	filteredTransactions: Record<string, definitions["shared_transactions"]>;
@@ -68,6 +70,8 @@ export const tempStore = create<TempStoreState>((set, get) => ({
 	setNewTransaction: (x) => set(() => ({ newTransaction: x })),
 	sharedTransactions: {},
 	setSharedTransactions: (x) => set(() => ({ sharedTransactions: x })),
+	updateSharedTransactions: (x) =>
+		set(() => ({ sharedTransactions: R.mergeDeepRight(get().sharedTransactions, x) })),
 	filteredTransactions: {},
 	setFilteredTransactions: (x) => set(() => ({ filteredTransactions: x })),
 	userPayments: {},
