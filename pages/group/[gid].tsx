@@ -42,7 +42,7 @@ const Group = ({
 }: {
 	user: AuthUser;
 	profile: definitions["profiles"];
-	transactions: definitions["shared_transactions"][];
+	transactions: Record<string, definitions["shared_transactions"]>;
 	users: definitions["profiles_groups"][] | any;
 	balances: definitions["balances"];
 	payments: [] | any;
@@ -52,7 +52,7 @@ const Group = ({
 
 	// @ts-ignore
 	const { gid }: { gid: string } = router.query;
-	const [groupUsers, setGroupUsers] = useState<Record<any, any>>(users);
+	const [groupUsers, setGroupUsers] = useState<Record<string, definitions["profiles"]>>(users);
 	const showAddTransactions = uiStore((state) => state.showAddTransactions);
 	const showAddManualTransactions = uiStore((state) => state.showAddManualTransactions);
 	const showManage = uiStore((state) => state.showManage);
@@ -108,8 +108,8 @@ const Group = ({
 		defaultNewTransaction({ gid, groupUsers });
 
 		return () => {
-			setSharedTransactions([]);
-			setFilteredTransactions([]);
+			setSharedTransactions({});
+			setFilteredTransactions({});
 			setUserPayments([]);
 			setShowManage(false);
 			setShowPayments(false);

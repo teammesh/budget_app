@@ -32,13 +32,13 @@ export const sessionStore = create<SessionStoreState>(
 );
 
 interface TempStoreState {
-	sharedTransactions: Record<string, definitions["shared_transactions"]>;
+	sharedTransactions: Record<string, definitions["shared_transactions"]> | any;
 	setSharedTransactions: (x: Record<string, definitions["shared_transactions"]>) => void;
 	updateSharedTransactions: (x: Record<string, definitions["shared_transactions"]>) => void;
 	newTransaction: definitions["shared_transactions"] | Record<any, any>;
 	setNewTransaction: (x: definitions["shared_transactions"] | Record<any, any>) => void;
 	filteredTransactions: Record<string, definitions["shared_transactions"]>;
-	setFilteredTransactions: (x: Record<any, any>) => void;
+	setFilteredTransactions: (x: Record<string, definitions["shared_transactions"]>) => void;
 	userPayments: Record<any, any>;
 	setUserPayments: (x: Record<any, any>) => void;
 	addTransactions: any[];
