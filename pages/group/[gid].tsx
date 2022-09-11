@@ -159,8 +159,7 @@ const Group = ({
 			true,
 		);
 
-		setSharedTransactions(R.mergeDeepLeft(tempStore.getState().sharedTransactions, data));
-		setFilteredTransactions(R.mergeDeepLeft(tempStore.getState().sharedTransactions, data));
+		setSharedTransactions(data);
 	};
 
 	return (
