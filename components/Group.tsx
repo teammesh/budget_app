@@ -135,11 +135,27 @@ export const GroupFeed = ({ groupUsers }: { groupUsers: any }) => {
 
 const TransactionList = () => {
 	const filteredTransactions = tempStore((state) => state.filteredTransactions);
+	const sharedTransactions = tempStore((state) => state.sharedTransactions);
+	const groupFilterbyUser = uiStore((state) => state.groupFilterbyUser);
+	const setFilteredTransactions = tempStore.getState().setFilteredTransactions;
+
+	/*
+	 * TODO: can we convert filteredTransactions into an indexed object?
+	 * that way we can use R.pick() to just find transactions of a user
+	 * would require us to have an array of transaction_ids in the user object
+	 */
+	useEffect(() => {
+		if (groupFilterbyUser)
+			setFilteredTransactions(
+				R.values(sharedTransactions).filter((x) => x.charged_to === groupFilterbyUser),
+			);
+		else setFilteredTransactions(R.values(sharedTransactions));
+	}, [sharedTransactions]);
 
 	return (
 		<div className={"grid grid-cols-1 gap-2"}>
 			{!R.isEmpty(filteredTransactions) ? (
-				R.values(filteredTransactions).map((x: any) => (
+				filteredTransactions.map((x: any) => (
 					<Link href={`/transaction/${encodeURIComponent(x.id)}`} key={x.id} passHref>
 						<SharedTransaction transaction={x} />
 					</Link>
@@ -225,27 +241,14 @@ export const GroupSummary = ({
 const GroupUser = ({ user, profile, showRunningTotal }: any) => {
 	const setFilteredTransactions = tempStore.getState().setFilteredTransactions;
 	const groupFilterbyUser = uiStore((state) => state.groupFilterbyUser);
-	const filteredTransactions = tempStore((state) => state.filteredTransactions);
 	const setGroupFilterbyUser = uiStore.getState().setGroupFilterbyUser;
 	const sharedTransactions = tempStore.getState().sharedTransactions;
 	const isSelected = groupFilterbyUser === user.profile_id;
 
-	useEffect(() => {
-		if (groupFilterbyUser)
-			setFilteredTransactions(
-				R.values(sharedTransactions).filter((x) => x.charged_to === groupFilterbyUser),
-			);
-	}, [filteredTransactions]);
-
-	// used when adding/removing/editing transactions
-	useEffect(() => {
-		if (!groupFilterbyUser) setFilteredTransactions(sharedTransactions);
-	}, [sharedTransactions]);
-
 	const filterTransactionsByUser = (profileId: string) => {
 		if (isSelected && profileId === user.profile_id) {
 			setGroupFilterbyUser(null);
-			setFilteredTransactions(sharedTransactions);
+			setFilteredTransactions(R.values(sharedTransactions));
 		} else {
 			setGroupFilterbyUser(profileId);
 			setFilteredTransactions(

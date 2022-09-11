@@ -67,13 +67,19 @@ const Group = ({
 	const setGroupActivities = tempStore.getState().setGroupActivities;
 
 	useEffect(() => {
+		console.log(user);
+		console.log(profile);
+		console.log(transactions);
+		console.log(users);
+		console.log(balances);
+		console.log(payments);
+		console.log(activities);
 		tempStore.getState().setGroupName(R.values(users)[0].groups.name);
 		tempStore.getState().setGroupAvatarUrl(R.values(users)[0].groups.avatar_url);
 		tempStore
 			.getState()
 			.setGroupMembers(R.values(groupUsers).map((user: any) => user.profiles.username));
 		transactions && setSharedTransactions(transactions);
-		transactions && setFilteredTransactions(transactions);
 		payments && setUserPayments(payments);
 		activities && setGroupActivities(activities);
 
@@ -109,7 +115,7 @@ const Group = ({
 
 		return () => {
 			setSharedTransactions({});
-			setFilteredTransactions({});
+			setFilteredTransactions([]);
 			setUserPayments([]);
 			setShowManage(false);
 			setShowPayments(false);
@@ -130,7 +136,6 @@ const Group = ({
 					.eq("group_id", gid),
 			true,
 		);
-
 		setGroupUsers(data);
 	};
 
@@ -145,7 +150,6 @@ const Group = ({
 					.eq("group_id", gid),
 			true,
 		);
-
 		setUserPayments(data);
 	};
 
@@ -158,7 +162,6 @@ const Group = ({
 					.eq("group_id", gid),
 			true,
 		);
-
 		setSharedTransactions(data);
 	};
 

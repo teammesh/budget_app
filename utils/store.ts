@@ -37,8 +37,8 @@ interface TempStoreState {
 	updateSharedTransactions: (x: Record<string, definitions["shared_transactions"]>) => void;
 	newTransaction: definitions["shared_transactions"] | Record<any, any>;
 	setNewTransaction: (x: definitions["shared_transactions"] | Record<any, any>) => void;
-	filteredTransactions: Record<string, definitions["shared_transactions"]>;
-	setFilteredTransactions: (x: Record<string, definitions["shared_transactions"]>) => void;
+	filteredTransactions: [definitions["shared_transactions"]] | any[];
+	setFilteredTransactions: (x: [definitions["shared_transactions"]] | any[]) => void;
 	userPayments: Record<any, any>;
 	setUserPayments: (x: Record<any, any>) => void;
 	addTransactions: any[];
@@ -72,7 +72,7 @@ export const tempStore = create<TempStoreState>((set, get) => ({
 	setSharedTransactions: (x) => set(() => ({ sharedTransactions: x })),
 	updateSharedTransactions: (x) =>
 		set(() => ({ sharedTransactions: R.mergeDeepRight(get().sharedTransactions, x) })),
-	filteredTransactions: {},
+	filteredTransactions: [],
 	setFilteredTransactions: (x) => set(() => ({ filteredTransactions: x })),
 	userPayments: {},
 	setUserPayments: (x) => set(() => ({ userPayments: x })),
