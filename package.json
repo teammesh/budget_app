@@ -22,6 +22,7 @@
     "@uiball/loaders": "^1.2.6",
     "autoprefixer": "^10.4.7",
     "boring-avatars": "^1.7.0",
+    "eslint-plugin-ramda": "^2.5.1",
     "framer-motion": "^6.5.1",
     "jotai": "^1.7.3",
     "luxon": "^3.0.1",
