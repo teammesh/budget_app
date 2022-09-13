@@ -20,6 +20,7 @@ import { ModalContent } from "./Modal";
 import { displayAmount } from "./Amount";
 import { Content } from "@/components/Main";
 import { definitions } from "../types/supabase";
+import { TRANSACTION_METADATA } from "@/constants/components.constants";
 
 export default function AddTransactions({
 	gid,
@@ -32,12 +33,12 @@ export default function AddTransactions({
 }) {
 	const profile_id = supabase.auth.session()?.user?.id;
 	const [showAccounts, setShowAccounts] = useState<any>([]);
-	const [transactions, setTransactions] = useState<any>([]);
+	const [transactions, setTransactions] = useState<
+		Record<string, definitions["profiles_transactions"]>
+	>({});
 	const [isLoading, setIsLoading] = useState<any>(true);
 	const accounts = sessionStore((state) => state.accounts);
 	const setAccounts = sessionStore.getState().setAccounts;
-	const transactionCursor = sessionStore.getState().transactionCursor;
-	const setTransactionCursor = sessionStore.getState().setTransactionCursor;
 	const setAddTransactions = tempStore.getState().setAddTransactions;
 
 	useEffect(() => {
@@ -49,23 +50,7 @@ export default function AddTransactions({
 				if (data && !R.isEmpty(data)) {
 					setAccounts(R.indexBy(R.prop("access_token"), data));
 					// fetch transactions for the first pm and display them
-					await getTransactions(data[0].access_token, data[0].account_id);
-
-					// const response = await fetch("/api/plaidGetBalances", {
-					// 	method: "post",
-					// 	body: JSON.stringify({
-					// 		access_token: "access-development-3ab682d2-9a9c-4c12-b5cd-60e344550673",
-					// 	}),
-					// }).catch((error) => console.error(error));
-					//
-					// // @ts-ignore
-					// const { balances } = response.json();
-
-					// const balance = await client.accountsBalanceGet({
-					// 	access_token: "access-development-70e98bbf-3bbb-4948-b4f3-2f02c66e9b2d",
-					// });
-					//
-					// console.log(balance);
+					await getTransactions(data[0].access_token, data[0].account_id, data[0].cursor);
 
 					// await fetch("/api/plaidRemoveItem", {
 					// 	method: "post",
@@ -90,25 +75,40 @@ export default function AddTransactions({
 
 		return () => {
 			setAddTransactions([]);
-			setTransactionCursor(null);
 		};
 	}, []);
 
 	const getTransactions = async (
 		access_token: ItemPublicTokenExchangeResponse["access_token"],
 		account_id: TransactionType["account_id"],
+		cursor: string | null,
 	) => {
 		setIsLoading(true);
 		// hide transactions for the pm if it is toggled again
 		if (showAccounts.includes(access_token)) {
 			setShowAccounts(R.without([access_token], showAccounts));
-			setTransactions(transactions.filter((x: TransactionType) => x.account_id !== account_id));
+			setTransactions(
+				R.pickBy(
+					(value: definitions["profiles_transactions"], key) => value.account_id !== account_id,
+					transactions,
+				),
+			);
 			return setIsLoading(false);
 		}
 
-		const cursor = transactionCursor?.access_token;
+		const { data: userTransactions } = await supabase
+			.from<definitions["profiles_transactions"]>("profiles_transactions")
+			.select("*")
+			.eq("profile_id", profile_id)
+			.not("transaction_id", "is", null)
+			.limit(100);
 
-		const data = await fetch("/api/plaidGetTransactions", {
+		const plaidTransactions: {
+			added: TransactionType[];
+			removed: TransactionType[];
+			modified: TransactionType[];
+			error?: any;
+		} = await fetch("/api/plaidGetTransactions", {
 			method: "post",
 			body: JSON.stringify({
 				access_token,
@@ -116,42 +116,61 @@ export default function AddTransactions({
 			}),
 		}).then((res) => res.json());
 
+		// if (userTransactions) {
+		// 	tempStore.getState().updateUserTransactions(userTransactions);
+		// }
+
 		// remove from showAccounts and flag the pm for re-authentication
-		if (data?.error?.error_code === "ITEM_LOGIN_REQUIRED") {
+		if (plaidTransactions?.error?.error_code === "ITEM_LOGIN_REQUIRED") {
 			setAccounts(assocPath([access_token, "invalid"], true, sessionStore.getState().accounts));
 			setShowAccounts(R.without([access_token], showAccounts));
 			setIsLoading(false);
 			return;
 		}
 
-		// if (data?.error?.error_code === "ITEM_LOGIN_REQUIRED") {
-		// 	fetch("/api/plaidCreateLinkToken", {
-		// 		method: "post",
-		// 		body: JSON.stringify({
-		// 			profile_id: supabase.auth.session()?.user?.id,
-		// 			access_token,
-		// 		}),
-		// 	}).then((res) =>
-		// 		res.json().then((token) => {
-		// 			tempStore.getState().setLinkToken(token);
-		// 			setIsLoading(false);
-		// 			return window.Plaid.create(plaidLinkUpdate({ setIsLoading, linkToken: token })).open();
-		// 		}),
-		// 	);
-		// }
-
-		setTransactionCursor({
-			...sessionStore.getState().transactionCursor,
-			[access_token]: data.next_cursor,
-		});
-		setShowAccounts([...showAccounts, access_token]);
-		setTransactions(
-			R.reverse(
-				sortByDate([...transactions, ...data.added.filter((x: any) => x.pending === false)]),
-			),
+		const newPlaidTransactions = R.map(
+			(x) => R.assocPath(["profile_id"], profile_id || null, R.pick(TRANSACTION_METADATA, x)),
+			R.filter((x) => !x.pending, plaidTransactions.added),
 		);
+		const modifiedPlaidTransactions = R.map(
+			(x) => R.assocPath(["profile_id"], profile_id || null, R.pick(TRANSACTION_METADATA, x)),
+			R.filter((x) => !x.pending, plaidTransactions.modified),
+		);
+		const removedPlaidTransactions = R.pluck("transaction_id", plaidTransactions.removed);
+		const userPlaidTransactions = R.isEmpty(userTransactions)
+			? {} // @ts-ignore
+			: R.omit(removedPlaidTransactions, R.indexBy(R.prop("transaction_id"), userTransactions));
+		const allTransactions = R.concat(
+			newPlaidTransactions,
+			R.concat(R.values(userPlaidTransactions), modifiedPlaidTransactions),
+		);
+		const sortedTransactions = R.reverse(sortByDate(allTransactions));
+		const indexedTransactions = R.indexBy(R.prop("transaction_id"), sortedTransactions);
 
-		console.log(data);
+		// add new Plaid transactions to db
+		!R.isEmpty(newPlaidTransactions) &&
+			(await supabase
+				.from("profiles_transactions")
+				.upsert(newPlaidTransactions, { returning: "minimal" }));
+		// remove any removed transactions from db
+		!R.isEmpty(removedPlaidTransactions) &&
+			(await supabase
+				.from("profiles_transactions")
+				.delete({ returning: "minimal" })
+				.eq("profile_id", profile_id)
+				.contains("transaction_id", removedPlaidTransactions));
+		// update any modified transactions to db
+		!R.isEmpty(modifiedPlaidTransactions) &&
+			(await supabase
+				.from("profiles_transactions")
+				.upsert(modifiedPlaidTransactions, { returning: "minimal" })
+				.eq("profile_id", profile_id));
+
+		setTransactions(indexedTransactions);
+		setShowAccounts([...showAccounts, access_token]);
+
+		console.log(plaidTransactions);
+		console.log(indexedTransactions);
 		return setIsLoading(false);
 	};
 
@@ -235,7 +254,9 @@ export default function AddTransactions({
 						className={
 							"grid grid-cols-[auto_1fr_auto] items-center justify-between content-center gap-3 py-1"
 						}
-						onClick={() => getTransactions(account.access_token, account.account_id)}
+						onClick={() =>
+							getTransactions(account.access_token, account.account_id, account.cursor)
+						}
 						key={account.item_id}
 					>
 						<Toggle checked={showAccounts.includes(account.access_token)} />
@@ -284,13 +305,8 @@ export default function AddTransactions({
 					</Header>
 					<div className={"grid grid-cols-1 gap-2"}>
 						{!R.isEmpty(transactions) &&
-							transactions.map((x: definitions["shared_transactions"]) => (
-								<Transaction
-									gid={gid}
-									transaction={x}
-									key={x.transaction_id}
-									groupUsers={groupUsers}
-								/>
+							R.values(transactions).map((x: definitions["profiles_transactions"]) => (
+								<Transaction gid={gid} transaction={x} key={x.id} groupUsers={groupUsers} />
 							))}
 					</div>
 				</div>

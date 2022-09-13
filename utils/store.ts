@@ -7,8 +7,6 @@ import * as R from "ramda";
 interface SessionStoreState {
 	session: any;
 	setSession: (x: any) => void;
-	transactionCursor: Record<string, unknown>;
-	setTransactionCursor: (x: any) => void;
 	accounts: Record<any, any>;
 	setAccounts: (x: any) => void;
 }
@@ -19,8 +17,6 @@ export const sessionStore = create<SessionStoreState>(
 		(set, get) => ({
 			session: null,
 			setSession: (x) => set(() => ({ session: x })),
-			transactionCursor: {},
-			setTransactionCursor: (x) => set(() => ({ transactionCursor: x })),
 			accounts: {},
 			setAccounts: (x) => set(() => ({ accounts: x })),
 		}),
@@ -32,6 +28,9 @@ export const sessionStore = create<SessionStoreState>(
 );
 
 interface TempStoreState {
+	userTransactions: definitions["profiles_transactions"][] | any;
+	setUserTransactions: (x: definitions["profiles_transactions"][]) => void;
+	updateUserTransactions: (x: definitions["profiles_transactions"][]) => void;
 	sharedTransactions: Record<string, definitions["shared_transactions"]> | any;
 	setSharedTransactions: (x: Record<string, definitions["shared_transactions"]>) => void;
 	updateSharedTransactions: (x: Record<string, definitions["shared_transactions"]>) => void;
@@ -72,6 +71,10 @@ export const tempStore = create<TempStoreState>((set, get) => ({
 	setSharedTransactions: (x) => set(() => ({ sharedTransactions: x })),
 	updateSharedTransactions: (x) =>
 		set(() => ({ sharedTransactions: R.mergeDeepRight(get().sharedTransactions, x) })),
+	userTransactions: {},
+	setUserTransactions: (x) => set(() => ({ userTransactions: x })),
+	updateUserTransactions: (x) =>
+		set(() => ({ userTransactions: R.mergeDeepRight(get().userTransactions, x) })),
 	filteredTransactions: [],
 	setFilteredTransactions: (x) => set(() => ({ filteredTransactions: x })),
 	userPayments: {},

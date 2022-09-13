@@ -5,30 +5,14 @@ import * as R from "ramda";
 import { supabase } from "@/utils/supabaseClient";
 import { displayAmount } from "./Amount";
 import { definitions } from "../types/supabase";
-
-const TRANSACTION_METADATA = [
-	"account_id",
-	"amount",
-	"authorized_date",
-	"category",
-	"category_id",
-	"date",
-	"location",
-	"merchant_name",
-	"name",
-	"payment_channel",
-	"payment_meta",
-	"pending",
-	"transaction_id",
-	"transaction_type",
-];
+import { TRANSACTION_METADATA } from "@/constants/components.constants";
 
 export const Transaction = ({
 	transaction,
 	gid,
 	groupUsers,
 }: {
-	transaction: definitions["shared_transactions"];
+	transaction: definitions["profiles_transactions"];
 	gid: any;
 	groupUsers: any;
 }) => {
@@ -43,7 +27,7 @@ export const Transaction = ({
 	const profile_id = supabase.auth.session()?.user?.id;
 
 	const shareTransaction = async (
-		transaction: definitions["shared_transactions"],
+		transaction: definitions["profiles_transactions"],
 		isShared: boolean,
 		isAdded: boolean,
 	) => {
@@ -68,7 +52,7 @@ export const Transaction = ({
 			);
 		});
 
-		const newTransaction: definitions["shared_transactions"] = {
+		const newTransaction: definitions["profiles_transactions"] = {
 			...metadata,
 			group_id: gid,
 			charged_to: profile_id,
