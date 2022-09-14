@@ -1,13 +1,14 @@
 import { PlaidLinkOptions } from "react-plaid-link";
 import { supabase } from "@/utils/supabaseClient";
-import { sessionStore, tempStore } from "@/utils/store";
+import { tempStore } from "@/utils/store";
 import { assocPath, dissocPath } from "ramda";
+import { definitions } from "../types/supabase";
 
 export function plaidLink({ setIsLoading }: { setIsLoading: any }) {
 	const linkToken = tempStore.getState().linkToken;
 	const setLinkToken = tempStore.getState().setLinkToken;
-	const accounts = sessionStore.getState().accounts;
-	const setAccounts = sessionStore.getState().setAccounts;
+	const accounts = tempStore.getState().accounts;
+	const setAccounts = tempStore.getState().setAccounts;
 
 	// The usePlaidLink hook manages Plaid Link creation
 	// It does not return a destroy function;
@@ -34,7 +35,7 @@ export function plaidLink({ setIsLoading }: { setIsLoading: any }) {
 						}),
 					})
 						.then((res) => res.json())
-						.then(async ({ data, error }) => {
+						.then(async ({ data, error }: { data: definitions["plaid_items"][]; error?: any }) => {
 							if (error) return alert(error.message);
 							await fetch("/api/plaidCreateLinkToken", {
 								method: "post",
@@ -44,7 +45,7 @@ export function plaidLink({ setIsLoading }: { setIsLoading: any }) {
 							}).then((res) =>
 								res.json().then((token) => tempStore.getState().setLinkToken(token)),
 							);
-							return setAccounts(assocPath([access_token], data[0], accounts));
+							return setAccounts(assocPath([item_id], data[0], accounts));
 						});
 				})
 				.catch(({ error }) => alert(error.message))
@@ -59,14 +60,14 @@ export function plaidLink({ setIsLoading }: { setIsLoading: any }) {
 export function plaidLinkUpdate({
 	setIsLoading,
 	linkToken,
-	access_token,
+	item_id,
 }: {
 	setIsLoading: any;
 	linkToken: string;
-	access_token: string;
+	item_id: string;
 }) {
-	const accounts = sessionStore.getState().accounts;
-	const setAccounts = sessionStore.getState().setAccounts;
+	const accounts = tempStore.getState().accounts;
+	const setAccounts = tempStore.getState().setAccounts;
 
 	// The usePlaidLink hook manages Plaid Link creation
 	// It does not return a destroy function;
@@ -74,7 +75,7 @@ export function plaidLinkUpdate({
 	const config: PlaidLinkOptions = {
 		onSuccess: async (public_token, metadata) => {
 			setIsLoading(false);
-			setAccounts(dissocPath([access_token, "invalid"], accounts));
+			setAccounts(dissocPath([item_id, "invalid"], accounts));
 			return await fetch("/api/plaidCreateLinkToken", {
 				method: "post",
 				body: JSON.stringify({

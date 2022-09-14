@@ -1,24 +1,23 @@
 import create from "zustand";
 import { persist } from "zustand/middleware";
 import { GROUP_FEED_MODE } from "@/constants/components.constants";
-import { definitions } from "../types/supabase";
 import * as R from "ramda";
+import { StoreType } from "../types/store";
 
-interface SessionStoreState {
-	session: any;
-	setSession: (x: any) => void;
-	accounts: Record<any, any>;
-	setAccounts: (x: any) => void;
-}
-
-export const sessionStore = create<SessionStoreState>(
+export const sessionStore = create<StoreType["sessionStore"]>(
 	// @ts-ignore
 	persist(
 		(set, get) => ({
 			session: null,
 			setSession: (x) => set(() => ({ session: x })),
-			accounts: {},
-			setAccounts: (x) => set(() => ({ accounts: x })),
+			userTransactions: {},
+			setUserTransactions: (x) => set(() => ({ userTransactions: x })),
+			updateUserTransactions: (x) =>
+				set(() => ({ userTransactions: R.mergeDeepRight(get().userTransactions, x) })),
+			accountPagination: {},
+			setAccountPagination: (x) => set(() => ({ accountPagination: x })),
+			updateAccountPagination: (x) =>
+				set(() => ({ accountPagination: R.mergeDeepRight(get().accountPagination, x) })),
 		}),
 		{
 			name: "session-store", // name of item in the storage (must be unique)
@@ -27,42 +26,9 @@ export const sessionStore = create<SessionStoreState>(
 	),
 );
 
-interface TempStoreState {
-	userTransactions: definitions["profiles_transactions"][] | any;
-	setUserTransactions: (x: definitions["profiles_transactions"][]) => void;
-	updateUserTransactions: (x: definitions["profiles_transactions"][]) => void;
-	sharedTransactions: Record<string, definitions["shared_transactions"]> | any;
-	setSharedTransactions: (x: Record<string, definitions["shared_transactions"]>) => void;
-	updateSharedTransactions: (x: Record<string, definitions["shared_transactions"]>) => void;
-	newTransaction: definitions["shared_transactions"] | Record<any, any>;
-	setNewTransaction: (x: definitions["shared_transactions"] | Record<any, any>) => void;
-	filteredTransactions: [definitions["shared_transactions"]] | any[];
-	setFilteredTransactions: (x: [definitions["shared_transactions"]] | any[]) => void;
-	userPayments: Record<any, any>;
-	setUserPayments: (x: Record<any, any>) => void;
-	addTransactions: any[];
-	setAddTransactions: (x: any[]) => void;
-	groupActivities: any[];
-	setGroupActivities: (x: any[]) => void;
-	groups: any[];
-	setGroups: (x: any[]) => void;
-	groupName: string;
-	setGroupName: (x: string) => void;
-	groupMembers: any;
-	setGroupMembers: (x: any) => void;
-	username: string;
-	setUsername: (x: string) => void;
-	website: string;
-	setWebsite: (x: string) => void;
-	avatarUrl: string;
-	setAvatarUrl: (x: string) => void;
-	groupAvatarUrl: string;
-	setGroupAvatarUrl: (x: string) => void;
-	linkToken: string;
-	setLinkToken: (x: string) => void;
-}
-
-export const tempStore = create<TempStoreState>((set, get) => ({
+export const tempStore = create<StoreType["tempStore"]>((set, get) => ({
+	accounts: {},
+	setAccounts: (x) => set(() => ({ accounts: x })),
 	addTransactions: [],
 	setAddTransactions: (x) => set(() => ({ addTransactions: x })),
 	newTransaction: {},
@@ -71,10 +37,6 @@ export const tempStore = create<TempStoreState>((set, get) => ({
 	setSharedTransactions: (x) => set(() => ({ sharedTransactions: x })),
 	updateSharedTransactions: (x) =>
 		set(() => ({ sharedTransactions: R.mergeDeepRight(get().sharedTransactions, x) })),
-	userTransactions: {},
-	setUserTransactions: (x) => set(() => ({ userTransactions: x })),
-	updateUserTransactions: (x) =>
-		set(() => ({ userTransactions: R.mergeDeepRight(get().userTransactions, x) })),
 	filteredTransactions: [],
 	setFilteredTransactions: (x) => set(() => ({ filteredTransactions: x })),
 	userPayments: {},
@@ -99,30 +61,7 @@ export const tempStore = create<TempStoreState>((set, get) => ({
 	setLinkToken: (x) => set(() => ({ linkToken: x })),
 }));
 
-interface UIStoreState {
-	showNavbar: boolean;
-	setShowNavbar: (x: boolean) => void;
-	globalLoading: boolean;
-	setGlobalLoading: (x: boolean) => void;
-	showAddTransactions: boolean;
-	setShowAddTransactions: (x: boolean) => void;
-	showAddManualTransactions: boolean;
-	setShowAddManualTransactions: (x: boolean) => void;
-	showPayments: boolean;
-	setShowPayments: (x: boolean) => void;
-	showManage: boolean;
-	setShowManage: (x: boolean) => void;
-	groupFeedMode: any;
-	setGroupFeedMode: (x: any) => void;
-	groupFilterbyUser: any;
-	setGroupFilterbyUser: (x: any) => void;
-	showSessionExpired: boolean;
-	setShowSessionExpired: (x: boolean) => void;
-	showAddTransactionSuccess: boolean;
-	setShowAddTransactionSuccess: (x: boolean) => void;
-}
-
-export const uiStore = create<UIStoreState>((set, get) => ({
+export const uiStore = create<StoreType["uiStore"]>((set, get) => ({
 	showNavbar: true,
 	setShowNavbar: (x) => set(() => ({ showNavbar: x })),
 	globalLoading: false,

@@ -29,6 +29,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 	const request: TransactionsSyncRequest = {
 		access_token,
 		cursor,
+		count: 50,
 	};
 
 	try {
