@@ -32,7 +32,7 @@ export default function AddTransactions({
 	groupUsers: any;
 }) {
 	const profile_id = supabase.auth.session()?.user?.id;
-	const [showAccounts, setShowAccounts] = useState<definitions["plaid_items"]["item_id"][]>([]);
+	const [showAccounts, setShowAccounts] = useState<definitions["plaid_items"]["account_id"][]>([]);
 	const [isLoading, setIsLoading] = useState<any>(true);
 	const userTransactions = sessionStore((state) => state.userTransactions);
 	const setUserTransactions = sessionStore.getState().setUserTransactions;
@@ -48,15 +48,14 @@ export default function AddTransactions({
 			.eq("profile_id", profile_id)
 			.then(async ({ data, error }) => {
 				if (data && !R.isEmpty(data)) {
-					setAccounts(R.indexBy(R.prop("item_id"), data));
+					setAccounts(R.indexBy(R.prop("account_id"), data));
 
 					// fetch transactions for the first pm and display them
 					await getTransactions(
 						data[0].access_token,
 						data[0].account_id,
-						data[0].item_id,
-						sessionStore.getState().accountPagination[data[0].item_id] &&
-							sessionStore.getState().accountPagination[data[0].item_id]["cursor"],
+						sessionStore.getState().accountPagination[data[0].account_id] &&
+							sessionStore.getState().accountPagination[data[0].account_id]["cursor"],
 					);
 				}
 				setIsLoading(false);
@@ -81,20 +80,13 @@ export default function AddTransactions({
 	const getTransactions = async (
 		access_token: definitions["plaid_items"]["access_token"],
 		account_id: definitions["plaid_items"]["account_id"],
-		item_id: definitions["plaid_items"]["item_id"],
 		cursor: StoreType["accountPagination"]["cursor"],
 	) => {
 		setIsLoading(true);
 
 		// hide transactions for the pm if it is toggled again
-		if (showAccounts.includes(access_token)) {
-			setShowAccounts(R.without([access_token], showAccounts));
-			setUserTransactions(
-				R.pickBy(
-					(value: definitions["profiles_transactions"], key) => value.account_id !== account_id,
-					userTransactions,
-				),
-			);
+		if (showAccounts.includes(account_id)) {
+			setShowAccounts(R.without([account_id], showAccounts));
 			return setIsLoading(false);
 		}
 
@@ -117,8 +109,8 @@ export default function AddTransactions({
 
 		// remove from showAccounts and flag the pm for re-authentication
 		if (plaidTransactions?.error?.error_code === "ITEM_LOGIN_REQUIRED") {
-			setAccounts(assocPath([access_token, "invalid"], true, accounts));
-			setShowAccounts(R.without([access_token], showAccounts));
+			setAccounts(assocPath([account_id, "invalid"], true, accounts));
+			setShowAccounts(R.without([account_id], showAccounts));
 			return setIsLoading(false);
 		}
 
@@ -143,7 +135,7 @@ export default function AddTransactions({
 
 		/*
 			If there are new transactions...
-			then we need to insert it to userTransactions and resort
+			then we need to insert it to userTransactions and re-sort
 		*/
 		if (!R.isEmpty(plaidTransactions.added)) {
 			const newPlaidTransactions = R.map(
@@ -151,6 +143,7 @@ export default function AddTransactions({
 				R.filter((x) => !x.pending, plaidTransactions.added),
 			);
 			const mergeTransactions = R.concat(R.values(allTransactions), newPlaidTransactions);
+			console.log(mergeTransactions);
 			const sortTransactions = R.reverse(sortByDate(mergeTransactions));
 			allTransactions = R.indexBy(R.prop("transaction_id"), sortTransactions);
 		}
@@ -158,12 +151,12 @@ export default function AddTransactions({
 		setUserTransactions(allTransactions);
 		setAccountPagination(
 			R.assocPath(
-				[item_id, "cursor"],
+				[account_id, "cursor"],
 				plaidTransactions.next_cursor,
 				sessionStore.getState().accountPagination,
 			),
 		);
-		setShowAccounts(R.append(access_token, showAccounts));
+		setShowAccounts(R.append(account_id, showAccounts));
 
 		console.log(plaidTransactions);
 		console.log(sessionStore.getState().userTransactions);
@@ -172,7 +165,7 @@ export default function AddTransactions({
 
 	const reauthenticatePlaid = (
 		access_token: definitions["plaid_items"]["access_token"],
-		item_id: definitions["plaid_items"]["item_id"],
+		account_id: definitions["plaid_items"]["account_id"],
 	) => {
 		setIsLoading(true);
 		fetch("/api/plaidCreateLinkToken", {
@@ -184,7 +177,7 @@ export default function AddTransactions({
 		}).then((res) =>
 			res.json().then((token) => {
 				return window.Plaid.create(
-					plaidLinkUpdate({ setIsLoading, linkToken: token, item_id }),
+					plaidLinkUpdate({ setIsLoading, linkToken: token, account_id }),
 				).open();
 			}),
 		);
@@ -196,15 +189,15 @@ export default function AddTransactions({
 		R.forEachObjIndexed((account, itemId) => {
 			if (account.invalid) {
 				arr.push(
-					<Dialog.Root key={account.item_id}>
+					<Dialog.Root key={account.account_id}>
 						<Dialog.Trigger asChild>
 							<div
 								className={
 									"grid grid-cols-[auto_1fr_auto] items-center justify-between content-center gap-3 py-1"
 								}
-								key={account.item_id}
+								key={account.account_id}
 							>
-								<Toggle checked={showAccounts.includes(account.access_token)} />
+								<Toggle checked={showAccounts.includes(account.account_id)} />
 								<div
 									className={
 										"grid grid-cols-[auto_auto] gap-2 items-center place-content-start text-ellipsis overflow-hidden whitespace-nowrap"
@@ -238,7 +231,7 @@ export default function AddTransactions({
 								<Button
 									size={"sm"}
 									background={theme.colors.gradient.a}
-									onClick={() => reauthenticatePlaid(account.access_token, account.item_id)}
+									onClick={() => reauthenticatePlaid(account.access_token, account.account_id)}
 								>
 									<ExitIcon />
 									Proceed
@@ -254,11 +247,15 @@ export default function AddTransactions({
 							"grid grid-cols-[auto_1fr_auto] items-center justify-between content-center gap-3 py-1"
 						}
 						onClick={() =>
-							getTransactions(account.access_token, account.account_id, account.cursor)
+							getTransactions(
+								account.access_token,
+								account.account_id,
+								sessionStore.getState().accountPagination[account.account_id]["cursor"],
+							)
 						}
-						key={account.item_id}
+						key={account.account_id}
 					>
-						<Toggle checked={showAccounts.includes(account.access_token)} />
+						<Toggle checked={showAccounts.includes(account.account_id)} />
 						<div className={"text-ellipsis overflow-hidden whitespace-nowrap"}>{account.name}</div>
 						<span className={"font-mono font-medium tracking-tight text-gray-500"}>
 							•••• {account.last_four_digits}
@@ -303,10 +300,13 @@ export default function AddTransactions({
 						Your <TextGradient gradient={theme.colors.gradient.a}>transactions</TextGradient>
 					</Header>
 					<div className={"grid grid-cols-1 gap-2"}>
-						{!R.isEmpty(transactions) &&
-							R.values(transactions).map((x: definitions["profiles_transactions"]) => (
-								<Transaction gid={gid} transaction={x} key={x.id} groupUsers={groupUsers} />
-							))}
+						{!R.isEmpty(userTransactions) &&
+							R.values(userTransactions).map(
+								(x) =>
+									showAccounts.includes(x.account_id) && (
+										<Transaction gid={gid} transaction={x} key={x.id} groupUsers={groupUsers} />
+									),
+							)}
 					</div>
 				</div>
 				{isLoading && <Loading />}

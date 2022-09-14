@@ -344,7 +344,7 @@ const Toolbar = () => {
 			() =>
 				supabase
 					.from("shared_transactions")
-					.insert(newTransaction)
+					.insert({ ...newTransaction, account_id: supabase.auth.user()?.id })
 					.select("*, profiles(username, avatar_url)"),
 			true,
 		);

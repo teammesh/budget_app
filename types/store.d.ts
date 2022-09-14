@@ -4,7 +4,7 @@ export interface StoreType {
 	sessionStore: {
 		session: any;
 		setSession: (x: any) => void;
-		userTransactions: Record<string, definitions["shared_transactions"]> | any;
+		userTransactions: Record<string, definitions["shared_transactions"]>;
 		setUserTransactions: (x: Record<string, definitions["shared_transactions"]>) => void;
 		updateUserTransactions: (x: Record<string, definitions["shared_transactions"]>) => void;
 		accountPagination: Record<string, StoreType["accountPagination"]>;
@@ -14,7 +14,7 @@ export interface StoreType {
 	tempStore: {
 		accounts: Record<string, AccountType>;
 		setAccounts: (x: Record<string, AccountType>) => void;
-		sharedTransactions: Record<string, definitions["shared_transactions"]> | any;
+		sharedTransactions: Record<string, definitions["shared_transactions"]>;
 		setSharedTransactions: (x: Record<string, definitions["shared_transactions"]>) => void;
 		updateSharedTransactions: (x: Record<string, definitions["shared_transactions"]>) => void;
 		newTransaction: definitions["shared_transactions"] | Record<any, any>;

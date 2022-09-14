@@ -25,7 +25,7 @@ export function plaidLink({ setIsLoading }: { setIsLoading: any }) {
 				}),
 			})
 				.then((res) => res.json())
-				.then(({ item_id, access_token }) => {
+				.then(({ item_id, access_token, account_id }) => {
 					return fetch("/api/plaidSavePaymentMethod", {
 						method: "post",
 						body: JSON.stringify({
@@ -45,7 +45,7 @@ export function plaidLink({ setIsLoading }: { setIsLoading: any }) {
 							}).then((res) =>
 								res.json().then((token) => tempStore.getState().setLinkToken(token)),
 							);
-							return setAccounts(assocPath([item_id], data[0], accounts));
+							return setAccounts(assocPath([account_id], data[0], accounts));
 						});
 				})
 				.catch(({ error }) => alert(error.message))
@@ -60,11 +60,11 @@ export function plaidLink({ setIsLoading }: { setIsLoading: any }) {
 export function plaidLinkUpdate({
 	setIsLoading,
 	linkToken,
-	item_id,
+	account_id,
 }: {
 	setIsLoading: any;
 	linkToken: string;
-	item_id: string;
+	account_id: string;
 }) {
 	const accounts = tempStore.getState().accounts;
 	const setAccounts = tempStore.getState().setAccounts;
@@ -75,7 +75,7 @@ export function plaidLinkUpdate({
 	const config: PlaidLinkOptions = {
 		onSuccess: async (public_token, metadata) => {
 			setIsLoading(false);
-			setAccounts(dissocPath([item_id, "invalid"], accounts));
+			setAccounts(dissocPath([account_id, "invalid"], accounts));
 			return await fetch("/api/plaidCreateLinkToken", {
 				method: "post",
 				body: JSON.stringify({

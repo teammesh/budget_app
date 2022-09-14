@@ -12,7 +12,7 @@ export const Transaction = ({
 	gid,
 	groupUsers,
 }: {
-	transaction: definitions["profiles_transactions"];
+	transaction: definitions["shared_transactions"];
 	gid: any;
 	groupUsers: any;
 }) => {
@@ -24,10 +24,10 @@ export const Transaction = ({
 		R.values(sharedTransactions),
 	);
 	const isAdded = addTransactions.find((y) => transaction.transaction_id === y.transaction_id);
-	const profile_id = supabase.auth.session()?.user?.id;
+	const profile_id = supabase.auth.session()?.user?.id || "";
 
 	const shareTransaction = async (
-		transaction: definitions["profiles_transactions"],
+		transaction: definitions["shared_transactions"],
 		isShared: boolean,
 		isAdded: boolean,
 	) => {
@@ -52,7 +52,7 @@ export const Transaction = ({
 			);
 		});
 
-		const newTransaction: definitions["profiles_transactions"] = {
+		const newTransaction: definitions["shared_transactions"] = {
 			...metadata,
 			group_id: gid,
 			charged_to: profile_id,
