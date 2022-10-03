@@ -23,6 +23,7 @@ import {
 	TRANSACTION_METADATA,
 	TRANSACTION_PAGINATION_COUNT,
 } from "@/constants/components.constants";
+import { AccountType } from "../types/store";
 
 export default function AddTransactions({
 	gid,
@@ -85,21 +86,23 @@ export default function AddTransactions({
 		access_token: definitions["plaid_items"]["access_token"],
 		account_id: definitions["plaid_items"]["account_id"],
 	) => {
+		// hide transactions for the pm if it is toggled again
+		if (showAccounts.includes(account_id)) {
+			setShowAccounts(R.without([account_id], showAccounts));
+			return setIsLoading(false);
+		} else if (tempStore.getState().transactionPagination.hasOwnProperty(account_id)) {
+			return setShowAccounts(R.append(account_id, showAccounts));
+		}
+
 		const pagination = tempStore.getState().transactionPagination[account_id] || {
 			start_date: paginateDate(getFormattedDate(new Date())),
 			end_date: getFormattedDate(new Date()),
 			offset: 0,
 		};
 		if (pagination?.reached_limit) return;
-		setIsLoading(true);
-
-		// hide transactions for the pm if it is toggled again
-		if (showAccounts.includes(account_id)) {
-			setShowAccounts(R.without([account_id], showAccounts));
-			return setIsLoading(false);
-		}
 
 		let allTransactions = tempStore.getState().userTransactions;
+		setIsLoading(true);
 
 		// Check Plaid for any new/modified/removed transactions using transaction cursor
 		const { start_date, end_date, offset } = pagination;
@@ -218,82 +221,76 @@ export default function AddTransactions({
 			.replaceAll("/", "-");
 	};
 
-	const Account = () => {
-		const arr: any[] = [];
-
-		R.forEachObjIndexed((account, itemId) => {
-			if (account.invalid) {
-				arr.push(
-					<Dialog.Root key={account.account_id}>
-						<Dialog.Trigger asChild>
+	const Account = (account: AccountType) => {
+		if (account.invalid) {
+			return (
+				<Dialog.Root key={account.account_id}>
+					<Dialog.Trigger asChild>
+						<div
+							className={
+								"grid grid-cols-[auto_1fr_auto] items-center justify-between content-center gap-3 py-1"
+							}
+							key={account.account_id}
+						>
+							<Toggle checked={showAccounts.includes(account.account_id)} />
 							<div
 								className={
-									"grid grid-cols-[auto_1fr_auto] items-center justify-between content-center gap-3 py-1"
+									"grid grid-cols-[auto_auto] gap-2 items-center place-content-start text-ellipsis overflow-hidden whitespace-nowrap"
 								}
-								key={account.account_id}
 							>
-								<Toggle checked={showAccounts.includes(account.account_id)} />
-								<div
-									className={
-										"grid grid-cols-[auto_auto] gap-2 items-center place-content-start text-ellipsis overflow-hidden whitespace-nowrap"
-									}
-								>
-									{<ExclamationTriangleIcon color={theme.colors.avatar[0]} />}
-									{account.name}
-								</div>
-								<span className={"font-mono font-medium tracking-tight text-gray-500"}>
-									•••• {account.last_four_digits}
-								</span>
+								{<ExclamationTriangleIcon color={theme.colors.avatar[0]} />}
+								{account.name}
 							</div>
-						</Dialog.Trigger>
-						<ModalContent>
-							<div className={"grid grid-cols-1 gap-2 text-center"}>
-								<Dialog.Title className={"font-medium text-md"}>
-									Lost connection to payment method
-								</Dialog.Title>
-								<Dialog.Description className={"text-sm text-gray-500"}>
-									To reconnect your payment method, you will need to login to your bank institution
-									via Plaid.
-								</Dialog.Description>
-							</div>
-							<div className={"grid grid-cols-1 gap-2"}>
-								<Dialog.Close asChild>
-									<Button size={"sm"} border={theme.colors.gradient.a}>
-										<ArrowLeftIcon />
-										Cancel
-									</Button>
-								</Dialog.Close>
-								<Button
-									size={"sm"}
-									background={theme.colors.gradient.a}
-									onClick={() => reauthenticatePlaid(account.access_token, account.account_id)}
-								>
-									<ExitIcon />
-									Proceed
+							<span className={"font-mono font-medium tracking-tight text-gray-500"}>
+								•••• {account.last_four_digits}
+							</span>
+						</div>
+					</Dialog.Trigger>
+					<ModalContent>
+						<div className={"grid grid-cols-1 gap-2 text-center"}>
+							<Dialog.Title className={"font-medium text-md"}>
+								Lost connection to payment method
+							</Dialog.Title>
+							<Dialog.Description className={"text-sm text-gray-500"}>
+								To reconnect your payment method, you will need to login to your bank institution
+								via Plaid.
+							</Dialog.Description>
+						</div>
+						<div className={"grid grid-cols-1 gap-2"}>
+							<Dialog.Close asChild>
+								<Button size={"sm"} border={theme.colors.gradient.a}>
+									<ArrowLeftIcon />
+									Cancel
 								</Button>
-							</div>
-						</ModalContent>
-					</Dialog.Root>,
-				);
-			} else
-				arr.push(
-					<div
-						className={
-							"grid grid-cols-[auto_1fr_auto] items-center justify-between content-center gap-3 py-1"
-						}
-						onClick={() => getTransactions(account.access_token, account.account_id)}
-						key={account.account_id}
-					>
-						<Toggle checked={showAccounts.includes(account.account_id)} />
-						<div className={"text-ellipsis overflow-hidden whitespace-nowrap"}>{account.name}</div>
-						<span className={"font-mono font-medium tracking-tight text-gray-500"}>
-							•••• {account.last_four_digits}
-						</span>
-					</div>,
-				);
-		}, accounts);
-
-		return arr;
+							</Dialog.Close>
+							<Button
+								size={"sm"}
+								background={theme.colors.gradient.a}
+								onClick={() => reauthenticatePlaid(account.access_token, account.account_id)}
+							>
+								<ExitIcon />
+								Proceed
+							</Button>
+						</div>
+					</ModalContent>
+				</Dialog.Root>
+			);
+		} else
+			return (
+				<div
+					className={
+						"grid grid-cols-[auto_1fr_auto] items-center justify-between content-center gap-3 py-1"
+					}
+					onClick={() => getTransactions(account.access_token, account.account_id)}
+					key={account.account_id}
+				>
+					<Toggle checked={showAccounts.includes(account.account_id)} />
+					<div className={"text-ellipsis overflow-hidden whitespace-nowrap"}>{account.name}</div>
+					<span className={"font-mono font-medium tracking-tight text-gray-500"}>
+						•••• {account.last_four_digits}
+					</span>
+				</div>
+			);
 	};
 
 	return (
@@ -322,7 +319,7 @@ export default function AddTransactions({
 					</Button>
 				</div>
 				<div className={"p-3 rounded-md bg-gray-900 grid grid-cols-1 gap-2 text-sm"}>
-					{Account()}
+					{R.values(accounts).map((account) => Account(account))}
 				</div>
 				<div className={"mt-6"}>
 					<Header>
