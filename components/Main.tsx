@@ -53,10 +53,11 @@ export const Main = ({ children }: { children: any }) => {
 	);
 };
 
-export const Content = ({ children, ref }: any) => {
+export const Content = ({ children, ref, id }: any) => {
 	return (
 		<div
 			ref={ref}
+			id={id}
 			className={"grid grid-cols-1 gap-4 overflow-x-hidden overflow-y-auto max-h-full p-3 relative"}
 		>
 			{children}

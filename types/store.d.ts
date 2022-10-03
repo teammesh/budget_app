@@ -4,9 +4,6 @@ export interface StoreType {
 	sessionStore: {
 		session: any;
 		setSession: (x: any) => void;
-		userTransactions: Record<string, definitions["shared_transactions"]>;
-		setUserTransactions: (x: Record<string, definitions["shared_transactions"]>) => void;
-		updateUserTransactions: (x: Record<string, definitions["shared_transactions"]>) => void;
 		accountPagination: Record<string, StoreType["accountPagination"]>;
 		setAccountPagination: (x: Record<string, StoreType["accountPagination"]>) => void;
 		updateAccountPagination: (x: Record<string, StoreType["accountPagination"]>) => void;
@@ -14,6 +11,15 @@ export interface StoreType {
 	tempStore: {
 		accounts: Record<string, AccountType>;
 		setAccounts: (x: Record<string, AccountType>) => void;
+		userTransactions: Record<
+			definitions["plaid_items"]["item_id"],
+			definitions["shared_transactions"]
+		>;
+		setUserTransactions: (x: Record<string, definitions["shared_transactions"]>) => void;
+		updateUserTransactions: (x: Record<string, definitions["shared_transactions"]>) => void;
+		transactionPagination: Record<definitions["plaid_items"]["item_id"], TransactionPaginationType>;
+		setTransactionPagination: (x: Record<string, TransactionPaginationType>) => void;
+		updateTransactionPagination: (x: Record<string, TransactionPaginationType>) => void;
 		sharedTransactions: Record<string, definitions["shared_transactions"]>;
 		setSharedTransactions: (x: Record<string, definitions["shared_transactions"]>) => void;
 		updateSharedTransactions: (x: Record<string, definitions["shared_transactions"]>) => void;
@@ -74,4 +80,10 @@ export interface StoreType {
 
 export type AccountType = definitions["plaid_items"] & {
 	invalid?: boolean;
+};
+
+export type TransactionPaginationType = {
+	start_date: string;
+	end_date: string;
+	offset: number;
 };

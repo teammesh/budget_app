@@ -10,11 +10,6 @@ export const sessionStore = create<StoreType["sessionStore"]>(
 		(set, get) => ({
 			session: null,
 			setSession: (x) => set(() => ({ session: x })),
-			userTransactions: {},
-			setUserTransactions: (x) => set(() => ({ userTransactions: x })),
-			updateUserTransactions: (x) =>
-				// @ts-ignore
-				set(() => ({ userTransactions: R.mergeDeepRight(get().userTransactions, x) })),
 			accountPagination: {},
 			setAccountPagination: (x) => set(() => ({ accountPagination: x })),
 			updateAccountPagination: (x) =>
@@ -30,6 +25,16 @@ export const sessionStore = create<StoreType["sessionStore"]>(
 export const tempStore = create<StoreType["tempStore"]>((set, get) => ({
 	accounts: {},
 	setAccounts: (x) => set(() => ({ accounts: x })),
+	userTransactions: {},
+	setUserTransactions: (x) => set(() => ({ userTransactions: x })),
+	updateUserTransactions: (x) =>
+		// @ts-ignore
+		set(() => ({ userTransactions: R.mergeDeepRight(get().userTransactions, x) })),
+	transactionPagination: {},
+	setTransactionPagination: (x) => set(() => ({ transactionPagination: x })),
+	updateTransactionPagination: (x) =>
+		// @ts-ignore
+		set(() => ({ transactionPagination: R.mergeDeepRight(get().transactionPagination, x) })),
 	addTransactions: [],
 	setAddTransactions: (x) => set(() => ({ addTransactions: x })),
 	newTransaction: {},

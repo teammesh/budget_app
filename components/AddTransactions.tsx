@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { supabase, supabaseQuery } from "@/utils/supabaseClient";
-import { sessionStore, tempStore, uiStore } from "@/utils/store";
+import { tempStore, uiStore } from "@/utils/store";
 import * as R from "ramda";
 import { assocPath } from "ramda";
-import { Transaction as TransactionType } from "plaid";
+import { TransactionsGetResponse } from "plaid";
 import { plaidLink, plaidLinkUpdate } from "@/components/plaidLink";
 import { sortByDate } from "@/utils/helper";
 import { Button } from "@/components/Button";
@@ -19,8 +19,11 @@ import { ModalContent } from "./Modal";
 import { displayAmount } from "./Amount";
 import { Content } from "@/components/Main";
 import { definitions } from "../types/supabase";
-import { TRANSACTION_METADATA } from "@/constants/components.constants";
-import { StoreType } from "../types/store";
+import {
+	TRANSACTION_METADATA,
+	TRANSACTION_PAGINATION_COUNT,
+} from "@/constants/components.constants";
+import { useBottomScrollListener } from "react-bottom-scroll-listener";
 
 export default function AddTransactions({
 	gid,
@@ -34,12 +37,14 @@ export default function AddTransactions({
 	const profile_id = supabase.auth.session()?.user?.id;
 	const [showAccounts, setShowAccounts] = useState<definitions["plaid_items"]["account_id"][]>([]);
 	const [isLoading, setIsLoading] = useState<any>(true);
-	const userTransactions = sessionStore((state) => state.userTransactions);
-	const setUserTransactions = sessionStore.getState().setUserTransactions;
+	const userTransactions = tempStore((state) => state.userTransactions);
+	const setUserTransactions = tempStore.getState().setUserTransactions;
+	const transactionPagination = tempStore((state) => state.transactionPagination);
+	const updateTransactionPagination = tempStore.getState().updateTransactionPagination;
 	const accounts = tempStore((state) => state.accounts);
 	const setAccounts = tempStore.getState().setAccounts;
 	const setAddTransactions = tempStore.getState().setAddTransactions;
-	const setAccountPagination = sessionStore.getState().setAccountPagination;
+	const containerRef = useRef();
 
 	useEffect(() => {
 		supabase
@@ -51,12 +56,7 @@ export default function AddTransactions({
 					setAccounts(R.indexBy(R.prop("account_id"), data));
 
 					// fetch transactions for the first pm and display them
-					await getTransactions(
-						data[0].access_token,
-						data[0].account_id,
-						sessionStore.getState().accountPagination[data[0].account_id] &&
-							sessionStore.getState().accountPagination[data[0].account_id]["cursor"],
-					);
+					await getTransactions(data[0].access_token, data[0].account_id);
 				}
 				setIsLoading(false);
 			});
@@ -80,7 +80,6 @@ export default function AddTransactions({
 	const getTransactions = async (
 		access_token: definitions["plaid_items"]["access_token"],
 		account_id: definitions["plaid_items"]["account_id"],
-		cursor: StoreType["accountPagination"]["cursor"],
 	) => {
 		setIsLoading(true);
 
@@ -90,20 +89,23 @@ export default function AddTransactions({
 			return setIsLoading(false);
 		}
 
-		let allTransactions = sessionStore.getState().userTransactions;
+		let allTransactions = tempStore.getState().userTransactions;
+		const pagination = transactionPagination[account_id] || {
+			start_date: paginateDate(getFormattedDate(new Date())),
+			end_date: getFormattedDate(new Date()),
+			offset: 0,
+		};
 
 		// Check Plaid for any new/modified/removed transactions using transaction cursor
-		const plaidTransactions: {
-			added: TransactionType[];
-			removed: TransactionType[];
-			modified: TransactionType[];
-			error?: any;
-			next_cursor: string;
-		} = await fetch("/api/plaidGetTransactions", {
+		const { start_date, end_date, offset } = pagination;
+		const plaidTransactions: TransactionsGetResponse = await fetch("/api/plaidGetTransactions", {
 			method: "post",
 			body: JSON.stringify({
 				access_token,
-				cursor,
+				start_date,
+				end_date,
+				offset,
+				count: TRANSACTION_PAGINATION_COUNT,
 			}),
 		}).then((res) => res.json());
 
@@ -114,52 +116,40 @@ export default function AddTransactions({
 			return setIsLoading(false);
 		}
 
-		/*
-			If there are modified/removed transactions...
-			then we need to update the locally stored transactions with these changes
-		*/
-		if (!R.isEmpty(plaidTransactions.modified)) {
-			const modifiedPlaidTransactions = R.indexBy(
-				R.prop("transaction_id"),
-				R.map<any, any>(
-					(x) => R.assocPath(["profile_id"], profile_id || null, R.pick(TRANSACTION_METADATA, x)),
-					R.filter((x) => !x.pending, plaidTransactions.modified),
-				),
-			);
-			allTransactions = R.mergeDeepLeft(modifiedPlaidTransactions, allTransactions);
-		}
-		if (!R.isEmpty(plaidTransactions.removed)) {
-			const removedPlaidTransactions = R.pluck("transaction_id", plaidTransactions.removed);
-			allTransactions = R.omit(removedPlaidTransactions, allTransactions);
+		// increment offset/date
+		if (plaidTransactions.total_transactions > offset) {
+			updateTransactionPagination({
+				[account_id]: { start_date, end_date, offset: offset + TRANSACTION_PAGINATION_COUNT },
+			});
+		} else {
+			updateTransactionPagination({
+				[account_id]: {
+					start_date: paginateDate(start_date),
+					end_date: paginateDate(end_date),
+					offset: 0,
+				},
+			});
 		}
 
 		/*
 			If there are new transactions...
 			then we need to insert it to userTransactions and re-sort
 		*/
-		if (!R.isEmpty(plaidTransactions.added)) {
+		if (!R.isEmpty(plaidTransactions.transactions)) {
 			const newPlaidTransactions = R.map(
 				(x) => R.assocPath(["profile_id"], profile_id || null, R.pick(TRANSACTION_METADATA, x)),
-				R.filter((x) => !x.pending, plaidTransactions.added),
+				plaidTransactions.transactions,
 			);
 			const mergeTransactions = R.concat(R.values(allTransactions), newPlaidTransactions);
-			console.log(mergeTransactions);
 			const sortTransactions = R.reverse(sortByDate(mergeTransactions));
 			allTransactions = R.indexBy(R.prop("transaction_id"), sortTransactions);
 		}
 
 		setUserTransactions(allTransactions);
-		setAccountPagination(
-			R.assocPath(
-				[account_id, "cursor"],
-				plaidTransactions.next_cursor,
-				sessionStore.getState().accountPagination,
-			),
-		);
 		setShowAccounts(R.append(account_id, showAccounts));
 
 		console.log(plaidTransactions);
-		console.log(sessionStore.getState().userTransactions);
+		console.log(tempStore.getState().userTransactions);
 		return setIsLoading(false);
 	};
 
@@ -181,6 +171,23 @@ export default function AddTransactions({
 				).open();
 			}),
 		);
+	};
+
+	const paginateDate = (date: string) => {
+		const newDate = new Date(date);
+		newDate.setMonth(newDate.getMonth() - 6);
+		newDate.setHours(0, 0, 0, 0);
+		return getFormattedDate(newDate);
+	};
+
+	const getFormattedDate = (date: Date) => {
+		return date
+			.toLocaleDateString("en-ZA", {
+				year: "numeric",
+				month: "2-digit",
+				day: "2-digit",
+			})
+			.replaceAll("/", "-");
 	};
 
 	const Account = () => {
@@ -246,13 +253,7 @@ export default function AddTransactions({
 						className={
 							"grid grid-cols-[auto_1fr_auto] items-center justify-between content-center gap-3 py-1"
 						}
-						onClick={() =>
-							getTransactions(
-								account.access_token,
-								account.account_id,
-								sessionStore.getState().accountPagination[account.account_id]["cursor"],
-							)
-						}
+						onClick={() => getTransactions(account.access_token, account.account_id)}
 						key={account.account_id}
 					>
 						<Toggle checked={showAccounts.includes(account.account_id)} />
@@ -269,7 +270,7 @@ export default function AddTransactions({
 
 	return (
 		<>
-			<Content>
+			<Content id={"transactions"}>
 				<Script src="https://cdn.plaid.com/link/v2/stable/link-initialize.js" />
 				<div className={"flex justify-between"}>
 					<Button

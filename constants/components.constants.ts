@@ -25,3 +25,5 @@ export const TRANSACTION_METADATA = [
 	"transaction_id",
 	"transaction_type",
 ];
+
+export const TRANSACTION_PAGINATION_COUNT = 50;
