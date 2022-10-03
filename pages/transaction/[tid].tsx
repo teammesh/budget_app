@@ -48,7 +48,7 @@ const Transaction = ({
 	const router = useRouter();
 	const [isEditing, setIsEditing] = useState(false);
 	const [transaction, setTransaction] = useState(oldTransaction);
-	const groupUsers = transaction.groups.profiles_groups;
+	const groupUsers = R.indexBy(R.prop("profile_id"), transaction.groups.profiles_groups);
 
 	useEffect(() => {
 		tempStore.getState().setNewTransaction(transaction);
@@ -136,7 +136,7 @@ const Transaction = ({
 				{!isEditing && (
 					<PrimaryBox>
 						<div className={"grid grid-cols-1 gap-3"}>
-							{groupUsers.map((user: any) => (
+							{R.values(groupUsers).map((user: any) => (
 								<div
 									key={user.profile_id}
 									className={"grid grid-cols-[auto_1fr_auto] items-center text-sm gap-3"}

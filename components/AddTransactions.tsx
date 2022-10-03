@@ -224,7 +224,7 @@ export default function AddTransactions({
 	const Account = (account: AccountType) => {
 		if (account.invalid) {
 			return (
-				<Dialog.Root key={account.account_id}>
+				<Dialog.Root>
 					<Dialog.Trigger asChild>
 						<div
 							className={
@@ -282,7 +282,6 @@ export default function AddTransactions({
 						"grid grid-cols-[auto_1fr_auto] items-center justify-between content-center gap-3 py-1"
 					}
 					onClick={() => getTransactions(account.access_token, account.account_id)}
-					key={account.account_id}
 				>
 					<Toggle checked={showAccounts.includes(account.account_id)} />
 					<div className={"text-ellipsis overflow-hidden whitespace-nowrap"}>{account.name}</div>
@@ -319,7 +318,9 @@ export default function AddTransactions({
 					</Button>
 				</div>
 				<div className={"p-3 rounded-md bg-gray-900 grid grid-cols-1 gap-2 text-sm"}>
-					{R.values(accounts).map((account) => Account(account))}
+					{R.values(accounts).map((account) => (
+						<React.Fragment key={account.account_id}>{Account(account)}</React.Fragment>
+					))}
 				</div>
 				<div className={"mt-6"}>
 					<Header>

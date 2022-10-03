@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { supabase } from "@/utils/supabaseClient";
 import { useRouter } from "next/router";
 import { motion } from "framer-motion";
-import { sessionStore } from "@/utils/store";
+import { sessionStore, tempStore } from "@/utils/store";
 
 export const Main = ({ children }: { children: any }) => {
 	const router = useRouter();
@@ -25,7 +25,7 @@ export const Main = ({ children }: { children: any }) => {
 				}).then((res) => res.json());
 
 				sessionStore.getState().setSession(null);
-				sessionStore.getState().setAccounts({});
+				tempStore.getState().setAccounts({});
 				localStorage.clear();
 				sessionStorage.clear();
 				return router.push("/login");

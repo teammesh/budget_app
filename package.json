@@ -17,7 +17,7 @@
     "@radix-ui/react-switch": "^1.0.0",
     "@radix-ui/react-toast": "^1.0.0",
     "@stitches/react": "^1.2.8",
-    "@supabase/supabase-js": "^1.35.6",
+    "@supabase/supabase-js": "^1.35.7",
     "@supabase/ui": "^0.36.5",
     "@uiball/loaders": "^1.2.6",
     "autoprefixer": "^10.4.7",

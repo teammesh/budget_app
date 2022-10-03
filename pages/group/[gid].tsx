@@ -302,12 +302,10 @@ export async function getServerSideProps({
 	const { props, redirect } = await verifyUser(req, res);
 	const { gid } = params;
 
-	const transactions: any[] = [];
-
-	// const { data: transactions } = await supabase
-	// 	.from("shared_transactions")
-	// 	.select("*, profiles(username, avatar_url)")
-	// 	.eq("group_id", gid);
+	const { data: transactions, error } = await supabase
+		.from("shared_transactions")
+		.select("*, profiles(username, avatar_url)")
+		.eq("group_id", gid);
 
 	const { data: users } = await supabase
 		.from("profiles_groups")
