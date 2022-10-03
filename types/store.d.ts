@@ -86,4 +86,5 @@ export type TransactionPaginationType = {
 	start_date: string;
 	end_date: string;
 	offset: number;
+	reached_limit?: boolean;
 };

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { supabase, supabaseQuery } from "@/utils/supabaseClient";
 import { tempStore, uiStore } from "@/utils/store";
 import * as R from "ramda";
@@ -23,7 +23,6 @@ import {
 	TRANSACTION_METADATA,
 	TRANSACTION_PAGINATION_COUNT,
 } from "@/constants/components.constants";
-import { useBottomScrollListener } from "react-bottom-scroll-listener";
 
 export default function AddTransactions({
 	gid,
@@ -39,12 +38,10 @@ export default function AddTransactions({
 	const [isLoading, setIsLoading] = useState<any>(true);
 	const userTransactions = tempStore((state) => state.userTransactions);
 	const setUserTransactions = tempStore.getState().setUserTransactions;
-	const transactionPagination = tempStore((state) => state.transactionPagination);
 	const updateTransactionPagination = tempStore.getState().updateTransactionPagination;
 	const accounts = tempStore((state) => state.accounts);
 	const setAccounts = tempStore.getState().setAccounts;
 	const setAddTransactions = tempStore.getState().setAddTransactions;
-	const containerRef = useRef();
 
 	useEffect(() => {
 		supabase
@@ -72,8 +69,15 @@ export default function AddTransactions({
 			}),
 		);
 
+		document
+			.querySelector("#transactions")
+			?.addEventListener("scroll", (evt) => getTransactionsOnScrollEnd(evt));
+
 		return () => {
 			setAddTransactions([]);
+			document
+				.querySelector("#transactions")
+				?.removeEventListener("scroll", (evt) => getTransactionsOnScrollEnd(evt));
 		};
 	}, []);
 
@@ -81,6 +85,12 @@ export default function AddTransactions({
 		access_token: definitions["plaid_items"]["access_token"],
 		account_id: definitions["plaid_items"]["account_id"],
 	) => {
+		const pagination = tempStore.getState().transactionPagination[account_id] || {
+			start_date: paginateDate(getFormattedDate(new Date())),
+			end_date: getFormattedDate(new Date()),
+			offset: 0,
+		};
+		if (pagination?.reached_limit) return;
 		setIsLoading(true);
 
 		// hide transactions for the pm if it is toggled again
@@ -90,11 +100,6 @@ export default function AddTransactions({
 		}
 
 		let allTransactions = tempStore.getState().userTransactions;
-		const pagination = transactionPagination[account_id] || {
-			start_date: paginateDate(getFormattedDate(new Date())),
-			end_date: getFormattedDate(new Date()),
-			offset: 0,
-		};
 
 		// Check Plaid for any new/modified/removed transactions using transaction cursor
 		const { start_date, end_date, offset } = pagination;
@@ -117,7 +122,14 @@ export default function AddTransactions({
 		}
 
 		// increment offset/date
-		if (plaidTransactions.total_transactions > offset) {
+		if (plaidTransactions.total_transactions === 0) {
+			updateTransactionPagination({
+				[account_id]: { start_date, end_date, offset, reached_limit: true },
+			});
+		} else if (
+			plaidTransactions.total_transactions > offset &&
+			plaidTransactions.total_transactions > TRANSACTION_PAGINATION_COUNT
+		) {
 			updateTransactionPagination({
 				[account_id]: { start_date, end_date, offset: offset + TRANSACTION_PAGINATION_COUNT },
 			});
@@ -148,8 +160,9 @@ export default function AddTransactions({
 		setUserTransactions(allTransactions);
 		setShowAccounts(R.append(account_id, showAccounts));
 
-		console.log(plaidTransactions);
-		console.log(tempStore.getState().userTransactions);
+		// console.log(plaidTransactions);
+		// console.log(tempStore.getState().userTransactions);
+		// console.log(tempStore.getState().transactionPagination);
 		return setIsLoading(false);
 	};
 
@@ -173,9 +186,24 @@ export default function AddTransactions({
 		);
 	};
 
+	const getTransactionsOnScrollEnd = (evt: Event) => {
+		const el = evt.target as HTMLDivElement;
+		if (R.isNil(el)) return;
+
+		if (el.scrollTop + el.clientHeight === el.scrollHeight) {
+			// User has scrolled to the bottom of the element
+			const accounts = tempStore.getState().accounts;
+			return getTransactions(R.values(accounts)[0].access_token, R.values(accounts)[0].account_id);
+		}
+	};
+
 	const paginateDate = (date: string) => {
-		const newDate = new Date(date);
-		newDate.setMonth(newDate.getMonth() - 6);
+		const newDate = new Date(date.replaceAll("-", "/"));
+		const month = newDate.getMonth() - 6;
+		if (month < 0) {
+			newDate.setFullYear(newDate.getFullYear() - 1);
+			newDate.setMonth(11 - Math.abs(month));
+		} else newDate.setMonth(month);
 		newDate.setHours(0, 0, 0, 0);
 		return getFormattedDate(newDate);
 	};
