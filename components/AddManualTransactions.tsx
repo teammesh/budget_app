@@ -200,8 +200,9 @@ const TransactionAmount = ({ groupUsers, profile }: any) => {
 				obj[key] = value;
 				amtRatios[key] = (value / 100) * newTransaction.amount;
 			} else {
-				obj[key] = (100 - value) / (groupUsers.length - 1);
-				amtRatios[key] = ((100 - value) / (groupUsers.length - 1) / 100) * newTransaction.amount;
+				obj[key] = (100 - value) / (R.values(groupUsers).length - 1);
+				amtRatios[key] =
+					((100 - value) / (R.values(groupUsers).length - 1) / 100) * newTransaction.amount;
 			}
 		}, amtPercentages);
 
