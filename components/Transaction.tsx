@@ -42,7 +42,7 @@ export const Transaction = ({
 			);
 
 		const metadata = R.pick(TRANSACTION_METADATA, transaction);
-		const splitAmountDivisor = 1 / groupUsers.length;
+		const splitAmountDivisor = 1 / R.values(groupUsers).length;
 		let split_amounts = {};
 		R.values(groupUsers).map((x: any) => {
 			split_amounts = R.assocPath(

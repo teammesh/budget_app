@@ -51,6 +51,9 @@ export function plaidLink({ setIsLoading }: { setIsLoading: any }) {
 				.catch(({ error }) => alert(error.message))
 				.finally(() => setIsLoading(false));
 		},
+		onExit: () => {
+			setIsLoading(false);
+		},
 		token: linkToken,
 	};
 
@@ -82,6 +85,9 @@ export function plaidLinkUpdate({
 					profile_id: supabase.auth.session()?.user?.id,
 				}),
 			}).then((res) => res.json().then((token) => tempStore.getState().setLinkToken(token)));
+		},
+		onExit: () => {
+			setIsLoading(false);
 		},
 		token: linkToken,
 	};
