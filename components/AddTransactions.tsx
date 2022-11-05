@@ -124,6 +124,13 @@ export default function AddTransactions({
 			return setIsLoading(false);
 		}
 
+		// remove from accounts & showAccounts
+		if (plaidTransactions?.error?.error_code === "INVALID_ACCESS_TOKEN") {
+			setAccounts(R.dissoc(account_id, accounts));
+			setShowAccounts(R.without([account_id], showAccounts));
+			return setIsLoading(false);
+		}
+
 		// increment offset/date
 		if (plaidTransactions.total_transactions === 0) {
 			updateTransactionPagination({
