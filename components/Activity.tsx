@@ -119,22 +119,18 @@ export const Activity = ({ activity }: { activity: any }) => {
 
 	useEffect(() => {
 		const moreInfo = async () => {
-			console.log(data);
 			if (showMore && isNil(data)) {
 				if (activity.table_name === tableNames.payments) {
 					const { data, error } = await supabase
 						.from("payments")
 						.select("*, from_user:from_profile_id(*), to_user:to_profile_id(*)")
 						.eq("id", activity.table_item_id);
-					console.log(data);
 					setData(data);
 				} else if (activity.table_name === tableNames.transactions) {
 					const { data, error } = await supabase
 						.from("shared_transactions")
 						.select("*, profiles(username, avatar_url)")
 						.eq("id", activity.table_item_id);
-					console.log(data);
-					console.log(error);
 					setData(data);
 				}
 			}

@@ -54,7 +54,6 @@ export default function Payments({
 			)
 			.eq("group_id", gid)
 			.then(({ data, error }) => {
-				console.log(data);
 				setUserBalances(data?.filter((balance) => balance.from_profile_id === profile_id));
 				setGroupBalances(data?.filter((balance) => balance.from_profile_id !== profile_id));
 			});
@@ -95,7 +94,8 @@ export default function Payments({
 								userBalances.reduce((prev: any, curr: any) => {
 									if (!curr.amount) return prev;
 									return curr.amount + prev;
-								}, 0))}
+								}, 0),
+						  )}
 				</div>
 			</div>
 			<Dialog.Root>

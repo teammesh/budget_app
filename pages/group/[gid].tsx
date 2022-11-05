@@ -67,13 +67,6 @@ const Group = ({
 	const setGroupActivities = tempStore.getState().setGroupActivities;
 
 	useEffect(() => {
-		console.log(user);
-		console.log(profile);
-		console.log(transactions);
-		console.log(users);
-		console.log(balances);
-		console.log(payments);
-		console.log(activities);
 		tempStore.getState().setGroupName(R.values(users)[0].groups.name);
 		tempStore.getState().setGroupAvatarUrl(R.values(users)[0].groups.avatar_url);
 		tempStore
