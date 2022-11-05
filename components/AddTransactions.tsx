@@ -102,6 +102,7 @@ export default function AddTransactions({
 		if (pagination?.reached_limit) return;
 
 		let allTransactions = tempStore.getState().userTransactions;
+		const accounts = tempStore.getState().accounts;
 		setIsLoading(true);
 
 		// Check Plaid for any new/modified/removed transactions using transaction cursor
