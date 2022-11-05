@@ -110,6 +110,15 @@ const Group = ({
 			})
 			.subscribe();
 
+		// subscribe to activities in this group
+		supabase
+			.from(`activities:group_id=eq.${gid}`)
+			.on("*", (payload) => {
+				console.log("Change received!", payload);
+				fetchActivities();
+			})
+			.subscribe();
+
 		// create a blank transaction to use in AddManualTransaction
 		defaultNewTransaction({ gid, groupUsers });
 
@@ -163,6 +172,19 @@ const Group = ({
 			true,
 		);
 		setSharedTransactions(data);
+	};
+
+	const fetchActivities = async () => {
+		const { data } = await supabaseQuery(() =>
+			supabase
+				.from("activities")
+				.select(
+					"id, group_id, user:profile_id(id, username), to_user:to_profile_id(id, username), table_name, table_item_id, type, created_at",
+				)
+				.eq("group_id", gid)
+				.order("created_at", { ascending: false }),
+		);
+		setGroupActivities(data);
 	};
 
 	return (
