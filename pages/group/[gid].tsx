@@ -44,7 +44,7 @@ const Group = ({
 	profile: definitions["profiles"];
 	transactions: Record<string, definitions["shared_transactions"]>;
 	users: definitions["profiles_groups"][] | any;
-	balances: definitions["balances"];
+	balances: definitions["balances"][];
 	payments: [] | any;
 	activities: [] | any;
 }) => {
@@ -65,6 +65,7 @@ const Group = ({
 	const setFilteredTransactions = tempStore.getState().setFilteredTransactions;
 	const setUserPayments = tempStore.getState().setUserPayments;
 	const setGroupActivities = tempStore.getState().setGroupActivities;
+	const setBalances = tempStore.getState().setBalances;
 
 	useEffect(() => {
 		tempStore.getState().setGroupName(R.values(users)[0].groups.name);
@@ -75,6 +76,7 @@ const Group = ({
 		transactions && setSharedTransactions(transactions);
 		payments && setUserPayments(payments);
 		activities && setGroupActivities(activities);
+		balances && setBalances(balances);
 
 		// subscribe to shared_transactions table based on group_id
 		supabase
@@ -109,6 +111,15 @@ const Group = ({
 			.on("*", (payload) => {
 				console.log("Change received!", payload);
 				fetchActivities();
+			})
+			.subscribe();
+
+		// subscribe to balances in this group
+		supabase
+			.from(`balances:group_id=eq.${gid}`)
+			.on("*", (payload) => {
+				console.log("Change received!", payload);
+				fetchBalances();
 			})
 			.subscribe();
 
@@ -178,6 +189,18 @@ const Group = ({
 				.order("created_at", { ascending: false }),
 		);
 		setGroupActivities(data);
+	};
+
+	const fetchBalances = async () => {
+		const { data } = await supabaseQuery(() =>
+			supabase
+				.from("balances")
+				.select(
+					"id, group_id, amount, from_profile_id, to_profile_id, from_user:from_profile_id(id, username, avatar_url), to_user:to_profile_id(id, username, avatar_url)",
+				)
+				.eq("group_id", gid),
+		);
+		setBalances(data);
 	};
 
 	return (
@@ -254,7 +277,7 @@ const Group = ({
 					</div>
 				</>
 			)}
-			{showPayments && <Payments gid={gid} setShowPayments={setShowPayments} balances={balances} />}
+			{showPayments && <Payments gid={gid} setShowPayments={setShowPayments} />}
 			{showManage && <Manage gid={gid} setShowManage={setShowManage} />}
 			{showAddTransactions && (
 				<AddTransactions

@@ -48,6 +48,8 @@ export const tempStore = create<StoreType["tempStore"]>((set, get) => ({
 	setFilteredTransactions: (x) => set(() => ({ filteredTransactions: x })),
 	userPayments: {},
 	setUserPayments: (x) => set(() => ({ userPayments: x })),
+	balances: [],
+	setBalances: (x) => set(() => ({ balances: x })),
 	groupActivities: [],
 	setGroupActivities: (x) => set(() => ({ groupActivities: x })),
 	groups: [],

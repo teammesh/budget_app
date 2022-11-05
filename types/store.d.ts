@@ -29,6 +29,8 @@ export interface StoreType {
 		setFilteredTransactions: (x: [definitions["shared_transactions"]] | any[]) => void;
 		userPayments: Record<any, any>;
 		setUserPayments: (x: Record<any, any>) => void;
+		balances: definitions["balances"][];
+		setBalances: (x: definitions["balances"][]) => void;
 		addTransactions: any[];
 		setAddTransactions: (x: any[]) => void;
 		groupActivities: any[];

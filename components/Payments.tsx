@@ -1,7 +1,7 @@
 import theme from "@/styles/theme";
 import { supabase } from "@/utils/supabaseClient";
 import { ArrowLeftIcon, CheckCircledIcon } from "@radix-ui/react-icons";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Button } from "./Button";
 import { definitions } from "../types/supabase";
 import { Loading } from "@/components/Loading";
@@ -11,53 +11,19 @@ import { ModalContent } from "@/components/Modal";
 import { isEmpty } from "ramda";
 import { displayAmount } from "./Amount";
 import { Content } from "@/components/Main";
+import { tempStore } from "@/utils/store";
 
-export default function Payments({
-	gid,
-	setShowPayments,
-	balances,
-}: {
-	gid: string;
-	setShowPayments: any;
-	balances: definitions["balances"] | any;
-}) {
+export default function Payments({ gid, setShowPayments }: { gid: string; setShowPayments: any }) {
 	const profile_id = supabase.auth.session()?.user?.id;
-	const [isLoading, setIsLoading] = useState<any>(true);
+	const [isLoading, setIsLoading] = useState<any>(false);
+	const balances = tempStore((state) => state.balances);
 
-	const [userBalances, setUserBalances] = useState<any>(
-		balances.filter((x: definitions["balances"]) => x.from_profile_id === profile_id),
+	const userBalances = balances.filter(
+		(x: definitions["balances"]) => x.from_profile_id === profile_id,
 	);
-	const [groupBalances, setGroupBalances] = useState<any>(
-		balances.filter((x: definitions["balances"]) => x.from_profile_id !== profile_id),
+	const groupBalances = balances.filter(
+		(x: definitions["balances"]) => x.from_profile_id !== profile_id,
 	);
-
-	useEffect(() => {
-		const balancesSub = supabase
-			.from(`balances:group_id=eq.${gid}`)
-			.on("*", (payload) => {
-				console.log("Change received!", payload);
-				fetchBalances();
-			})
-			.subscribe();
-		setIsLoading(false);
-
-		return () => {
-			supabase.removeSubscription(balancesSub);
-		};
-	}, []);
-
-	const fetchBalances = () => {
-		return supabase
-			.from("balances")
-			.select(
-				"id, group_id, amount, from_profile_id, to_profile_id, from_user:from_profile_id(id, username, avatar_url), to_user:to_profile_id(id, username, avatar_url)",
-			)
-			.eq("group_id", gid)
-			.then(({ data, error }) => {
-				setUserBalances(data?.filter((balance) => balance.from_profile_id === profile_id));
-				setGroupBalances(data?.filter((balance) => balance.from_profile_id !== profile_id));
-			});
-	};
 
 	const handleMarkAsPaid = async () => {
 		if (isEmpty(userBalances)) {

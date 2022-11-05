@@ -1092,7 +1092,7 @@ export interface definitions {
 		 * @description Note:
 		 * This is a Primary Key.<pk/>
 		 */
-		id: number;
+		id?: number;
 		/**
 		 * Format: timestamp with time zone
 		 * @default now()
