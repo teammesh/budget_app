@@ -88,3 +88,24 @@ export type TransactionPaginationType = {
 	offset: number;
 	reached_limit?: boolean;
 };
+
+export type TransactionType = definitions["shared_transactions"] & {
+	groups: {
+		name: definitions["groups"]["name"];
+		id: definitions["groups"]["name"];
+		profiles_groups: TransactionProfilesGroupType;
+	};
+	profiles: {
+		id: definitions["profiles"]["id"];
+		username: definitions["profiles"]["username"];
+		avatar_url: definitions["profiles"]["avatar_url"];
+	};
+};
+
+type TransactionProfilesGroupType = definitions["profiles_groups"] & {
+	profiles: {
+		id: definitions["profiles"]["id"];
+		username: definitions["profiles"]["username"];
+		avatar_url: definitions["profiles"]["avatar_url"];
+	};
+};

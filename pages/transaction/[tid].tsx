@@ -25,6 +25,7 @@ import create from "zustand";
 import Toast from "@/components/Toast";
 import { Avatar } from "@/components/Avatar";
 import { TransactionForm } from "@/components/AddManualTransactions";
+import { TransactionType } from "../../types/store";
 
 interface UIStoreState {
 	showToast: boolean;
@@ -43,11 +44,12 @@ const Transaction = ({
 }: {
 	user: AuthUser;
 	profile: definitions["profiles"];
-	transaction: definitions["shared_transactions"] | any;
+	transaction: TransactionType;
 }) => {
 	const router = useRouter();
 	const [isEditing, setIsEditing] = useState(false);
-	const [transaction, setTransaction] = useState(oldTransaction);
+	const [transaction, setTransaction] = useState<TransactionType>(oldTransaction);
+	// @ts-ignore
 	const groupUsers = R.indexBy(R.prop("profile_id"), transaction.groups.profiles_groups);
 
 	useEffect(() => {
