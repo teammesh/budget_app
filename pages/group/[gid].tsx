@@ -126,6 +126,8 @@ const Group = ({
 		// create a blank transaction to use in AddManualTransaction
 		defaultNewTransaction({ gid, groupUsers });
 
+		// Plaid OAuth
+
 		return () => {
 			setSharedTransactions({});
 			setFilteredTransactions([]);

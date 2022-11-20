@@ -1,6 +1,6 @@
 import { PlaidLinkOptions } from "react-plaid-link";
 import { supabase } from "@/utils/supabaseClient";
-import { tempStore } from "@/utils/store";
+import { sessionStore, tempStore } from "@/utils/store";
 import { assocPath, dissocPath } from "ramda";
 import { definitions } from "../types/supabase";
 
@@ -9,6 +9,10 @@ export function plaidLink({ setIsLoading }: { setIsLoading: any }) {
 	const setLinkToken = tempStore.getState().setLinkToken;
 	const accounts = tempStore.getState().accounts;
 	const setAccounts = tempStore.getState().setAccounts;
+	const receivedRedirectUri = sessionStore.getState().plaidReceivedRedirectUri;
+
+	// set URL to return to after logging in to Plaid OAuth
+	sessionStore.getState().setPlaidReturnToUrl(window.location.href);
 
 	// The usePlaidLink hook manages Plaid Link creation
 	// It does not return a destroy function;
@@ -55,6 +59,7 @@ export function plaidLink({ setIsLoading }: { setIsLoading: any }) {
 			setIsLoading(false);
 		},
 		token: linkToken,
+		receivedRedirectUri: receivedRedirectUri,
 	};
 
 	return config;
@@ -71,6 +76,7 @@ export function plaidLinkUpdate({
 }) {
 	const accounts = tempStore.getState().accounts;
 	const setAccounts = tempStore.getState().setAccounts;
+	const receivedRedirectUri = sessionStore.getState().plaidReceivedRedirectUri;
 
 	// The usePlaidLink hook manages Plaid Link creation
 	// It does not return a destroy function;
@@ -90,7 +96,13 @@ export function plaidLinkUpdate({
 			setIsLoading(false);
 		},
 		token: linkToken,
+		receivedRedirectUri: receivedRedirectUri,
 	};
 
 	return config;
 }
+
+export const removePlaidStorage = () => {
+	sessionStore.setState({ plaidReturnToUrl: "" });
+	sessionStore.setState({ plaidReceivedRedirectUri: "" });
+};

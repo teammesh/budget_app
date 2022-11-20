@@ -92,7 +92,7 @@ export const GroupFeed = ({ groupUsers }: { groupUsers: any }) => {
 				</PaginatedHeaderCont>
 			</div>
 			<Swiper
-				spaceBetween={16}
+				// spaceBetween={16}
 				slidesPerView={"auto"}
 				autoHeight={true}
 				onSlideChange={(e) => {

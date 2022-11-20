@@ -11,9 +11,13 @@ export const sessionStore = create<StoreType["sessionStore"]>(
 			session: null,
 			setSession: (x) => set(() => ({ session: x })),
 			accountPagination: {},
-			setAccountPagination: (x) => set(() => ({ accountPagination: x })),
 			updateAccountPagination: (x) =>
 				set(() => ({ accountPagination: R.mergeDeepRight(get().accountPagination, x) })),
+			setAccountPagination: (x) => set(() => ({ accountPagination: x })),
+			plaidReturnToUrl: "",
+			setPlaidReturnToUrl: (x) => set(() => ({ plaidReturnToUrl: x })),
+			plaidReceivedRedirectUri: "",
+			setPlaidReceivedRedirectUri: (x) => set(() => ({ plaidReceivedRedirectUri: x })),
 		}),
 		{
 			name: "session-store", // name of item in the storage (must be unique)

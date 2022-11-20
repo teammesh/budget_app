@@ -7,6 +7,10 @@ export interface StoreType {
 		accountPagination: Record<string, StoreType["accountPagination"]>;
 		setAccountPagination: (x: Record<string, StoreType["accountPagination"]>) => void;
 		updateAccountPagination: (x: Record<string, StoreType["accountPagination"]>) => void;
+		plaidReturnToUrl: string;
+		setPlaidReturnToUrl: (x: string) => void;
+		plaidReceivedRedirectUri: string;
+		setPlaidReceivedRedirectUri: (x: string) => void;
 	};
 	tempStore: {
 		accounts: Record<string, AccountType>;
