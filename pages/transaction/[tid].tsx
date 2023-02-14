@@ -163,6 +163,16 @@ const Transaction = ({
 						</div>
 					</PrimaryBox>
 				)}
+				{!isEditing && (
+					<PrimaryBox>
+						<div className="flex justify-between">
+							<div className="font-medium text-sm">Notes</div>
+						</div>
+						<div className="font-mono font-medium text-sm tracking-tight text-gray-500">
+							{transaction?.notes || "Edit transaction to add notes"}
+						</div>
+					</PrimaryBox>
+				)}
 			</Content>
 			{isEditing ? (
 				<div className={"grid grid-cols-[auto_1fr] gap-2 pt-3 px-3"}>
