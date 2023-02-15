@@ -64,7 +64,7 @@ const Transaction = ({
 		await supabase
 			.from("shared_transactions")
 			.delete()
-			.eq("transaction_id", transaction.transaction_id);
+			.eq("id", transaction.id);
 		router.push(`/group/${transaction.groups.id}`);
 	};
 
@@ -79,7 +79,7 @@ const Transaction = ({
 				supabase
 					.from("shared_transactions")
 					.upsert(req)
-					.eq("transaction_id", transaction.transaction_id),
+					.eq("id", transaction.id),
 			true,
 		);
 

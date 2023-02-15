@@ -1320,6 +1320,7 @@ export interface definitions {
 		 * This is a Foreign Key to `groups.id`.<fk table='groups' column='id'/>
 		 */
 		group_id: string;
+		notes: string;
 		/** Format: jsonb */
 		split_amounts?: any;
 	};
