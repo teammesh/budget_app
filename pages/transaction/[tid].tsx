@@ -106,6 +106,7 @@ const Transaction = ({
 						<ArrowLeftIcon />
 						Return
 					</Button>
+					{transaction.is_deleted && <div className="flex self-center font-large text-lg text-red-600">Deleted</div>}
 					<Button
 						size={"sm"}
 						style={{ background: theme.colors.gradient.a }}
@@ -189,6 +190,7 @@ const Transaction = ({
 						size={"sm"}
 						background={theme.colors.gradient.a}
 						onClick={() => setIsEditing(true)}
+						disabled={transaction.is_deleted}
 					>
 						<Pencil1Icon /> Edit transaction
 					</Button>
