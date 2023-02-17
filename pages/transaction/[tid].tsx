@@ -111,6 +111,7 @@ const Transaction = ({
 						size={"sm"}
 						style={{ background: theme.colors.gradient.a }}
 						onClick={deleteTransaction}
+						disabled={transaction.is_deleted}
 					>
 						<TrashIcon />
 						Delete
