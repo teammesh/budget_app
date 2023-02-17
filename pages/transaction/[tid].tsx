@@ -63,7 +63,7 @@ const Transaction = ({
 	const deleteTransaction = async () => {
 		await supabase
 			.from("shared_transactions")
-			.delete()
+			.update({ "is_deleted": true })
 			.eq("id", transaction.id);
 		router.push(`/group/${transaction.groups.id}`);
 	};
