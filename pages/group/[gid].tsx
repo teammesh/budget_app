@@ -172,6 +172,7 @@ const Group = ({
 				supabase
 					.from("shared_transactions")
 					.select("*, profiles(username, avatar_url)")
+					.neq("is_deleted", false)
 					.eq("group_id", gid),
 			true,
 		);
@@ -343,6 +344,7 @@ export async function getServerSideProps({
 	const { data: transactions, error } = await supabase
 		.from("shared_transactions")
 		.select("*, profiles(username, avatar_url)")
+		.neq("is_deleted", false)
 		.eq("group_id", gid);
 
 	const { data: users } = await supabase
