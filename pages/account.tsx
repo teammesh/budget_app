@@ -86,7 +86,7 @@ export default function Account({
 			<div className="grid grid-cols-1 gap-4 pt-4">
 				<ProfileAvatarUpload
 					avatarUrl={profile.avatar_url}
-					avatarName={profile.username}
+					avatarName={profile.username || profile.id}
 					profileId={profile.id}
 				/>
 				<Field>

@@ -97,7 +97,7 @@ export const AvatarUpload = ({
 			{isLoading ? (
 				<Loading />
 			) : (
-				<Avatar avatarName={avatarName} avatarUrl={newAvatarURL} size={128} variant={"marble"} />
+				<Avatar avatarName={avatarName} avatarUrl={newAvatarURL} size={128} variant={"beam"} />
 			)}
 			<div className="mt-3">
 				<Dialog.Root>
@@ -115,7 +115,7 @@ export const AvatarUpload = ({
 								avatarName={avatarName}
 								avatarUrl={localAvatarURL}
 								size={128}
-								variant={"marble"}
+								variant={"beam"}
 							/>
 						</div>
 						<input type="file" name="avatar" onChange={uploadToClient} />
