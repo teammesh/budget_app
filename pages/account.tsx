@@ -4,7 +4,7 @@ import { verifyUser } from "@/utils/ssr";
 import { AuthUser } from "@supabase/supabase-js";
 import { definitions } from "../types/supabase";
 import { RequestData } from "next/dist/server/web/types";
-import { tempStore } from "@/utils/store";
+import { tempStore, uiStore } from "@/utils/store";
 import { Button } from "@/components/Button";
 import theme from "@/styles/theme";
 import { ArrowLeftIcon, ExitIcon } from "@radix-ui/react-icons";
@@ -15,6 +15,18 @@ import { Content } from "@/components/Main";
 import { NextApiResponse } from "next";
 import { ProfileAvatarUpload } from "@/components/ProfileAvatarUpload";
 import { useEffect } from "react";
+import Toast from "@/components/Toast";
+import create from "zustand";
+
+interface StoreState {
+	showToast: boolean;
+	setShowToast: (x: boolean) => void;
+}
+
+const store = create<StoreState>((set, get) => ({
+	showToast: false,
+	setShowToast: (x) => set(() => ({ showToast: x })),
+}));
 
 export default function Account({
 	user,
@@ -27,20 +39,18 @@ export default function Account({
 
 	useEffect(() => {
 		tempStore.getState().setUsername(profile.username ? profile.username : "");
-		tempStore.getState().setWebsite(profile.website ? profile.website : "");
 		tempStore.getState().setAvatarUrl(profile.avatar_url ? profile.avatar_url : "");
 	}, []);
 
 	async function updateProfile() {
 		const username = tempStore.getState().username;
-		const website = tempStore.getState().website;
 		const avatar_url = tempStore.getState().avatarUrl;
+		uiStore.getState().setGlobalLoading(true);
 
 		try {
 			const updates = {
 				id: user.id,
 				username,
-				website,
 				avatar_url,
 				updated_at: new Date(),
 			};
@@ -52,10 +62,21 @@ export default function Account({
 			if (error && error.code === "23505") {
 				alert("Woops, username is already taken.");
 			}
+
+			uiStore.getState().setGlobalLoading(false);
+			store.getState().setShowToast(true);
 		} catch (error: any) {
 			alert(error.message);
 		}
 	}
+
+	const SavedSuccessfulToast = () => {
+		const showToast = store((state) => state.showToast);
+		const setShowToast = store.getState().setShowToast;
+
+		return <Toast open={showToast} setOpen={setShowToast} title={"Profile saved"} />;
+	};
+
 
 	return (
 		<Content className={"grid grid-cols-1 gap-8"}>
@@ -100,6 +121,7 @@ export default function Account({
 					Update
 				</Button>
 			</div>
+			<SavedSuccessfulToast/>
 		</Content>
 	);
 }
