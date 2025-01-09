@@ -1,7 +1,7 @@
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { supabase, supabaseQuery } from "@/utils/supabaseClient";
-import AddTransactions from "@/components/AddTransactions";
+import AddTransactions from "@/components/AddTransactions/AddTransactions";
 import * as R from "ramda";
 import { tempStore, uiStore } from "@/utils/store";
 import { verifyUser } from "@/utils/ssr";

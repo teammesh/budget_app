@@ -10,6 +10,7 @@ export const Button = forwardRef(
 			border,
 			onClick = () => {},
 			disabled = false,
+			id,
 			...props
 		}: {
 			children: any;
@@ -20,11 +21,13 @@ export const Button = forwardRef(
 			border?: any;
 			onClick?: any;
 			disabled?: boolean;
+			id?: string;
 		},
 		ref,
 	) => (
 		<button
 			className={"p-0.5 rounded-full text-sm"}
+			id={id}
 			style={
 				disabled
 					? style
