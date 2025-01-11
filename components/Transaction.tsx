@@ -3,8 +3,8 @@ import * as Avatar from "@radix-ui/react-avatar";
 import { tempStore } from "@/utils/store";
 import * as R from "ramda";
 import { supabase } from "@/utils/supabaseClient";
-import { displayAmount } from "./Amount";
-import { definitions } from "../types/supabase";
+import { displayAmount } from "@/components/Amount";
+import { definitions } from "@/types/supabase";
 import { TRANSACTION_METADATA } from "@/constants/components.constants";
 
 export const Transaction = ({
