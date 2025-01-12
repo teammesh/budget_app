@@ -1,26 +1,6 @@
-import fs from "fs";
 import type { NextApiRequest, NextApiResponse } from "next";
-import { Agent } from "undici";
-
-// {
-// 	"enrollment_id" : "enr_oiin624rqaojse22oe000",
-// 	"links" : {
-// 	"balances" : "https://api.teller.io/accounts/acc_oiin624kqjrg2mp2ea000/balances",
-// 		"self" : "https://api.teller.io/accounts/acc_oiin624kqjrg2mp2ea000",
-// 		"transactions" : "https://api.teller.io/accounts/acc_oiin624kqjrg2mp2ea000/transactions"
-// },
-// 	"institution" : {
-// 	"name" : "Security Credit Union",
-// 		"id" : "security_cu"
-// },
-// 	"type" : "credit",
-// 	"name" : "Platinum Card",
-// 	"subtype" : "credit_card",
-// 	"currency" : "USD",
-// 	"id" : "acc_oiin624kqjrg2mp2ea000",
-// 	"last_four" : "7857",
-// 	"status" : "open"
-// }
+import { supabase } from "@/utils/supabaseClient";
+import { tellerApiRequest } from "@/utils/teller";
 
 type TellerAccount = {
 	enrollment_id: string;
@@ -41,31 +21,6 @@ type TellerAccount = {
 	last_four: string;
 	status: string;
 }
-
-const tellerApiRequest = async (endpoint: string, options: any) => {
-	const response =await fetch(`https://api.teller.io/${endpoint}`, {
-		// @ts-ignore
-		dispatcher: new Agent({
-			connect: {
-				cert: fs.readFileSync(process.env.TELLER_CLIENT_CERT_PATH!),
-				key: fs.readFileSync(process.env.TELLER_CLIENT_KEY_PATH!),
-			},
-		}),
-		method: options.method,
-		headers: {
-			"Authorization": `Basic ${Buffer.from(options.access_token + ":").toString("base64")}`,
-			"Content-Type": "application/json",
-		},
-	});
-
-	if (!response.ok) {
-		const errorBody = await response.text();
-		console.error(`API Error: ${response.status} - ${errorBody}`);
-		throw new Error(`Teller API request failed: ${response.statusText}`);
-	}
-
-	return response.json();
-};
 
 const fetchTellerAccounts = async (accessToken: string) => {
 	try {
@@ -92,16 +47,29 @@ const fetchTellerAccount = async (accessToken: string, accountId: string) => {
 };
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-	const { access_token, account_id } = JSON.parse(req.body);
+	const { access_token, account_id, profile_id } = JSON.parse(req.body);
 
 	try {
+
 		// Fetch transactions using tellerApiRequest
-		const tellerTransactions : TellerAccount = await tellerApiRequest(
+		const tellerAccounts : TellerAccount[] = await tellerApiRequest(
 			`accounts`,
 			{ method: "GET", access_token },
 		);
 
-		res.status(200).json(tellerTransactions);
+		const formattedAccounts = tellerAccounts.map((account) => ({
+			account_id: account.id,
+			account_name: account.name,
+			account_subtype: account.subtype,
+			account_type: account.type,
+			enrollment_id: account.enrollment_id,
+			last_four: account.last_four,
+			profile_id,
+		}));
+
+		const accounts = await supabase.from("teller_accounts").upsert(formattedAccounts, { onConflict: "account_id" });
+
+		res.status(200).json(accounts);
 	} catch (error: any) {
 		console.error("Teller Transactions Error:", error);
 

@@ -341,6 +341,7 @@ export type Database = {
           charged_to: string
           created_at: string
           date: string | null
+          description: string | null
           group_id: string
           id: string
           is_deleted: boolean
@@ -364,6 +365,7 @@ export type Database = {
           charged_to: string
           created_at?: string
           date?: string | null
+          description?: string | null
           group_id: string
           id?: string
           is_deleted?: boolean
@@ -387,6 +389,7 @@ export type Database = {
           charged_to?: string
           created_at?: string
           date?: string | null
+          description?: string | null
           group_id?: string
           id?: string
           is_deleted?: boolean

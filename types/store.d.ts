@@ -1,4 +1,5 @@
 import { definitions } from "./supabase";
+import { Database } from "@/types/database.types";
 
 export interface StoreType {
 	sessionStore: {
@@ -82,7 +83,7 @@ export interface StoreType {
 	};
 }
 
-export type AccountType = definitions["plaid_items"] & {
+export type AccountType = Database["teller_accounts"] & {
 	invalid?: boolean;
 };
 

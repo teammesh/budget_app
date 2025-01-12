@@ -6,6 +6,7 @@ import { tempStore } from "@/utils/store";
 import { supabase } from "@/utils/supabaseClient";
 import Script from "next/script";
 import { AccountType } from "@/types/store";
+import * as R from "ramda";
 
 declare global {
 	interface Window {
@@ -69,9 +70,10 @@ export const TellerConnect = () => {
 
 				// Fetch accounts
 				const accounts = await fetch("/api/tellerGetAccounts", {
-					method: "GET",
+					method: "POST",
 					body: JSON.stringify({
-						access_token: accessToken,
+						access_token: R.values(tempStore.getState().tellerAuth)[0].access_token,
+						profile_id: supabase.auth.session()?.user?.id,
 					}),
 				});
 
@@ -92,7 +94,7 @@ export const TellerConnect = () => {
 			onExit: () => {
 				console.log("User closed Teller Connect");
 			},
-			onFailure: (error) => {
+			onFailure: (error: any) => {
 				console.error("Teller Connect enrollment failed:", error);
 			},
 		});

@@ -53,7 +53,7 @@ export const getTransactions = async (
 	let allTransactions = tempStore.getState().userTransactions;
 
 	const tellerTransactions = await fetch("/api/tellerGetTransactions", {
-		method: "post",
+		method: "POST",
 		body: JSON.stringify({
 			access_token,
 			account_id,
@@ -93,9 +93,11 @@ export const getTransactions = async (
 
 		const mergeTransactions = R.concat(R.values(allTransactions), newTellerTransactions);
 		const sortTransactions = R.reverse(sortByDate(mergeTransactions));
+
 		allTransactions = R.indexBy(R.prop("transaction_id"), sortTransactions);
 	}
 
+	// console.log(allTransactions);
 	setUserTransactions(allTransactions);
 	return allTransactions;
 };

@@ -2,16 +2,15 @@
 import { supabase } from "@/utils/supabaseClient";
 import { tempStore } from "@/utils/store";
 import * as R from "ramda";
-import { definitions } from "@/types/supabase";
 import { getTransactions } from "./transactionService";
 
-export const fetchAccounts = async () => {
+export const fetchAccounts = async (setShowAccounts) => {
 	const profile_id = supabase.auth.session()?.user?.id;
 	const setAccounts = tempStore.getState().setAccounts;
 
 	try {
 		const { data, error } = await supabase
-			.from<definitions["plaid_items"]>("plaid_items")
+			.from("teller_accounts")
 			.select()
 			.eq("profile_id", profile_id);
 
@@ -23,7 +22,8 @@ export const fetchAccounts = async () => {
 
 			// Automatically fetch transactions for the first account
 			if (data[0]) {
-				await getTransactions(data[0].access_token, data[0].account_id);
+				await getTransactions(R.values(tempStore.getState().tellerAuth)[0].access_token, data[0].account_id);
+				setShowAccounts([data[0].account_id]);
 			}
 
 			return indexedAccounts;

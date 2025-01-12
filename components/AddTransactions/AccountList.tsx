@@ -8,16 +8,19 @@ import { ModalContent } from "@/components/Modal";
 import { ExclamationTriangleIcon, ArrowLeftIcon, ExitIcon } from "@radix-ui/react-icons";
 import theme from "@/styles/theme";
 import { AccountType } from "@/types/store";
+import { tempStore } from "@/utils/store";
 
 interface AccountListProps {
 	accounts: Record<string, AccountType>;
 	showAccounts: string[];
-	getTransactions: (access_token: string, account_id: string) => Promise<void>;
+	getTransactions: (access_token: string, account_id: string) => void;
 	setShowAccounts: React.Dispatch<React.SetStateAction<string[]>>;
 }
 
 export const AccountList: React.FC<AccountListProps> = ({ accounts, showAccounts, getTransactions, setShowAccounts }) => {
 	const renderAccount = (account: AccountType) => {
+		const access_token = tempStore.getState().tellerAuth[account.enrollment_id].access_token;
+
 		if (account.invalid) {
 			return (
 				<Dialog.Root key={account.account_id}>
@@ -26,10 +29,10 @@ export const AccountList: React.FC<AccountListProps> = ({ accounts, showAccounts
 							<Toggle checked={showAccounts.includes(account.account_id)} />
 							<div className="grid grid-cols-[auto_auto] gap-2 items-center place-content-start text-ellipsis overflow-hidden whitespace-nowrap">
 								<ExclamationTriangleIcon color={theme.colors.avatar[0]} />
-								{account.name}
+								{account.account_name}
 							</div>
 							<span className="font-mono font-medium tracking-tight text-gray-500">
-                •••• {account.last_four_digits}
+                •••• {account.last_four}
               </span>
 						</div>
 					</Dialog.Trigger>
@@ -63,16 +66,16 @@ export const AccountList: React.FC<AccountListProps> = ({ accounts, showAccounts
 
 		return (
 			<div
-				className="grid grid-cols-[auto_1fr_auto] items-center justify-between content-center gap-3 py-1"
-				onClick={() => getTransactions(account.access_token, account.account_id)}
+				className="grid grid-cols-[auto_1fr_auto] items-center justify-between content-center gap-3 py-1 cursor-pointer"
+				onClick={() => getTransactions(access_token, account.account_id)}
 				key={account.account_id}
 			>
 				<Toggle checked={showAccounts.includes(account.account_id)} />
 				<div className="text-ellipsis overflow-hidden whitespace-nowrap">
-					{account.name}
+					{account.account_name}
 				</div>
 				<span className="font-mono font-medium tracking-tight text-gray-500">
-          •••• {account.last_four_digits}
+          •••• {account.last_four}
         </span>
 			</div>
 		);

@@ -20,10 +20,10 @@ export const Transaction = ({
 	const addTransactions = tempStore((state) => state.addTransactions);
 
 	const isShared = R.any(
-		(y) => transaction.id === y.id,
+		(y) => transaction.transaction_id === y.transaction_id,
 		R.values(sharedTransactions),
 	);
-	const isAdded = addTransactions.find((y) => transaction.id === y.id);
+	const isAdded = addTransactions.find((y) => transaction.transaction_id === y.transaction_id);
 	const profile_id = supabase.auth.session()?.user?.id || "";
 
 	const shareTransaction = async (
@@ -38,7 +38,7 @@ export const Transaction = ({
 
 		if (isAdded)
 			return setAddTransactions(
-				addTransactions.filter((x) => x.id !== transaction.id),
+				addTransactions.filter((x) => x.transaction_id !== transaction.transaction_id),
 			);
 
 		const metadata = R.pick(TRANSACTION_METADATA, transaction);

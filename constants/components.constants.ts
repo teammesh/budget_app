@@ -10,20 +10,16 @@ export const EDIT_TRANSACTION_AMOUNT_MODE = {
 };
 
 export const TRANSACTION_METADATA = [
+	"transaction_id",
 	"account_id",
 	"amount",
-	"authorized_date",
-	"category",
-	"category_id",
 	"date",
-	"location",
-	"merchant_name",
 	"name",
-	"payment_channel",
-	"payment_meta",
+	"merchant_name",
+	"category",
 	"pending",
-	"transaction_id",
 	"transaction_type",
+	"description",
 ];
 
 export const TRANSACTION_PAGINATION_COUNT = 50;

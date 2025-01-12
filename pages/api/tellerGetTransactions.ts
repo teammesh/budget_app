@@ -1,6 +1,5 @@
-import https from "https";
-import fs from "fs";
 import type { NextApiRequest, NextApiResponse } from "next";
+import { tellerApiRequest } from "@/utils/teller";
 
 type TellerTransaction = {
 	running_balance: number | null;
@@ -24,34 +23,6 @@ type TellerTransaction = {
 	type: string;
 	status: string;
 }
-
-const tellerApiRequest = async (endpoint: string, options: any) => {
-	const httpsAgent = new https.Agent({
-		cert: fs.readFileSync(process.env.TELLER_CLIENT_CERT_PATH!),
-		key: fs.readFileSync(process.env.TELLER_CLIENT_KEY_PATH!),
-		rejectUnauthorized: true,
-	});
-
-	const requestOptions = {
-		...options,
-		agent: httpsAgent,
-		headers: {
-			...options.headers,
-			"Authorization": `Basic ${Buffer.from(options.access_token + ":").toString("base64")}`,
-			"Content-Type": "application/json",
-		},
-	};
-
-	const response = await fetch(`https://api.teller.io${endpoint}`, requestOptions);
-
-	if (!response.ok) {
-		const errorBody = await response.text();
-		console.error(`API Error: ${response.status} - ${errorBody}`);
-		throw new Error(`Teller API request failed: ${response.statusText}`);
-	}
-
-	return response.json();
-};
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
 	const { access_token, account_id, start_date, end_date, offset, count } = JSON.parse(req.body);

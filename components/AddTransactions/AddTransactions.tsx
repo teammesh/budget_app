@@ -7,7 +7,6 @@ import theme from "@/styles/theme";
 import { ArrowLeftIcon } from "@radix-ui/react-icons";
 import { Header, TextGradient } from "@/components/text";
 import { Loading } from "@/components/Loading";
-import Script from "next/script";
 import { Content } from "@/components/Main";
 import { definitions } from "@/types/supabase";
 
@@ -33,12 +32,16 @@ export default function AddTransactions({ gid, setShowAddTransactions, groupUser
 	useEffect(() => {
 		const initializeAccounts = async () => {
 			await fetchTellerAuth();
-			// await fetchAccounts();
+			await fetchAccounts(setShowAccounts);
 			setIsLoading(false);
 		};
 
 		initializeAccounts();
 	}, []);
+
+	useEffect(() => {
+		console.log(userTransactions);
+	}, [userTransactions]);
 
 	const handleGetTransactions = async (access_token: string, account_id: string) => {
 		if (showAccounts.includes(account_id)) {
@@ -49,25 +52,9 @@ export default function AddTransactions({ gid, setShowAddTransactions, groupUser
 		}
 	};
 
-	const connectAccounts = async () => {
-		const accounts = await fetch("/api/tellerGetAccounts", {
-			method: "POST",
-			body: JSON.stringify({
-				access_token: Object.values(tempStore.getState().tellerAuth)[0].access_token,
-			}),
-		});
-	};
-
 	return (
 		<>
 			<Content id="transactions">
-				<Button
-					size="sm"
-					style={{ background: theme.colors.gradient.a }}
-					onClick={connectAccounts}
-				>
-					Hello
-				</Button>
 				<div className="flex justify-between">
 					<Button
 						size="sm"
@@ -102,7 +89,7 @@ export default function AddTransactions({ gid, setShowAddTransactions, groupUser
 										<Transaction
 											gid={gid}
 											transaction={transaction}
-											key={transaction.id}
+											key={transaction.transaction_id}
 											groupUsers={groupUsers}
 										/>
 									),
