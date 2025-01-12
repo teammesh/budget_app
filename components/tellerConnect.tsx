@@ -47,7 +47,7 @@ export const TellerConnect = () => {
 		tellerConnect.current = window.TellerConnect.setup({
 			applicationId: process.env.NEXT_PUBLIC_TELLER_APP_ID,
 			products: ["transactions", "balance", "identity"],
-			environment: "development", // or "production" as needed
+			environment: "sandbox", // or "production" as needed
 			onSuccess: async (enrollment : TellerConnectEnrollment) => {
 				// Handle successful enrollment
 				const { accessToken, user, enrollment: tellerEnrollment } = enrollment;
@@ -72,7 +72,7 @@ export const TellerConnect = () => {
 				const accounts = await fetch("/api/tellerGetAccounts", {
 					method: "POST",
 					body: JSON.stringify({
-						access_token: R.values(tempStore.getState().tellerAuth)[0].access_token,
+						access_token: accessToken,
 						profile_id: supabase.auth.session()?.user?.id,
 					}),
 				});
