@@ -11,6 +11,8 @@ export interface StoreType {
 	tempStore: {
 		accounts: Record<string, AccountType>;
 		setAccounts: (x: Record<string, AccountType>) => void;
+		tellerAuth: Record<string, definitions["teller_auth"]>;
+		setTellerAuth: (x: Record<string, definitions["teller_auth"]>) => void;
 		userTransactions: Record<
 			definitions["plaid_items"]["item_id"],
 			definitions["shared_transactions"]

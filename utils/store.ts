@@ -25,6 +25,8 @@ export const sessionStore = create<StoreType["sessionStore"]>(
 export const tempStore = create<StoreType["tempStore"]>((set, get) => ({
 	accounts: {},
 	setAccounts: (x) => set(() => ({ accounts: x })),
+	tellerAuth: {},
+	setTellerAuth: (x) => set(() => ({ tellerAuth: x })),
 	userTransactions: {},
 	setUserTransactions: (x) => set(() => ({ userTransactions: x })),
 	updateUserTransactions: (x) =>

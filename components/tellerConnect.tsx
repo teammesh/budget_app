@@ -5,6 +5,7 @@ import { Button } from "@/components/Button";
 import { tempStore } from "@/utils/store";
 import { supabase } from "@/utils/supabaseClient";
 import Script from "next/script";
+import { AccountType } from "@/types/store";
 
 declare global {
 	interface Window {
@@ -45,19 +46,20 @@ export const TellerConnect = () => {
 		tellerConnect.current = window.TellerConnect.setup({
 			applicationId: process.env.NEXT_PUBLIC_TELLER_APP_ID,
 			products: ["transactions", "balance", "identity"],
-			environment: "development", // or "production" as needed
+			environment: "sandbox", // or "production" as needed
 			onSuccess: async (enrollment : TellerConnectEnrollment) => {
 				// Handle successful enrollment
 				const { accessToken, user, enrollment: tellerEnrollment } = enrollment;
 
 				// Save the enrollment to Supabase
 				const { data, error } = await supabase
-					.from("plaid_items")
+					.from("teller_auth")
 					.insert({
 						profile_id: supabase.auth.session()?.user?.id,
 						access_token: accessToken,
-						name: tellerEnrollment.institution.name,
-						account_id: user.id,
+						institution_name: tellerEnrollment.institution.name,
+						enrollment_id: tellerEnrollment.id,
+						user_id: user.id,
 					});
 
 				if (error) {
@@ -65,16 +67,27 @@ export const TellerConnect = () => {
 					return;
 				}
 
-				// Update local state
-				const accounts = tempStore.getState().accounts;
-				tempStore.getState().setAccounts({
-					...accounts,
-					[user.id]: {
+				// Fetch accounts
+				const accounts = await fetch("/api/tellerGetAccounts", {
+					method: "GET",
+					body: JSON.stringify({
 						access_token: accessToken,
-						account_id: user.id,
-						name: tellerEnrollment.institution.name,
-					},
+					}),
 				});
+
+				console.log("Fetched accounts:", accounts);
+
+				// Update local state
+				// const accounts = tempStore.getState().accounts;
+				// const newAccounts = {
+				// 	...accounts,
+				// 	[user.id]: {
+				// 		access_token: accessToken,
+				// 		account_id: user.id,
+				// 		name: tellerEnrollment.institution.name,
+				// 	},
+				// } as Record<string, AccountType>;
+				// tempStore.getState().setAccounts(newAccounts);
 			},
 			onExit: () => {
 				console.log("User closed Teller Connect");

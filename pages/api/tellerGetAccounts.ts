@@ -1,6 +1,6 @@
-import https from "https";
 import fs from "fs";
 import type { NextApiRequest, NextApiResponse } from "next";
+import { Agent } from "undici";
 
 // {
 // 	"enrollment_id" : "enr_oiin624rqaojse22oe000",
@@ -43,23 +43,20 @@ type TellerAccount = {
 }
 
 const tellerApiRequest = async (endpoint: string, options: any) => {
-	const httpsAgent = new https.Agent({
-		cert: fs.readFileSync(process.env.TELLER_CLIENT_CERT_PATH!),
-		key: fs.readFileSync(process.env.TELLER_CLIENT_KEY_PATH!),
-		rejectUnauthorized: true,
-	});
-
-	const requestOptions = {
-		...options,
-		agent: httpsAgent,
+	const response =await fetch(`https://api.teller.io/${endpoint}`, {
+		// @ts-ignore
+		dispatcher: new Agent({
+			connect: {
+				cert: fs.readFileSync(process.env.TELLER_CLIENT_CERT_PATH!),
+				key: fs.readFileSync(process.env.TELLER_CLIENT_KEY_PATH!),
+			},
+		}),
+		method: options.method,
 		headers: {
-			...options.headers,
 			"Authorization": `Basic ${Buffer.from(options.access_token + ":").toString("base64")}`,
 			"Content-Type": "application/json",
 		},
-	};
-
-	const response = await fetch(`https://api.teller.io${endpoint}`, requestOptions);
+	});
 
 	if (!response.ok) {
 		const errorBody = await response.text();
@@ -72,7 +69,7 @@ const tellerApiRequest = async (endpoint: string, options: any) => {
 
 const fetchTellerAccounts = async (accessToken: string) => {
 	try {
-		return await tellerApiRequest("/accounts", {
+		return await tellerApiRequest("accounts", {
 			method: "GET",
 			access_token: accessToken,
 		});
@@ -84,7 +81,7 @@ const fetchTellerAccounts = async (accessToken: string) => {
 
 const fetchTellerAccount = async (accessToken: string, accountId: string) => {
 	try {
-		return await tellerApiRequest(`/accounts/${accountId}`, {
+		return await tellerApiRequest(`accounts/${accountId}`, {
 			method: "GET",
 			access_token: accessToken,
 		});
@@ -100,7 +97,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 	try {
 		// Fetch transactions using tellerApiRequest
 		const tellerTransactions : TellerAccount = await tellerApiRequest(
-			`/accounts`,
+			`accounts`,
 			{ method: "GET", access_token },
 		);
 

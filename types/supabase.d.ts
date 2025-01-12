@@ -1179,9 +1179,36 @@ export interface definitions {
 		/** Format: text */
 		account_id: string;
 		/** Format: text */
-		name?: string;
+		institution_name?: string;
 		/** Format: smallint */
 		last_four_digits?: number;
+	};
+	teller_auth: {
+		/**
+		 * Format: bigint
+		 * @description Note:
+		 * This is a Primary Key.<pk/>
+		 */
+		id: number;
+		/**
+		 * Format: timestamp with time zone
+		 * @default now()
+		 */
+		created_at?: string;
+		/** Format: text */
+		enrollment_id: string;
+		/** Format: text */
+		access_token: string;
+		/**
+		 * Format: uuid
+		 * @description Note:
+		 * This is a Foreign Key to `profiles.id`.<fk table='profiles' column='id'/>
+		 */
+		profile_id: string;
+		/** Format: text */
+		user_id: string;
+		/** Format: text */
+		institution_name?: string;
 	};
 	groups: {
 		/**

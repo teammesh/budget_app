@@ -17,6 +17,7 @@ import { AccountList } from "@/components/AddTransactions/AccountList";
 import { TransactionToolbar } from "@/components/AddTransactions/TransactionToolbar";
 import { Transaction } from "@/components/Transaction";
 import { TellerConnect } from "@/components/tellerConnect";
+import { fetchTellerAuth } from "@/services/tellerAuthService";
 
 export default function AddTransactions({ gid, setShowAddTransactions, groupUsers }: {
 	gid: string;
@@ -31,7 +32,8 @@ export default function AddTransactions({ gid, setShowAddTransactions, groupUser
 
 	useEffect(() => {
 		const initializeAccounts = async () => {
-			await fetchAccounts();
+			await fetchTellerAuth();
+			// await fetchAccounts();
 			setIsLoading(false);
 		};
 
@@ -47,9 +49,25 @@ export default function AddTransactions({ gid, setShowAddTransactions, groupUser
 		}
 	};
 
+	const connectAccounts = async () => {
+		const accounts = await fetch("/api/tellerGetAccounts", {
+			method: "POST",
+			body: JSON.stringify({
+				access_token: Object.values(tempStore.getState().tellerAuth)[0].access_token,
+			}),
+		});
+	};
+
 	return (
 		<>
 			<Content id="transactions">
+				<Button
+					size="sm"
+					style={{ background: theme.colors.gradient.a }}
+					onClick={connectAccounts}
+				>
+					Hello
+				</Button>
 				<div className="flex justify-between">
 					<Button
 						size="sm"
