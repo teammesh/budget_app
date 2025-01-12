@@ -4,7 +4,7 @@ import { tempStore } from "@/utils/store";
 import * as R from "ramda";
 import { getTransactions } from "./transactionService";
 
-export const fetchAccounts = async (setShowAccounts) => {
+export const fetchAccounts = async (setShowAccounts: any) => {
 	const profile_id = supabase.auth.session()?.user?.id;
 	const setAccounts = tempStore.getState().setAccounts;
 

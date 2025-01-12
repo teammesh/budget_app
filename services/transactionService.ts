@@ -91,7 +91,7 @@ export const getTransactions = async (
 			tellerTransactions.transactions,
 		);
 
-		const mergeTransactions = R.concat(R.values(allTransactions), newTellerTransactions);
+		const mergeTransactions = R.concat(R.values(allTransactions), newTellerTransactions as any);
 		const sortTransactions = R.reverse(sortByDate(mergeTransactions));
 
 		allTransactions = R.indexBy(R.prop("transaction_id"), sortTransactions);

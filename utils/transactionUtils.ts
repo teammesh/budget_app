@@ -25,7 +25,7 @@ export const processTransactions = (
 
 	const mergedTransactions = R.concat(
 		R.values(tempStore.getState().userTransactions),
-		processedTransactions,
+		processedTransactions as any,
 	);
 
 	const sortedTransactions = R.reverse(sortByDate(mergedTransactions));
