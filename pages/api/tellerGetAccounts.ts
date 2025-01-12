@@ -67,9 +67,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 			profile_id,
 		}));
 
-		const accounts = await supabase.from("teller_accounts").upsert(formattedAccounts, { onConflict: "account_id" });
+		const { data } = await supabase.from("teller_accounts").upsert(formattedAccounts, { onConflict: "account_id" });
 
-		res.status(200).json(accounts);
+		res.status(200).json(data);
 	} catch (error: any) {
 		console.error("Teller Transactions Error:", error);
 

@@ -1,6 +1,6 @@
 // AddTransactions.tsx
 import React, { useEffect, useState } from "react";
-import { tempStore } from "@/utils/store";
+import { tempStore, uiStore } from "@/utils/store";
 import * as R from "ramda";
 import { Button } from "@/components/Button";
 import theme from "@/styles/theme";
@@ -8,7 +8,6 @@ import { ArrowLeftIcon } from "@radix-ui/react-icons";
 import { Header, TextGradient } from "@/components/text";
 import { Loading } from "@/components/Loading";
 import { Content } from "@/components/Main";
-import { definitions } from "@/types/supabase";
 
 import { fetchAccounts } from "@/services/accountService";
 import { getTransactions } from "@/services/transactionService";
@@ -23,8 +22,9 @@ export default function AddTransactions({ gid, setShowAddTransactions, groupUser
 	setShowAddTransactions: (show: boolean) => void;
 	groupUsers: any;
 }) {
-	const [showAccounts, setShowAccounts] = useState<definitions["plaid_items"]["account_id"][]>([]);
 	const [isLoading, setIsLoading] = useState<boolean>(true);
+	const showAccounts = uiStore((state) => state.showAccounts);
+	const setShowAccounts = uiStore.getState().setShowAccounts;
 
 	const userTransactions = tempStore((state) => state.userTransactions);
 	const accounts = tempStore((state) => state.accounts);
@@ -32,16 +32,12 @@ export default function AddTransactions({ gid, setShowAddTransactions, groupUser
 	useEffect(() => {
 		const initializeAccounts = async () => {
 			await fetchTellerAuth();
-			await fetchAccounts(setShowAccounts);
+			await fetchAccounts();
 			setIsLoading(false);
 		};
 
 		initializeAccounts();
 	}, []);
-
-	useEffect(() => {
-		console.log(userTransactions);
-	}, [userTransactions]);
 
 	const handleGetTransactions = async (access_token: string, account_id: string) => {
 		if (showAccounts.includes(account_id)) {
@@ -73,7 +69,6 @@ export default function AddTransactions({ gid, setShowAddTransactions, groupUser
 					accounts={accounts}
 					showAccounts={showAccounts}
 					getTransactions={handleGetTransactions}
-					setShowAccounts={setShowAccounts}
 				/>
 
 				<div className="mt-6">

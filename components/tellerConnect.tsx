@@ -4,6 +4,9 @@ import { PlusIcon } from "@radix-ui/react-icons";
 import { Button } from "@/components/Button";
 import { supabase } from "@/utils/supabaseClient";
 import Script from "next/script";
+import { populateAccounts } from "@/services/accountService";
+import { tempStore } from "@/utils/store";
+import * as R from "ramda";
 
 declare global {
 	interface Window {
@@ -66,7 +69,7 @@ export const TellerConnect = () => {
 				}
 
 				// Fetch accounts
-				const accounts = await fetch("/api/tellerGetAccounts", {
+				const response = await fetch("/api/tellerGetAccounts", {
 					method: "POST",
 					body: JSON.stringify({
 						access_token: accessToken,
@@ -74,19 +77,14 @@ export const TellerConnect = () => {
 					}),
 				});
 
-				console.log("Fetched accounts:", accounts);
+				if (data && !R.isEmpty(data)) {
+					const indexedData = R.indexBy(R.prop("enrollment_id"), data);
+					tempStore.getState().setTellerAuth(indexedData);
+				}
 
-				// Update local state
-				// const accounts = tempStore.getState().accounts;
-				// const newAccounts = {
-				// 	...accounts,
-				// 	[user.id]: {
-				// 		access_token: accessToken,
-				// 		account_id: user.id,
-				// 		name: tellerEnrollment.institution.name,
-				// 	},
-				// } as Record<string, AccountType>;
-				// tempStore.getState().setAccounts(newAccounts);
+				const accounts = await response.json();
+				console.log("Fetched accounts:", accounts);
+				await populateAccounts(accessToken, accounts);
 			},
 			onExit: () => {
 				console.log("User closed Teller Connect");

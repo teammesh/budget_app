@@ -81,6 +81,8 @@ export const uiStore = create<StoreType["uiStore"]>((set, get) => ({
 	setShowAddTransactions: (x) => set(() => ({ showAddTransactions: x })),
 	showAddManualTransactions: false,
 	setShowAddManualTransactions: (x) => set(() => ({ showAddManualTransactions: x })),
+	showAccounts: [],
+	setShowAccounts: (x) => set(() => ({ showAccounts: x })),
 	showPayments: false,
 	setShowPayments: (x) => set(() => ({ showPayments: x })),
 	showManage: false,

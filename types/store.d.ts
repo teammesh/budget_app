@@ -64,6 +64,8 @@ export interface StoreType {
 		setShowAddTransactions: (x: boolean) => void;
 		showAddManualTransactions: boolean;
 		setShowAddManualTransactions: (x: boolean) => void;
+		showAccounts: string[];
+		setShowAccounts: (x: string[]) => void;
 		showPayments: boolean;
 		setShowPayments: (x: boolean) => void;
 		showManage: boolean;

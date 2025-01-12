@@ -1,10 +1,10 @@
 // services/accountService.ts
 import { supabase } from "@/utils/supabaseClient";
-import { tempStore } from "@/utils/store";
+import { tempStore, uiStore } from "@/utils/store";
 import * as R from "ramda";
 import { getTransactions } from "./transactionService";
 
-export const fetchAccounts = async (setShowAccounts: any) => {
+export const fetchAccounts = async () => {
 	const profile_id = supabase.auth.session()?.user?.id;
 	const setAccounts = tempStore.getState().setAccounts;
 
@@ -23,7 +23,7 @@ export const fetchAccounts = async (setShowAccounts: any) => {
 			// Automatically fetch transactions for the first account
 			if (data[0]) {
 				await getTransactions(R.values(tempStore.getState().tellerAuth)[0].access_token, data[0].account_id);
-				setShowAccounts([data[0].account_id]);
+				uiStore.getState().setShowAccounts([data[0].account_id]);
 			}
 
 			return indexedAccounts;
@@ -32,6 +32,26 @@ export const fetchAccounts = async (setShowAccounts: any) => {
 		return {};
 	} catch (error) {
 		console.error("Error fetching accounts:", error);
+		return {};
+	}
+};
+
+export const populateAccounts = async (accessToken: any, accounts: any) => {
+	const setAccounts = tempStore.getState().setAccounts;
+
+	try {
+		const indexedAccounts = R.indexBy(R.prop("account_id"), accounts);
+		setAccounts(indexedAccounts);
+
+		// Automatically fetch transactions for the first account
+		if (accounts[0]) {
+			await getTransactions(accessToken, accounts[0].account_id);
+			uiStore.getState().setShowAccounts([accounts[0].account_id]);
+		}
+
+		return indexedAccounts;
+	} catch (error) {
+		console.error("Error populating accounts:", error);
 		return {};
 	}
 };

@@ -14,10 +14,9 @@ interface AccountListProps {
 	accounts: Record<string, AccountType>;
 	showAccounts: string[];
 	getTransactions: (access_token: string, account_id: string) => void;
-	setShowAccounts: React.Dispatch<React.SetStateAction<string[]>>;
 }
 
-export const AccountList: React.FC<AccountListProps> = ({ accounts, showAccounts, getTransactions, setShowAccounts }) => {
+export const AccountList: React.FC<AccountListProps> = ({ accounts, showAccounts, getTransactions }) => {
 	const renderAccount = (account: AccountType) => {
 		const access_token = tempStore.getState().tellerAuth[account.enrollment_id].access_token;
 
