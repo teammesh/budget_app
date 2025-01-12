@@ -1,12 +1,9 @@
-import React, { useEffect } from "react";
+import React from "react";
 import theme from "@/styles/theme";
 import { PlusIcon } from "@radix-ui/react-icons";
 import { Button } from "@/components/Button";
-import { tempStore } from "@/utils/store";
 import { supabase } from "@/utils/supabaseClient";
 import Script from "next/script";
-import { AccountType } from "@/types/store";
-import * as R from "ramda";
 
 declare global {
 	interface Window {
