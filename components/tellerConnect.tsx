@@ -47,7 +47,7 @@ export const TellerConnect = () => {
 		tellerConnect.current = window.TellerConnect.setup({
 			applicationId: process.env.NEXT_PUBLIC_TELLER_APP_ID,
 			products: ["transactions", "balance", "identity"],
-			environment: "sandbox", // or "production" as needed
+			environment: "development", // or "production" as needed
 			onSuccess: async (enrollment : TellerConnectEnrollment) => {
 				// Handle successful enrollment
 				const { accessToken, user, enrollment: tellerEnrollment } = enrollment;
