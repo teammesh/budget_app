@@ -8,6 +8,9 @@ const nextConfig = {
 		images: {
 			allowFutureImage: true,
 		},
+		outputFileTracingIncludes: {
+			"/": ["./client/*"],
+		},
 	},
 };
 
