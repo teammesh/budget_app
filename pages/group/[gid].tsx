@@ -176,7 +176,10 @@ const Group = ({
 					.eq("group_id", gid),
 			true,
 		);
-		setSharedTransactions(data);
+
+		const sortedTransactions = (data && data.length > 0 && R.reverse(sortByDate(data))) || [];
+		const indexedTransactions = R.indexBy(R.prop("id"), sortedTransactions);
+		setSharedTransactions(indexedTransactions);
 	};
 
 	const fetchActivities = async () => {
